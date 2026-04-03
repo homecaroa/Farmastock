@@ -3,719 +3,499 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Almacén Farmacia — Control de Stock</title>
+<title>FarmaStock - Control de Almacen</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #f0f2f5;
-    --surface: #ffffff;
-    --border: #c8cfd8;
-    --border-dark: #8a9ab0;
-    --accent: #1a3a5c;
-    --accent2: #2563a8;
-    --highlight: #e8f0fc;
-    --highlight2: #d0e4ff;
-    --green: #0d7a4e;
-    --green-bg: #e6f5ef;
-    --red: #b91c1c;
-    --red-bg: #fee2e2;
-    --yellow: #92400e;
-    --yellow-bg: #fef3c7;
-    --text: #1a2433;
-    --text2: #4a5568;
-    --text3: #8a9ab0;
-    --zone-empty: #f7f9fc;
-    --zone-hover: #dbeafe;
-    --zone-active: #bfdbfe;
-    --zone-filled: #dcfce7;
-    --radius: 6px;
-    --shadow: 0 2px 8px rgba(26,58,92,0.10);
-    --shadow-lg: 0 8px 32px rgba(26,58,92,0.18);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-
-  /* HEADER */
-  header { background: var(--accent); color: #fff; padding: 0 20px; height: 54px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.18); position: sticky; top: 0; z-index: 200; }
-  header .logo { font-family: 'IBM Plex Mono', monospace; font-size: 1.05rem; font-weight: 600; letter-spacing: 0.08em; white-space: nowrap; }
-  header .logo span { color: #7ab8f5; }
-  header .sep { flex: 1; }
-  header .subtitle { font-size: 0.74rem; color: #a8c4e0; letter-spacing: 0.04em; }
-  .header-btns { display: flex; gap: 7px; }
-  .btn-header { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.22); border-radius: var(--radius); padding: 5px 11px; font-size: 0.73rem; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
-  .btn-header:hover { background: rgba(255,255,255,0.24); }
-  .btn-header.import { background: rgba(122,184,245,0.2); }
-  #importFileInput { display: none; }
-
-  /* LAYOUT */
-  .main-layout { display: grid; grid-template-columns: 1fr 390px; flex: 1; min-height: 0; }
-
-  /* MAP */
-  .map-panel { padding: 22px 18px 22px 22px; display: flex; flex-direction: column; gap: 12px; }
-  .panel-title { font-size: 0.67rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); display: flex; align-items: center; gap: 8px; }
-  .panel-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .warehouse-container { background: var(--surface); border: 2px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 14px; }
-  .warehouse-svg { width: 100%; height: auto; display: block; }
-
-  .zone-rect { fill: var(--zone-empty); stroke: var(--accent); stroke-width: 1.5; cursor: pointer; transition: fill 0.15s, stroke-width 0.15s; }
-  .zone-rect:hover { fill: var(--zone-hover); stroke-width: 2.5; }
-  .zone-rect.has-items { fill: var(--zone-filled); }
-  .zone-rect.selected { fill: var(--zone-active); stroke: var(--accent2); stroke-width: 3; }
-  .zone-label { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; fill: var(--accent); text-anchor: middle; dominant-baseline: middle; pointer-events: none; user-select: none; }
-  .zone-count { font-family: 'IBM Plex Sans', sans-serif; font-size: 8px; fill: var(--green); text-anchor: middle; dominant-baseline: middle; pointer-events: none; user-select: none; }
-  .casonera-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; fill: var(--accent); writing-mode: tb; text-anchor: middle; pointer-events: none; letter-spacing: 0.12em; }
-
-  .legend { display: flex; gap: 12px; flex-wrap: wrap; }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; color: var(--text2); }
-  .legend-dot { width: 13px; height: 13px; border-radius: 3px; border: 1.5px solid var(--accent); }
-  .legend-dot.empty { background: var(--zone-empty); }
-  .legend-dot.filled { background: var(--zone-filled); border-color: var(--green); }
-  .legend-dot.selected { background: var(--zone-active); border-color: var(--accent2); }
-
-  /* SIDEBAR */
-  .sidebar { background: var(--surface); border-left: 1.5px solid var(--border); display: flex; flex-direction: column; height: calc(100vh - 54px); position: sticky; top: 54px; overflow: hidden; }
-
-  /* Search */
-  .search-section { padding: 14px 16px 11px; border-bottom: 1.5px solid var(--border); background: var(--highlight); flex-shrink: 0; }
-  .search-section .panel-title { margin-bottom: 8px; }
-  .search-box { display: flex; gap: 6px; align-items: center; }
-  .search-box input { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 0.79rem; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: var(--radius); background: #fff; color: var(--text); outline: none; transition: border-color 0.15s; }
-  .search-box input:focus { border-color: var(--accent2); }
-  .search-box button { background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 7px 12px; font-size: 0.77rem; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; transition: background 0.15s; }
-  .search-box button:hover { background: var(--accent2); }
-  .search-results { margin-top: 8px; max-height: 130px; overflow-y: auto; }
-  .search-result-item { padding: 6px 8px; border-radius: 4px; font-size: 0.77rem; display: flex; align-items: center; justify-content: space-between; gap: 7px; cursor: pointer; transition: background 0.1s; }
-  .search-result-item:hover { background: var(--highlight2); }
-  .sri-name { font-weight: 500; color: var(--text); }
-  .sri-code { font-family: 'IBM Plex Mono', monospace; font-size: 0.69rem; color: var(--text3); }
-  .sri-zone { background: var(--accent); color: #fff; border-radius: 4px; padding: 2px 7px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
-  .search-no-results { font-size: 0.77rem; color: var(--text3); padding: 5px 8px; font-style: italic; }
-
-  /* Zone detail */
-  .zone-detail { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .zone-header { padding: 12px 16px 9px; border-bottom: 1.5px solid var(--border); flex-shrink: 0; }
-  .zone-header .zone-id { font-family: 'IBM Plex Mono', monospace; font-size: 1.35rem; font-weight: 600; color: var(--accent); line-height: 1; }
-  .zone-header .zone-subtitle { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
-  .zone-placeholder { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text3); gap: 8px; padding: 20px; }
-  .zone-placeholder svg { opacity: 0.28; }
-  .zone-placeholder p { font-size: 0.78rem; text-align: center; }
-
-  /* Add form */
-  .add-form { padding: 11px 16px; border-bottom: 1.5px solid var(--border); background: var(--green-bg); display: none; flex-shrink: 0; }
-  .add-form.visible { display: block; }
-  .form-title { font-size: 0.64rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 7px; }
-  .form-row { display: flex; gap: 6px; margin-bottom: 6px; }
-  .form-row:last-child { margin-bottom: 0; }
-  .form-row input { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; padding: 6px 8px; border: 1.5px solid #a7d3b8; border-radius: var(--radius); background: #fff; color: var(--text); outline: none; min-width: 0; transition: border-color 0.15s; }
-  .form-row input:focus { border-color: var(--green); }
-  .form-row input::placeholder { color: var(--text3); }
-  .btn-add { background: var(--green); color: #fff; border: none; border-radius: var(--radius); padding: 6px 13px; font-size: 0.76rem; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; white-space: nowrap; transition: background 0.15s; }
-  .btn-add:hover { background: #0a6040; }
-
-  /* Items list */
-  .items-list { flex: 1; overflow-y: auto; padding: 8px 16px 14px; display: none; }
-  .items-list.visible { display: block; }
-  .item-card { border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 7px; background: #fff; transition: border-color 0.1s, box-shadow 0.1s; overflow: hidden; }
-  .item-card:hover { border-color: #93c5fd; box-shadow: var(--shadow); }
-  .item-card-view { display: flex; align-items: center; gap: 8px; padding: 8px 10px; }
-  .item-info { flex: 1; min-width: 0; }
-  .item-n { font-weight: 600; font-size: 0.79rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .item-c { font-family: 'IBM Plex Mono', monospace; font-size: 0.69rem; color: var(--text3); margin-top: 1px; }
-  .card-actions { display: flex; gap: 3px; flex-shrink: 0; }
-  .btn-card { background: none; border: 1px solid var(--border); color: var(--text3); cursor: pointer; font-size: 0.7rem; padding: 3px 7px; border-radius: 4px; transition: all 0.12s; font-family: 'IBM Plex Sans', sans-serif; white-space: nowrap; }
-  .btn-card:hover { background: var(--highlight2); color: var(--accent); border-color: var(--accent2); }
-  .btn-card.del:hover { background: var(--red-bg); color: var(--red); border-color: var(--red); }
-  .btn-card.mv:hover { background: var(--yellow-bg); color: var(--yellow); border-color: #d97706; }
-
-  /* Inline edit */
-  .item-card-edit { display: none; padding: 10px; background: #f0f7ff; border-top: 1.5px solid #bfdbfe; }
-  .item-card-edit.visible { display: block; }
-  .edit-title { font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent2); margin-bottom: 7px; }
-  .edit-row { display: flex; gap: 5px; margin-bottom: 5px; }
-  .edit-row:last-child { margin-bottom: 0; }
-  .edit-row input { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: var(--radius); background: #fff; color: var(--text); outline: none; min-width: 0; transition: border-color 0.15s; }
-  .edit-row input:focus { border-color: var(--accent2); }
-  .btn-save-edit { background: var(--accent2); color: #fff; border: none; border-radius: var(--radius); padding: 5px 11px; font-size: 0.73rem; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; white-space: nowrap; transition: background 0.15s; }
-  .btn-save-edit:hover { background: var(--accent); }
-  .btn-cancel-edit { background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 9px; font-size: 0.73rem; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; color: var(--text2); transition: background 0.12s; }
-  .btn-cancel-edit:hover { background: var(--bg); }
-  .items-empty { color: var(--text3); font-size: 0.77rem; text-align: center; margin-top: 18px; font-style: italic; }
-
-  /* MOVE MODAL */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,20,40,0.46); z-index: 500; align-items: center; justify-content: center; }
-  .modal-overlay.active { display: flex; }
-  .modal { background: #fff; border-radius: 12px; box-shadow: var(--shadow-lg); padding: 22px 24px; width: 340px; max-width: 94vw; animation: modalIn 0.2s cubic-bezier(.22,1,.36,1); }
-  @keyframes modalIn { from { transform: scale(0.9) translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .modal-title { font-size: 1rem; font-weight: 600; color: var(--accent); margin-bottom: 3px; }
-  .modal-subtitle { font-size: 0.76rem; color: var(--text3); margin-bottom: 14px; }
-  .modal-item-info { background: var(--highlight); border-radius: var(--radius); padding: 9px 12px; margin-bottom: 14px; font-size: 0.8rem; line-height: 1.6; }
-  .modal-item-info strong { color: var(--accent); display: block; }
-  .zone-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 14px; max-height: 200px; overflow-y: auto; }
-  .zone-btn { border: 1.5px solid var(--border); border-radius: 5px; padding: 8px 2px; text-align: center; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; font-weight: 600; color: var(--accent); background: var(--zone-empty); transition: all 0.12s; line-height: 1.2; }
-  .zone-btn:hover { background: var(--zone-hover); border-color: var(--accent2); }
-  .zone-btn.current { background: var(--highlight2); border-color: var(--accent2); color: var(--accent2); cursor: default; }
-  .zone-btn.current::after { content: 'aquí'; display: block; font-size: 0.5rem; font-weight: 400; color: var(--text3); font-family: 'IBM Plex Sans', sans-serif; }
-  .modal-footer { display: flex; justify-content: flex-end; }
-  .btn-modal-cancel { background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 7px 16px; font-size: 0.78rem; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; color: var(--text2); transition: background 0.12s; }
-  .btn-modal-cancel:hover { background: var(--bg); }
-
-  /* TOAST */
-  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--accent); color: #fff; padding: 9px 20px; border-radius: 22px; font-size: 0.79rem; font-weight: 500; box-shadow: var(--shadow-lg); transition: transform 0.28s cubic-bezier(.22,1,.36,1), opacity 0.28s; opacity: 0; z-index: 9999; pointer-events: none; }
-  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-  .toast.success { background: var(--green); }
-  .toast.error { background: var(--red); }
-
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-  @media (max-width: 860px) {
-    .main-layout { grid-template-columns: 1fr; }
-    .sidebar { height: auto; position: static; border-left: none; border-top: 1.5px solid var(--border); }
-  }
+:root{--bg:#f0f2f5;--surface:#fff;--border:#c8cfd8;--accent:#1a3a5c;--accent2:#2563a8;--hi:#e8f0fc;--hi2:#d0e4ff;--green:#0d7a4e;--green-bg:#e6f5ef;--red:#b91c1c;--red-bg:#fee2e2;--yellow:#92400e;--yellow-bg:#fef3c7;--text:#1a2433;--text2:#4a5568;--text3:#8a9ab0;--ze:#f7f9fc;--zh:#dbeafe;--za:#bfdbfe;--zf:#dcfce7;--r:6px;--sh:0 2px 8px rgba(26,58,92,.10);--shl:0 8px 32px rgba(26,58,92,.18)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.18);position:sticky;top:0;z-index:200}
+.logo{font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:600;letter-spacing:.08em;white-space:nowrap}
+.logo span{color:#7ab8f5}
+.sep{flex:1}
+.sub{font-size:.74rem;color:#a8c4e0;letter-spacing:.04em}
+.hbtns{display:flex;gap:7px}
+.hbtn{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:var(--r);padding:5px 11px;font-size:.73rem;font-family:'IBM Plex Sans',sans-serif;font-weight:500;cursor:pointer;transition:background .15s;white-space:nowrap}
+.hbtn:hover{background:rgba(255,255,255,.24)}
+.hbtn.imp{background:rgba(122,184,245,.2)}
+#ifi{display:none}
+.layout{display:grid;grid-template-columns:1fr 390px;flex:1;min-height:0}
+.mapp{padding:22px 18px 22px 22px;display:flex;flex-direction:column;gap:12px}
+.ptitle{font-size:.67rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:8px}
+.ptitle::after{content:'';flex:1;height:1px;background:var(--border)}
+.wc{background:var(--surface);border:2px solid var(--border);border-radius:10px;box-shadow:var(--sh);padding:14px}
+.wsvg{width:100%;height:auto;display:block}
+.zone-rect{fill:var(--ze);stroke:var(--accent);stroke-width:1.5;cursor:pointer;transition:fill .15s,stroke-width .15s}
+.zone-rect:hover{fill:var(--zh);stroke-width:2.5}
+.zone-rect.has-items{fill:var(--zf)}
+.zone-rect.selected{fill:var(--za);stroke:var(--accent2);stroke-width:3}
+.zlbl{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;fill:var(--accent);text-anchor:middle;dominant-baseline:middle;pointer-events:none;user-select:none}
+.zcnt{font-family:'IBM Plex Sans',sans-serif;font-size:8px;fill:var(--green);text-anchor:middle;dominant-baseline:middle;pointer-events:none;user-select:none}
+.caslbl{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;fill:var(--accent);writing-mode:tb;text-anchor:middle;pointer-events:none;letter-spacing:.12em}
+.legend{display:flex;gap:12px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--text2)}
+.ld{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--accent)}
+.ld.e{background:var(--ze)}
+.ld.f{background:var(--zf);border-color:var(--green)}
+.ld.s{background:var(--za);border-color:var(--accent2)}
+.sidebar{background:var(--surface);border-left:1.5px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 54px);position:sticky;top:54px;overflow:hidden}
+.ssec{padding:14px 16px 11px;border-bottom:1.5px solid var(--border);background:var(--hi);flex-shrink:0}
+.ssec .ptitle{margin-bottom:8px}
+.sbox{display:flex;gap:6px;align-items:center}
+.sbox input{flex:1;font-family:'IBM Plex Mono',monospace;font-size:.79rem;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none;transition:border-color .15s}
+.sbox input:focus{border-color:var(--accent2)}
+.sbox button{background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:7px 12px;font-size:.77rem;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-weight:500;transition:background .15s}
+.sbox button:hover{background:var(--accent2)}
+.sres{margin-top:8px;max-height:130px;overflow-y:auto}
+.sri{padding:6px 8px;border-radius:4px;font-size:.77rem;display:flex;align-items:center;justify-content:space-between;gap:7px;cursor:pointer;transition:background .1s}
+.sri:hover{background:var(--hi2)}
+.sri-n{font-weight:500;color:var(--text)}
+.sri-c{font-family:'IBM Plex Mono',monospace;font-size:.69rem;color:var(--text3)}
+.sri-z{background:var(--accent);color:#fff;border-radius:4px;padding:2px 7px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:600;white-space:nowrap}
+.snr{font-size:.77rem;color:var(--text3);padding:5px 8px;font-style:italic}
+.zd{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.zhdr{padding:12px 16px 9px;border-bottom:1.5px solid var(--border);flex-shrink:0}
+.zid{font-family:'IBM Plex Mono',monospace;font-size:1.35rem;font-weight:600;color:var(--accent);line-height:1}
+.zsub{font-size:.72rem;color:var(--text3);margin-top:2px}
+.zph{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:8px;padding:20px}
+.zph svg{opacity:.28}
+.zph p{font-size:.78rem;text-align:center}
+.af{padding:11px 16px;border-bottom:1.5px solid var(--border);background:var(--green-bg);display:none;flex-shrink:0}
+.af.vis{display:block}
+.aft{font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:7px}
+.fr{display:flex;gap:6px;margin-bottom:6px}
+.fr:last-child{margin-bottom:0}
+.fr input{flex:1;font-family:'IBM Plex Mono',monospace;font-size:.76rem;padding:6px 8px;border:1.5px solid #a7d3b8;border-radius:var(--r);background:#fff;color:var(--text);outline:none;min-width:0;transition:border-color .15s}
+.fr input:focus{border-color:var(--green)}
+.fr input::placeholder{color:var(--text3)}
+.badd{background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:6px 13px;font-size:.76rem;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-weight:600;white-space:nowrap;transition:background .15s}
+.badd:hover{background:#0a6040}
+.il{flex:1;overflow-y:auto;padding:8px 16px 14px;display:none}
+.il.vis{display:block}
+.ic{border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:7px;background:#fff;transition:border-color .1s,box-shadow .1s;overflow:hidden}
+.ic:hover{border-color:#93c5fd;box-shadow:var(--sh)}
+.icv{display:flex;align-items:center;gap:8px;padding:8px 10px}
+.ii{flex:1;min-width:0}
+.in{font-weight:600;font-size:.79rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ico{font-family:'IBM Plex Mono',monospace;font-size:.69rem;color:var(--text3);margin-top:1px}
+.ca{display:flex;gap:3px;flex-shrink:0}
+.bc{background:none;border:1px solid var(--border);color:var(--text3);cursor:pointer;font-size:.7rem;padding:3px 7px;border-radius:4px;transition:all .12s;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap}
+.bc:hover{background:var(--hi2);color:var(--accent);border-color:var(--accent2)}
+.bc.del:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+.bc.mv:hover{background:var(--yellow-bg);color:var(--yellow);border-color:#d97706}
+.ice{display:none;padding:10px;background:#f0f7ff;border-top:1.5px solid #bfdbfe}
+.ice.vis{display:block}
+.iet{font-size:.63rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);margin-bottom:7px}
+.er{display:flex;gap:5px;margin-bottom:5px}
+.er:last-child{margin-bottom:0}
+.er input{flex:1;font-family:'IBM Plex Mono',monospace;font-size:.75rem;padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none;min-width:0;transition:border-color .15s}
+.er input:focus{border-color:var(--accent2)}
+.bse{background:var(--accent2);color:#fff;border:none;border-radius:var(--r);padding:5px 11px;font-size:.73rem;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-weight:600;white-space:nowrap;transition:background .15s}
+.bse:hover{background:var(--accent)}
+.bce{background:none;border:1px solid var(--border);border-radius:var(--r);padding:5px 9px;font-size:.73rem;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:var(--text2);transition:background .12s}
+.bce:hover{background:var(--bg)}
+.imt{color:var(--text3);font-size:.77rem;text-align:center;margin-top:18px;font-style:italic}
+.mo{display:none;position:fixed;inset:0;background:rgba(10,20,40,.46);z-index:500;align-items:center;justify-content:center}
+.mo.act{display:flex}
+.md{background:#fff;border-radius:12px;box-shadow:var(--shl);padding:22px 24px;width:340px;max-width:94vw;animation:mi .2s cubic-bezier(.22,1,.36,1)}
+@keyframes mi{from{transform:scale(.9) translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.mt{font-size:1rem;font-weight:600;color:var(--accent);margin-bottom:3px}
+.mst{font-size:.76rem;color:var(--text3);margin-bottom:14px}
+.mii{background:var(--hi);border-radius:var(--r);padding:9px 12px;margin-bottom:14px;font-size:.8rem;line-height:1.6}
+.mii strong{color:var(--accent);display:block}
+.zg{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px;max-height:200px;overflow-y:auto}
+.zb{border:1.5px solid var(--border);border-radius:5px;padding:8px 2px;text-align:center;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.8rem;font-weight:600;color:var(--accent);background:var(--ze);transition:all .12s;line-height:1.2}
+.zb:hover{background:var(--zh);border-color:var(--accent2)}
+.zb.cur{background:var(--hi2);border-color:var(--accent2);color:var(--accent2);cursor:default}
+.zb.cur::after{content:'aqui';display:block;font-size:.5rem;font-weight:400;color:var(--text3);font-family:'IBM Plex Sans',sans-serif}
+.mf{display:flex;justify-content:flex-end}
+.bmc{background:none;border:1px solid var(--border);border-radius:var(--r);padding:7px 16px;font-size:.78rem;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:var(--text2);transition:background .12s}
+.bmc:hover{background:var(--bg)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#fff;padding:9px 20px;border-radius:22px;font-size:.79rem;font-weight:500;box-shadow:var(--shl);transition:transform .28s cubic-bezier(.22,1,.36,1),opacity .28s;opacity:0;z-index:9999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:var(--green)}
+.toast.err{background:var(--red)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.sidebar{height:auto;position:static;border-left:none;border-top:1.5px solid var(--border)}}
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">FARMA<span>STOCK</span></div>
   <div class="sep"></div>
-  <div class="subtitle">Control de Almacén</div>
-  <div class="header-btns">
-    <button class="btn-header" onclick="exportData()">⬇ Exportar</button>
-    <button class="btn-header import" onclick="document.getElementById('importFileInput').click()">⬆ Importar</button>
-    <input type="file" id="importFileInput" accept=".json" onchange="importData(event)"/>
+  <div class="sub">Control de Almacen</div>
+  <div class="hbtns">
+    <button class="hbtn" onclick="exportData()">&#11015; Exportar</button>
+    <button class="hbtn imp" onclick="document.getElementById('ifi').click()">&#11014; Importar</button>
+    <input type="file" id="ifi" accept=".json" onchange="importData(event)">
   </div>
 </header>
 
-<div class="main-layout">
-
-  <!-- MAP PANEL -->
-  <div class="map-panel">
-    <div class="panel-title">Plano del Almacén</div>
+<div class="layout">
+  <div class="mapp">
+    <div class="ptitle">Plano del Almacen</div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot empty"></div> Vacía</div>
-      <div class="legend-item"><div class="legend-dot filled"></div> Con artículos</div>
-      <div class="legend-item"><div class="legend-dot selected"></div> Seleccionada</div>
+      <div class="li"><div class="ld e"></div>Vacia</div>
+      <div class="li"><div class="ld f"></div>Con articulos</div>
+      <div class="li"><div class="ld s"></div>Seleccionada</div>
     </div>
-    <div class="warehouse-container">
-      <svg class="warehouse-svg" viewBox="0 0 620 780" xmlns="http://www.w3.org/2000/svg">
+    <div class="wc">
+      <svg class="wsvg" viewBox="0 0 620 780" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="2" width="616" height="776" fill="none" stroke="#1a3a5c" stroke-width="2.5" rx="4"/>
-
-        <!-- RIGHT: 1-9 -->
-        <rect class="zone-rect" id="zone-1"  data-zone="1"  x="468" y="680" width="144" height="54"  rx="3"/>
-        <text class="zone-label" x="540" y="707">1</text><text class="zone-count" id="count-1"  x="540" y="722"></text>
-        <rect class="zone-rect" id="zone-2"  data-zone="2"  x="468" y="622" width="144" height="54"  rx="3"/>
-        <text class="zone-label" x="540" y="649">2</text><text class="zone-count" id="count-2"  x="540" y="664"></text>
-        <rect class="zone-rect" id="zone-3"  data-zone="3"  x="468" y="564" width="144" height="54"  rx="3"/>
-        <text class="zone-label" x="540" y="591">3</text><text class="zone-count" id="count-3"  x="540" y="606"></text>
-        <rect class="zone-rect" id="zone-4"  data-zone="4"  x="468" y="500" width="144" height="60"  rx="3"/>
-        <text class="zone-label" x="540" y="530">4</text><text class="zone-count" id="count-4"  x="540" y="546"></text>
-        <rect class="zone-rect" id="zone-5"  data-zone="5"  x="468" y="424" width="144" height="72"  rx="3"/>
-        <text class="zone-label" x="540" y="460">5</text><text class="zone-count" id="count-5"  x="540" y="476"></text>
-        <rect class="zone-rect" id="zone-5b" data-zone="5b" x="370" y="424" width="90"  height="72"  rx="3"/>
-        <text class="zone-label" x="415" y="460">5b</text><text class="zone-count" id="count-5b" x="415" y="476"></text>
-        <rect class="zone-rect" id="zone-6"  data-zone="6"  x="468" y="348" width="144" height="72"  rx="3"/>
-        <text class="zone-label" x="540" y="384">6</text><text class="zone-count" id="count-6"  x="540" y="400"></text>
-        <rect class="zone-rect" id="zone-7"  data-zone="7"  x="468" y="272" width="144" height="72"  rx="3"/>
-        <text class="zone-label" x="540" y="308">7</text><text class="zone-count" id="count-7"  x="540" y="324"></text>
-        <rect class="zone-rect" id="zone-8"  data-zone="8"  x="468" y="196" width="144" height="72"  rx="3"/>
-        <text class="zone-label" x="540" y="232">8</text><text class="zone-count" id="count-8"  x="540" y="248"></text>
-        <rect class="zone-rect" id="zone-9"  data-zone="9"  x="468" y="20"  width="144" height="172" rx="3"/>
-        <text class="zone-label" x="540" y="106">9</text><text class="zone-count" id="count-9"  x="540" y="122"></text>
-
-        <!-- TOP: 10, 11 -->
-        <rect class="zone-rect" id="zone-10" data-zone="10" x="294" y="20"  width="84"  height="76"  rx="3"/>
-        <text class="zone-label" x="336" y="58">10</text><text class="zone-count" id="count-10" x="336" y="74"></text>
-        <rect class="zone-rect" id="zone-11" data-zone="11" x="210" y="20"  width="80"  height="76"  rx="3"/>
-        <text class="zone-label" x="250" y="58">11</text><text class="zone-count" id="count-11" x="250" y="74"></text>
-
-        <!-- CASONERA strip -->
+        <rect class="zone-rect" data-zone="1"  x="468" y="680" width="144" height="54"  rx="3"/><text class="zlbl" x="540" y="707">1</text><text class="zcnt" id="c-1"  x="540" y="722"></text>
+        <rect class="zone-rect" data-zone="2"  x="468" y="622" width="144" height="54"  rx="3"/><text class="zlbl" x="540" y="649">2</text><text class="zcnt" id="c-2"  x="540" y="664"></text>
+        <rect class="zone-rect" data-zone="3"  x="468" y="564" width="144" height="54"  rx="3"/><text class="zlbl" x="540" y="591">3</text><text class="zcnt" id="c-3"  x="540" y="606"></text>
+        <rect class="zone-rect" data-zone="4"  x="468" y="500" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="530">4</text><text class="zcnt" id="c-4"  x="540" y="546"></text>
+        <rect class="zone-rect" data-zone="5"  x="468" y="424" width="144" height="72"  rx="3"/><text class="zlbl" x="540" y="460">5</text><text class="zcnt" id="c-5"  x="540" y="476"></text>
+        <rect class="zone-rect" data-zone="5b" x="370" y="424" width="90"  height="72"  rx="3"/><text class="zlbl" x="415" y="460">5b</text><text class="zcnt" id="c-5b" x="415" y="476"></text>
+        <rect class="zone-rect" data-zone="6"  x="468" y="348" width="144" height="72"  rx="3"/><text class="zlbl" x="540" y="384">6</text><text class="zcnt" id="c-6"  x="540" y="400"></text>
+        <rect class="zone-rect" data-zone="7"  x="468" y="272" width="144" height="72"  rx="3"/><text class="zlbl" x="540" y="308">7</text><text class="zcnt" id="c-7"  x="540" y="324"></text>
+        <rect class="zone-rect" data-zone="8"  x="468" y="196" width="144" height="72"  rx="3"/><text class="zlbl" x="540" y="232">8</text><text class="zcnt" id="c-8"  x="540" y="248"></text>
+        <rect class="zone-rect" data-zone="9"  x="468" y="20"  width="144" height="172" rx="3"/><text class="zlbl" x="540" y="106">9</text><text class="zcnt" id="c-9"  x="540" y="122"></text>
+        <rect class="zone-rect" data-zone="10" x="294" y="20"  width="84"  height="76"  rx="3"/><text class="zlbl" x="336" y="58">10</text><text class="zcnt" id="c-10" x="336" y="74"></text>
+        <rect class="zone-rect" data-zone="11" x="210" y="20"  width="80"  height="76"  rx="3"/><text class="zlbl" x="250" y="58">11</text><text class="zcnt" id="c-11" x="250" y="74"></text>
         <rect x="138" y="20" width="22" height="520" fill="#eef3f9" stroke="#1a3a5c" stroke-width="1.2"/>
-        <text class="casonera-label" x="149" y="280" transform="rotate(-90,149,280)">CASONERA</text>
-
-        <!-- LEFT: 12-17 -->
-        <rect class="zone-rect" id="zone-12" data-zone="12" x="20"  y="20"  width="114" height="130" rx="3"/>
-        <text class="zone-label" x="77"  y="85">12</text><text class="zone-count" id="count-12" x="77"  y="101"></text>
-        <rect class="zone-rect" id="zone-13" data-zone="13" x="20"  y="154" width="114" height="136" rx="3"/>
-        <text class="zone-label" x="77"  y="222">13</text><text class="zone-count" id="count-13" x="77"  y="238"></text>
-        <rect class="zone-rect" id="zone-14" data-zone="14" x="20"  y="294" width="114" height="60"  rx="3"/>
-        <text class="zone-label" x="77"  y="324">14</text><text class="zone-count" id="count-14" x="77"  y="340"></text>
-        <rect class="zone-rect" id="zone-15" data-zone="15" x="20"  y="358" width="114" height="60"  rx="3"/>
-        <text class="zone-label" x="77"  y="388">15</text><text class="zone-count" id="count-15" x="77"  y="404"></text>
-        <rect class="zone-rect" id="zone-16" data-zone="16" x="20"  y="422" width="114" height="60"  rx="3"/>
-        <text class="zone-label" x="77"  y="452">16</text><text class="zone-count" id="count-16" x="77"  y="468"></text>
-        <rect class="zone-rect" id="zone-17" data-zone="17" x="20"  y="486" width="36"  height="44"  rx="3"/>
-        <text class="zone-label" x="38"  y="508">17</text><text class="zone-count" id="count-17" x="38"  y="522"></text>
-
-        <!-- BOTTOM LEFT: 18, 19 -->
-        <rect class="zone-rect" id="zone-18" data-zone="18" x="42"  y="560" width="96"  height="72"  rx="3"/>
-        <text class="zone-label" x="90"  y="596">18</text><text class="zone-count" id="count-18" x="90"  y="612"></text>
-        <rect class="zone-rect" id="zone-19" data-zone="19" x="142" y="560" width="96"  height="72"  rx="3"/>
-        <text class="zone-label" x="190" y="596">19</text><text class="zone-count" id="count-19" x="190" y="612"></text>
-
-        <!-- CENTER BOTTOM: 20-23 -->
-        <rect class="zone-rect" id="zone-20" data-zone="20" x="278" y="666" width="70"  height="50"  rx="3"/>
-        <text class="zone-label" x="313" y="691">20</text><text class="zone-count" id="count-20" x="313" y="706"></text>
-        <rect class="zone-rect" id="zone-21" data-zone="21" x="352" y="666" width="70"  height="50"  rx="3"/>
-        <text class="zone-label" x="387" y="691">21</text><text class="zone-count" id="count-21" x="387" y="706"></text>
-        <rect class="zone-rect" id="zone-22" data-zone="22" x="352" y="720" width="70"  height="50"  rx="3"/>
-        <text class="zone-label" x="387" y="745">22</text><text class="zone-count" id="count-22" x="387" y="760"></text>
-        <rect class="zone-rect" id="zone-23" data-zone="23" x="278" y="730" width="144" height="46"  rx="3"/>
-        <text class="zone-label" x="350" y="753">23</text><text class="zone-count" id="count-23" x="350" y="768"></text>
+        <text class="caslbl" x="149" y="280" transform="rotate(-90,149,280)">CASONERA</text>
+        <rect class="zone-rect" data-zone="12" x="20"  y="20"  width="114" height="130" rx="3"/><text class="zlbl" x="77"  y="85">12</text><text class="zcnt" id="c-12" x="77"  y="101"></text>
+        <rect class="zone-rect" data-zone="13" x="20"  y="154" width="114" height="136" rx="3"/><text class="zlbl" x="77"  y="222">13</text><text class="zcnt" id="c-13" x="77"  y="238"></text>
+        <rect class="zone-rect" data-zone="14" x="20"  y="294" width="114" height="60"  rx="3"/><text class="zlbl" x="77"  y="324">14</text><text class="zcnt" id="c-14" x="77"  y="340"></text>
+        <rect class="zone-rect" data-zone="15" x="20"  y="358" width="114" height="60"  rx="3"/><text class="zlbl" x="77"  y="388">15</text><text class="zcnt" id="c-15" x="77"  y="404"></text>
+        <rect class="zone-rect" data-zone="16" x="20"  y="422" width="114" height="60"  rx="3"/><text class="zlbl" x="77"  y="452">16</text><text class="zcnt" id="c-16" x="77"  y="468"></text>
+        <rect class="zone-rect" data-zone="17" x="20"  y="486" width="36"  height="44"  rx="3"/><text class="zlbl" x="38"  y="508">17</text><text class="zcnt" id="c-17" x="38"  y="522"></text>
+        <rect class="zone-rect" data-zone="18" x="42"  y="560" width="96"  height="72"  rx="3"/><text class="zlbl" x="90"  y="596">18</text><text class="zcnt" id="c-18" x="90"  y="612"></text>
+        <rect class="zone-rect" data-zone="19" x="142" y="560" width="96"  height="72"  rx="3"/><text class="zlbl" x="190" y="596">19</text><text class="zcnt" id="c-19" x="190" y="612"></text>
+        <rect class="zone-rect" data-zone="20" x="278" y="666" width="70"  height="50"  rx="3"/><text class="zlbl" x="313" y="691">20</text><text class="zcnt" id="c-20" x="313" y="706"></text>
+        <rect class="zone-rect" data-zone="21" x="352" y="666" width="70"  height="50"  rx="3"/><text class="zlbl" x="387" y="691">21</text><text class="zcnt" id="c-21" x="387" y="706"></text>
+        <rect class="zone-rect" data-zone="22" x="352" y="720" width="70"  height="50"  rx="3"/><text class="zlbl" x="387" y="745">22</text><text class="zcnt" id="c-22" x="387" y="760"></text>
+        <rect class="zone-rect" data-zone="23" x="278" y="730" width="144" height="46"  rx="3"/><text class="zlbl" x="350" y="753">23</text><text class="zcnt" id="c-23" x="350" y="768"></text>
       </svg>
     </div>
   </div>
 
-  <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="search-section">
-      <div class="panel-title">Buscar Artículo</div>
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Nombre o código nacional..." autocomplete="off"/>
+    <div class="ssec">
+      <div class="ptitle">Buscar Articulo</div>
+      <div class="sbox">
+        <input type="text" id="si" placeholder="Nombre o codigo nacional..." autocomplete="off">
         <button onclick="doSearch()">Buscar</button>
       </div>
-      <div class="search-results" id="searchResults"></div>
+      <div class="sres" id="sr"></div>
     </div>
-
-    <div class="zone-detail">
-      <div class="zone-header" id="zoneHeader" style="display:none">
-        <div class="zone-id" id="zoneIdDisplay">—</div>
-        <div class="zone-subtitle" id="zoneSubtitle">0 artículos</div>
+    <div class="zd">
+      <div id="zh" style="display:none" class="zhdr">
+        <div class="zid" id="zid">-</div>
+        <div class="zsub" id="zsub">0 articulos</div>
       </div>
-      <div class="zone-placeholder" id="zonePlaceholder">
+      <div class="zph" id="zph">
         <svg width="44" height="44" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>
         </svg>
-        <p>Haz clic en una zona del plano<br>para gestionar sus artículos</p>
+        <p>Haz clic en una zona del plano<br>para gestionar sus articulos</p>
       </div>
-      <div class="add-form" id="addForm">
-        <div class="form-title">➕ Añadir artículo — Zona <span id="addFormZone"></span></div>
-        <div class="form-row">
-          <input type="text" id="itemName" placeholder="Nombre del artículo" autocomplete="off"/>
-        </div>
-        <div class="form-row">
-          <input type="text" id="itemCode" placeholder="Código Nacional (opcional)" autocomplete="off" maxlength="20"/>
-          <button class="btn-add" onclick="addItem()">Añadir</button>
+      <div class="af" id="af">
+        <div class="aft">Anadir articulo - Zona <span id="afz"></span></div>
+        <div class="fr"><input type="text" id="iname" placeholder="Nombre del articulo" autocomplete="off"></div>
+        <div class="fr">
+          <input type="text" id="icode" placeholder="Codigo Nacional (opcional)" autocomplete="off" maxlength="20">
+          <button class="badd" onclick="addItem()">Anadir</button>
         </div>
       </div>
-      <div class="items-list" id="itemsList"></div>
+      <div class="il" id="il"></div>
     </div>
   </div>
 </div>
 
-<!-- MOVE MODAL -->
-<div class="modal-overlay" id="moveModal">
-  <div class="modal">
-    <div class="modal-title">↔ Mover artículo</div>
-    <div class="modal-subtitle">Elige la zona de destino</div>
-    <div class="modal-item-info" id="moveModalInfo"></div>
-    <div class="zone-grid" id="moveZoneGrid"></div>
-    <div class="modal-footer">
-      <button class="btn-modal-cancel" onclick="closeMoveModal()">Cancelar</button>
-    </div>
+<div class="mo" id="mm">
+  <div class="md">
+    <div class="mt">Mover articulo</div>
+    <div class="mst">Elige la zona de destino</div>
+    <div class="mii" id="mii"></div>
+    <div class="zg" id="zg"></div>
+    <div class="mf"><button class="bmc" onclick="closeMM()">Cancelar</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// --- DATA ---
-const STORAGE_KEY = 'farmastock_v1';
-const ALL_ZONES = ['1','2','3','4','5','5b','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+var SK='farmastock_v1';
+var AZ=['1','2','3','4','5','5b','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+var db=loadDB();
+var sel=null;
+var mid=null;
 
-let db = loadDB();
-let selectedZone = null;
+function uid(){return Math.random().toString(36).slice(2,10)}
+function loadDB(){try{var r=localStorage.getItem(SK);if(r)return JSON.parse(r)}catch(e){}return{}}
+function saveDB(){try{localStorage.setItem(SK,JSON.stringify(db))}catch(e){}}
+function gz(z){return db[z]||[]}
 
-function uid() { return Math.random().toString(36).slice(2, 10); }
-
-function loadDB() {
-  try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e) {}
-  return {};
-}
-function saveDB() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch(e) {}
-}
-function getZoneItems(z) { return db[z] || []; }
-
-// Ensure every item has a stable _id (migration for existing data)
-function ensureIds() {
-  let changed = false;
-  for (const z in db) {
-    db[z].forEach(item => { if (!item._id) { item._id = uid(); changed = true; } });
-  }
-  if (changed) saveDB();
+function ensureIds(){
+  var ch=false;
+  for(var z in db){db[z].forEach(function(it){if(!it._id){it._id=uid();ch=true}})}
+  if(ch)saveDB();
 }
 
-// --- DUPLICATE GUARDS ---
-// excludeId: the _id of the item being edited, so it does not block itself
-function findDupName(name, excludeId) {
-  const n = name.trim().toLowerCase();
-  for (const z in db) {
-    for (const item of db[z]) {
-      if (item._id && item._id === excludeId) continue;
-      if (item.name.trim().toLowerCase() === n) return { zone: z, item };
+function dupName(name,xid){
+  var n=name.trim().toLowerCase();
+  for(var z in db){
+    for(var i=0;i<db[z].length;i++){
+      var it=db[z][i];
+      if(it._id&&it._id===xid)continue;
+      if(it.name.trim().toLowerCase()===n)return{zone:z,item:it};
     }
   }
   return null;
 }
-function findDupCode(code, excludeId) {
-  if (!code || !code.trim()) return null;
-  const c = code.trim().toLowerCase();
-  for (const z in db) {
-    for (const item of db[z]) {
-      if (item._id && item._id === excludeId) continue;
-      if (item.code && item.code.trim().toLowerCase() === c) return { zone: z, item };
+function dupCode(code,xid){
+  if(!code||!code.trim())return null;
+  var c=code.trim().toLowerCase();
+  for(var z in db){
+    for(var i=0;i<db[z].length;i++){
+      var it=db[z][i];
+      if(it._id&&it._id===xid)continue;
+      if(it.code&&it.code.trim().toLowerCase()===c)return{zone:z,item:it};
     }
   }
   return null;
 }
-
-// Find item anywhere by _id
-function findById(id) {
-  for (const z in db) {
-    const idx = db[z].findIndex(i => i._id === id);
-    if (idx !== -1) return { zone: z, idx, item: db[z][idx] };
+function byId(id){
+  for(var z in db){
+    var idx=db[z].findIndex(function(i){return i._id===id});
+    if(idx!==-1)return{zone:z,idx:idx,item:db[z][idx]};
   }
   return null;
 }
 
-// --- RENDER MAP ---
-function renderMap() {
-  document.querySelectorAll('.zone-rect').forEach(rect => {
-    const z = rect.getAttribute('data-zone');
-    const n = getZoneItems(z).length;
-    const el = document.getElementById('count-' + z);
-    rect.classList.toggle('has-items', n > 0);
-    rect.classList.toggle('selected', z === selectedZone);
-    if (el) el.textContent = n > 0 ? n + ' art.' : '';
+function renderMap(){
+  document.querySelectorAll('.zone-rect').forEach(function(r){
+    var z=r.getAttribute('data-zone');
+    var n=gz(z).length;
+    var el=document.getElementById('c-'+z);
+    r.classList.toggle('has-items',n>0);
+    r.classList.toggle('selected',z===sel);
+    if(el)el.textContent=n>0?n+' art.':'';
   });
 }
 
-// --- RENDER SIDEBAR ---
-function renderZoneDetail() {
-  const header      = document.getElementById('zoneHeader');
-  const placeholder = document.getElementById('zonePlaceholder');
-  const addForm     = document.getElementById('addForm');
-  const itemsList   = document.getElementById('itemsList');
-
-  if (!selectedZone) {
-    header.style.display = 'none';
-    placeholder.style.display = 'flex';
-    addForm.classList.remove('visible');
-    itemsList.classList.remove('visible');
+function renderZone(){
+  var hdr=document.getElementById('zh');
+  var ph=document.getElementById('zph');
+  var af=document.getElementById('af');
+  var il=document.getElementById('il');
+  if(!sel){
+    hdr.style.display='none';ph.style.display='flex';
+    af.classList.remove('vis');il.classList.remove('vis');
     return;
   }
-
-  const items = getZoneItems(selectedZone);
-  header.style.display = 'block';
-  placeholder.style.display = 'none';
-  addForm.classList.add('visible');
-  itemsList.classList.add('visible');
-
-  document.getElementById('zoneIdDisplay').textContent = 'Zona ' + selectedZone;
-  document.getElementById('zoneSubtitle').textContent = items.length + (items.length === 1 ? ' articulo' : ' articulos');
-  document.getElementById('addFormZone').textContent = selectedZone;
-
-  itemsList.innerHTML = '';
-  if (items.length === 0) {
-    itemsList.innerHTML = '<div class="items-empty">Sin articulos en esta zona.<br>Anade el primero.</div>';
-    return;
-  }
-
-  items.forEach(item => {
-    const id = item._id;
-    const card = document.createElement('div');
-    card.className = 'item-card';
-    card.dataset.id = id;
-    card.innerHTML =
-      '<div class="item-card-view">' +
-        '<div class="item-info">' +
-          '<div class="item-n">' + esc(item.name) + '</div>' +
-          '<div class="item-c">' + (item.code ? 'CN: ' + esc(item.code) : '<em style="color:#bbb">Sin codigo</em>') + '</div>' +
-        '</div>' +
-        '<div class="card-actions">' +
-          '<button class="btn-card"     data-action="edit" data-id="' + id + '" title="Editar">&#9999;&#65039;</button>' +
-          '<button class="btn-card mv"  data-action="move" data-id="' + id + '" title="Mover">&#8596;</button>' +
-          '<button class="btn-card del" data-action="del"  data-id="' + id + '" title="Eliminar">&#x2715;</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="item-card-edit" id="edit-' + id + '">' +
-        '<div class="edit-title">Editar articulo</div>' +
-        '<div class="edit-row">' +
-          '<input type="text" id="en-' + id + '" value="' + escA(item.name) + '" placeholder="Nombre"/>' +
-        '</div>' +
-        '<div class="edit-row">' +
-          '<input type="text" id="ec-' + id + '" value="' + escA(item.code || '') + '" placeholder="CN (opcional)" maxlength="20"/>' +
-          '<button class="btn-save-edit"   data-action="save-edit" data-id="' + id + '">Guardar</button>' +
-          '<button class="btn-cancel-edit" data-action="cancel-edit" data-id="' + id + '">&#x2715;</button>' +
-        '</div>' +
+  var items=gz(sel);
+  hdr.style.display='block';ph.style.display='none';
+  af.classList.add('vis');il.classList.add('vis');
+  document.getElementById('zid').textContent='Zona '+sel;
+  document.getElementById('zsub').textContent=items.length+(items.length===1?' articulo':' articulos');
+  document.getElementById('afz').textContent=sel;
+  il.innerHTML='';
+  if(!items.length){il.innerHTML='<div class="imt">Sin articulos en esta zona.<br>Anade el primero.</div>';return}
+  items.forEach(function(item){
+    var id=item._id;
+    var d=document.createElement('div');
+    d.className='ic';
+    d.innerHTML=
+      '<div class="icv">'+
+        '<div class="ii">'+
+          '<div class="in">'+eh(item.name)+'</div>'+
+          '<div class="ico">'+(item.code?'CN: '+eh(item.code):'<em style="color:#bbb">Sin codigo</em>')+'</div>'+
+        '</div>'+
+        '<div class="ca">'+
+          '<button class="bc" data-a="edit" data-id="'+id+'" title="Editar">&#9999;</button>'+
+          '<button class="bc mv" data-a="move" data-id="'+id+'" title="Mover">&#8596;</button>'+
+          '<button class="bc del" data-a="del" data-id="'+id+'" title="Eliminar">&#10005;</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="ice" id="ice-'+id+'">'+
+        '<div class="iet">Editar articulo</div>'+
+        '<div class="er"><input type="text" id="en-'+id+'" value="'+ea(item.name)+'" placeholder="Nombre"></div>'+
+        '<div class="er">'+
+          '<input type="text" id="ec-'+id+'" value="'+ea(item.code||'')+'" placeholder="CN (opcional)" maxlength="20">'+
+          '<button class="bse" data-a="save" data-id="'+id+'">Guardar</button>'+
+          '<button class="bce" data-a="cancel" data-id="'+id+'">&#10005;</button>'+
+        '</div>'+
       '</div>';
-    itemsList.appendChild(card);
+    il.appendChild(d);
   });
 }
 
-function esc(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function escA(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function eh(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function ea(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 
-// --- DELEGATED CLICK HANDLER for item cards ---
-document.getElementById('itemsList').addEventListener('click', function(e) {
-  const btn = e.target.closest('[data-action]');
-  if (!btn) return;
-  const action = btn.dataset.action;
-  const id = btn.dataset.id;
-  if (action === 'edit')        openEdit(id);
-  if (action === 'move')        openMove(id);
-  if (action === 'del')         delItem(id);
-  if (action === 'save-edit')   saveEdit(id);
-  if (action === 'cancel-edit') closeEdit(id);
+document.getElementById('il').addEventListener('click',function(e){
+  var btn=e.target.closest('[data-a]');
+  if(!btn)return;
+  var a=btn.getAttribute('data-a');
+  var id=btn.getAttribute('data-id');
+  if(a==='edit')openEdit(id);
+  else if(a==='move')openMM(id);
+  else if(a==='del')delItem(id);
+  else if(a==='save')saveEdit(id);
+  else if(a==='cancel')closeEdit(id);
 });
 
-// --- ZONE CLICK ---
-document.querySelectorAll('.zone-rect').forEach(rect => {
-  rect.addEventListener('click', () => {
-    const z = rect.getAttribute('data-zone');
-    selectedZone = z;
-    document.getElementById('itemName').value = '';
-    document.getElementById('itemCode').value = '';
-    document.getElementById('searchResults').innerHTML = '';
-    document.getElementById('searchInput').value = '';
-    renderMap();
-    renderZoneDetail();
+document.querySelectorAll('.zone-rect').forEach(function(r){
+  r.addEventListener('click',function(){
+    sel=r.getAttribute('data-zone');
+    document.getElementById('iname').value='';
+    document.getElementById('icode').value='';
+    document.getElementById('sr').innerHTML='';
+    document.getElementById('si').value='';
+    renderMap();renderZone();
   });
 });
 
-// --- ADD ITEM ---
-function addItem() {
-  if (!selectedZone) return;
-  const name = document.getElementById('itemName').value.trim();
-  const code = document.getElementById('itemCode').value.trim();
-  if (!name) { toast('Introduce el nombre del articulo', 'error'); return; }
-
-  const dn = findDupName(name, null);
-  if (dn) { toast('"' + dn.item.name + '" ya existe en Zona ' + dn.zone, 'error'); return; }
-  const dc = findDupCode(code, null);
-  if (dc) { toast('CN ' + code + ' ya esta en Zona ' + dc.zone + ': ' + dc.item.name, 'error'); return; }
-
-  if (!db[selectedZone]) db[selectedZone] = [];
-  db[selectedZone].push({ _id: uid(), name, code });
+function addItem(){
+  if(!sel)return;
+  var name=document.getElementById('iname').value.trim();
+  var code=document.getElementById('icode').value.trim();
+  if(!name){toast('Introduce el nombre del articulo','err');return}
+  var dn=dupName(name,null);
+  if(dn){toast('"'+dn.item.name+'" ya existe en Zona '+dn.zone,'err');return}
+  var dc=dupCode(code,null);
+  if(dc){toast('CN '+code+' ya esta en Zona '+dc.zone+': '+dc.item.name,'err');return}
+  if(!db[sel])db[sel]=[];
+  db[sel].push({_id:uid(),name:name,code:code});
   saveDB();
-  document.getElementById('itemName').value = '';
-  document.getElementById('itemCode').value = '';
-  toast('Anadido a Zona ' + selectedZone, 'success');
-  renderMap();
-  renderZoneDetail();
+  document.getElementById('iname').value='';
+  document.getElementById('icode').value='';
+  toast('Anadido a Zona '+sel,'ok');
+  renderMap();renderZone();
 }
-document.getElementById('itemCode').addEventListener('keydown', e => { if (e.key==='Enter') addItem(); });
-document.getElementById('itemName').addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('itemCode').focus(); });
+document.getElementById('icode').addEventListener('keydown',function(e){if(e.key==='Enter')addItem()});
+document.getElementById('iname').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('icode').focus()});
 
-// --- EDIT ITEM (inline, identified by _id) ---
-function openEdit(id) {
-  document.querySelectorAll('.item-card-edit.visible').forEach(el => el.classList.remove('visible'));
-  const el = document.getElementById('edit-' + id);
-  if (el) { el.classList.add('visible'); document.getElementById('en-' + id).focus(); }
+function openEdit(id){
+  document.querySelectorAll('.ice.vis').forEach(function(el){el.classList.remove('vis')});
+  var el=document.getElementById('ice-'+id);
+  if(el){el.classList.add('vis');document.getElementById('en-'+id).focus()}
 }
-function closeEdit(id) {
-  const el = document.getElementById('edit-' + id);
-  if (el) el.classList.remove('visible');
+function closeEdit(id){
+  var el=document.getElementById('ice-'+id);
+  if(el)el.classList.remove('vis');
 }
-function saveEdit(id) {
-  const name = document.getElementById('en-' + id).value.trim();
-  const code = document.getElementById('ec-' + id).value.trim();
-  if (!name) { toast('El nombre no puede estar vacio', 'error'); return; }
-
-  // excludeId = id so the item does not conflict with itself
-  const dn = findDupName(name, id);
-  if (dn) { toast('"' + dn.item.name + '" ya existe en Zona ' + dn.zone, 'error'); return; }
-  const dc = findDupCode(code, id);
-  if (dc) { toast('CN ' + code + ' ya esta en Zona ' + dc.zone + ': ' + dc.item.name, 'error'); return; }
-
-  const found = findById(id);
-  if (!found) return;
-  db[found.zone][found.idx] = { _id: id, name, code };
-  saveDB();
-  toast('Articulo actualizado', 'success');
-  renderMap();
-  renderZoneDetail();
+function saveEdit(id){
+  var name=document.getElementById('en-'+id).value.trim();
+  var code=document.getElementById('ec-'+id).value.trim();
+  if(!name){toast('El nombre no puede estar vacio','err');return}
+  var dn=dupName(name,id);
+  if(dn){toast('"'+dn.item.name+'" ya existe en Zona '+dn.zone,'err');return}
+  var dc=dupCode(code,id);
+  if(dc){toast('CN '+code+' ya esta en Zona '+dc.zone+': '+dc.item.name,'err');return}
+  var f=byId(id);
+  if(!f)return;
+  db[f.zone][f.idx]={_id:id,name:name,code:code};
+  saveDB();toast('Articulo actualizado','ok');renderMap();renderZone();
 }
 
-// --- MOVE ITEM (modal, identified by _id) ---
-let moveId = null;
-
-function openMove(id) {
-  moveId = id;
-  const found = findById(id);
-  if (!found) return;
-  const item = found.item;
-
-  document.getElementById('moveModalInfo').innerHTML =
-    '<strong>' + esc(item.name) + '</strong>' +
-    (item.code ? ' <span>CN: ' + esc(item.code) + '</span>' : '') +
-    ' <span style="margin-left:6px;background:var(--accent);color:#fff;border-radius:3px;padding:1px 7px;font-size:0.68rem;font-family:IBM Plex Mono,monospace;">Zona ' + esc(found.zone) + '</span>';
-
-  const grid = document.getElementById('moveZoneGrid');
-  grid.innerHTML = '';
-  ALL_ZONES.forEach(zz => {
-    const btn = document.createElement('button');
-    btn.className = 'zone-btn' + (zz === found.zone ? ' current' : '');
-    btn.textContent = zz;
-    if (zz !== found.zone) btn.addEventListener('click', () => execMove(zz));
-    grid.appendChild(btn);
+function openMM(id){
+  mid=id;
+  var f=byId(id);if(!f)return;
+  var it=f.item;
+  document.getElementById('mii').innerHTML=
+    '<strong>'+eh(it.name)+'</strong>'+
+    (it.code?'<span>CN: '+eh(it.code)+'</span> ':'')+
+    '<span style="background:var(--accent);color:#fff;border-radius:3px;padding:1px 7px;font-size:.68rem;font-family:IBM Plex Mono,monospace">Zona '+eh(f.zone)+'</span>';
+  var g=document.getElementById('zg');g.innerHTML='';
+  AZ.forEach(function(zz){
+    var b=document.createElement('button');
+    b.className='zb'+(zz===f.zone?' cur':'');
+    b.textContent=zz;
+    if(zz!==f.zone)b.addEventListener('click',function(){execMove(zz)});
+    g.appendChild(b);
   });
-  document.getElementById('moveModal').classList.add('active');
+  document.getElementById('mm').classList.add('act');
+}
+function closeMM(){document.getElementById('mm').classList.remove('act');mid=null}
+function execMove(tz){
+  if(!mid)return;
+  var f=byId(mid);if(!f){closeMM();return}
+  var it=f.item;
+  if(!db[tz])db[tz]=[];
+  db[tz].push(Object.assign({},it));
+  db[f.zone].splice(f.idx,1);
+  if(!db[f.zone].length)delete db[f.zone];
+  saveDB();closeMM();
+  sel=tz;
+  toast('"'+it.name+'" -> Zona '+tz,'ok');
+  renderMap();renderZone();
+}
+document.getElementById('mm').addEventListener('click',function(e){if(e.target===this)closeMM()});
+
+function delItem(id){
+  var f=byId(id);if(!f)return;
+  if(!confirm('Eliminar "'+f.item.name+'" de Zona '+f.zone+'?'))return;
+  db[f.zone].splice(f.idx,1);
+  if(!db[f.zone].length)delete db[f.zone];
+  saveDB();toast('"'+f.item.name+'" eliminado','');renderMap();renderZone();
 }
 
-function closeMoveModal() {
-  document.getElementById('moveModal').classList.remove('active');
-  moveId = null;
-}
-
-function execMove(targetZone) {
-  if (!moveId) return;
-  // Re-locate by id at execution time (not stale index)
-  const found = findById(moveId);
-  if (!found) { closeMoveModal(); return; }
-  const item = found.item;
-
-  if (!db[targetZone]) db[targetZone] = [];
-  db[targetZone].push({ ...item });
-  db[found.zone].splice(found.idx, 1);
-  if (db[found.zone].length === 0) delete db[found.zone];
-  saveDB();
-  closeMoveModal();
-  selectedZone = targetZone;
-  toast('"' + item.name + '" movido a Zona ' + targetZone, 'success');
-  renderMap();
-  renderZoneDetail();
-}
-
-document.getElementById('moveModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('moveModal')) closeMoveModal();
-});
-
-// --- DELETE ITEM (by _id) ---
-function delItem(id) {
-  const found = findById(id);
-  if (!found) return;
-  if (!confirm('Eliminar "' + found.item.name + '" de Zona ' + found.zone + '?')) return;
-  db[found.zone].splice(found.idx, 1);
-  if (db[found.zone].length === 0) delete db[found.zone];
-  saveDB();
-  toast('"' + found.item.name + '" eliminado', '');
-  renderMap();
-  renderZoneDetail();
-}
-
-// --- SEARCH ---
-function doSearch() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const container = document.getElementById('searchResults');
-  container.innerHTML = '';
-  if (!q) return;
-  const results = [];
-  for (const z in db) {
-    db[z].forEach(item => {
-      if (item.name.toLowerCase().includes(q) || (item.code && item.code.toLowerCase().includes(q)))
-        results.push({ zone: z, ...item });
-    });
-  }
-  if (!results.length) { container.innerHTML = '<div class="search-no-results">Sin resultados para "' + esc(q) + '"</div>'; return; }
-  results.forEach(r => {
-    const div = document.createElement('div');
-    div.className = 'search-result-item';
-    div.innerHTML =
-      '<div>' +
-        '<div class="sri-name">' + esc(r.name) + '</div>' +
-        '<div class="sri-code">' + (r.code ? 'CN: ' + esc(r.code) : 'Sin codigo') + '</div>' +
-      '</div>' +
-      '<span class="sri-zone">Zona ' + esc(r.zone) + '</span>';
-    div.addEventListener('click', () => {
-      selectedZone = r.zone;
-      renderMap();
-      renderZoneDetail();
-      document.querySelector('.warehouse-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      toast('Zona ' + r.zone + ' seleccionada', 'success');
-    });
-    container.appendChild(div);
+function doSearch(){
+  var q=document.getElementById('si').value.trim().toLowerCase();
+  var c=document.getElementById('sr');c.innerHTML='';if(!q)return;
+  var res=[];
+  for(var z in db){db[z].forEach(function(it){if(it.name.toLowerCase().indexOf(q)!==-1||(it.code&&it.code.toLowerCase().indexOf(q)!==-1))res.push({zone:z,name:it.name,code:it.code})})}
+  if(!res.length){c.innerHTML='<div class="snr">Sin resultados para "'+eh(q)+'"</div>';return}
+  res.forEach(function(r){
+    var d=document.createElement('div');d.className='sri';
+    d.innerHTML='<div><div class="sri-n">'+eh(r.name)+'</div><div class="sri-c">'+(r.code?'CN: '+eh(r.code):'Sin codigo')+'</div></div><span class="sri-z">Zona '+eh(r.zone)+'</span>';
+    d.addEventListener('click',function(){sel=r.zone;renderMap();renderZone();document.querySelector('.wc').scrollIntoView({behavior:'smooth',block:'center'});toast('Zona '+r.zone+' seleccionada','ok')});
+    c.appendChild(d);
   });
 }
-document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key==='Enter') doSearch(); });
+document.getElementById('si').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch()});
 
-// --- EXPORT / IMPORT ---
-function exportData() {
-  const payload = { _farmastock: true, _version: '1.3', _exported: new Date().toISOString(), zones: db };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'farmastock-backup-' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('Datos exportados', 'success');
+function exportData(){
+  var p={_farmastock:true,_v:'1.3',_d:new Date().toISOString(),zones:db};
+  var b=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});
+  var u=URL.createObjectURL(b);
+  var a=document.createElement('a');a.href=u;a.download='farmastock-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(u);
+  toast('Exportado correctamente','ok');
 }
-
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const parsed = JSON.parse(e.target.result);
-      const incoming = parsed._farmastock ? parsed.zones : parsed;
-      if (typeof incoming !== 'object' || Array.isArray(incoming)) throw new Error('Formato no reconocido');
-      for (const z in incoming) if (!Array.isArray(incoming[z])) throw new Error('Estructura invalida');
-
-      // Ensure all imported items have _id
-      for (const z in incoming) {
-        incoming[z].forEach(item => { if (!item._id) item._id = uid(); });
+function importData(ev){
+  var f=ev.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(e){
+    try{
+      var p=JSON.parse(e.target.result);
+      var inc=p._farmastock?p.zones:p;
+      if(typeof inc!=='object'||Array.isArray(inc))throw new Error('Formato no reconocido');
+      for(var z in inc)if(!Array.isArray(inc[z]))throw new Error('Estructura invalida');
+      for(var z in inc)inc[z].forEach(function(it){if(!it._id)it._id=uid()});
+      var sn=new Map(),sc=new Map();
+      for(var z in inc){
+        inc[z].forEach(function(it){
+          var n=it.name.trim().toLowerCase();
+          if(sn.has(n))throw new Error('Nombre duplicado: "'+it.name+'"');
+          sn.set(n,z);
+          if(it.code&&it.code.trim()){var c=it.code.trim().toLowerCase();if(sc.has(c))throw new Error('CN duplicado: '+it.code);sc.set(c,z)}
+        });
       }
-
-      // Check no internal duplicates
-      const seenN = new Map(), seenC = new Map();
-      for (const z in incoming) {
-        for (const item of incoming[z]) {
-          const n = item.name.trim().toLowerCase();
-          if (seenN.has(n)) throw new Error('Nombre duplicado en archivo: "' + item.name + '"');
-          seenN.set(n, z);
-          if (item.code && item.code.trim()) {
-            const c = item.code.trim().toLowerCase();
-            if (seenC.has(c)) throw new Error('CN duplicado en archivo: ' + item.code);
-            seenC.set(c, z);
-          }
-        }
-      }
-
-      const cur = Object.values(db).reduce((a,x)=>a+x.length,0);
-      const imp = Object.values(incoming).reduce((a,x)=>a+x.length,0);
-      if (!confirm('Importar? Esto reemplaza el inventario actual (' + cur + ' articulos) con el del archivo (' + imp + ' articulos).')) return;
-      db = incoming;
-      saveDB();
-      selectedZone = null;
-      renderMap();
-      renderZoneDetail();
-      toast(imp + ' articulos importados', 'success');
-    } catch(err) {
-      toast('Error al importar: ' + err.message, 'error');
-    }
-    event.target.value = '';
+      var cur=Object.values(db).reduce(function(a,x){return a+x.length},0);
+      var imp=Object.values(inc).reduce(function(a,x){return a+x.length},0);
+      if(!confirm('Importar? Reemplaza el inventario actual ('+cur+' articulos) con '+imp+' articulos del archivo.'))return;
+      db=inc;saveDB();sel=null;renderMap();renderZone();toast(imp+' articulos importados','ok');
+    }catch(err){toast('Error: '+err.message,'err')}
+    ev.target.value='';
   };
-  reader.readAsText(file);
+  r.readAsText(f);
 }
 
-// --- TOAST ---
-let toastT;
-function toast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' ' + type : '');
-  clearTimeout(toastT);
-  toastT = setTimeout(() => { t.className = 'toast'; }, 2600);
+var toastT;
+function toast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  clearTimeout(toastT);toastT=setTimeout(function(){t.className='toast'},2600);
 }
 
-// --- INIT ---
-ensureIds();
-renderMap();
-renderZoneDetail();
+ensureIds();renderMap();renderZone();
 </script>
 </body>
 </html>
