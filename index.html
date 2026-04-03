@@ -319,6 +319,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
       <div class="mxls-step-tab" id="xtab-3">3. Seleccion</div>
       <div class="mxls-step-tab" id="xtab-4">4. Ubicacion</div>
       <div class="mxls-step-tab" id="xtab-5">5. Confirmar</div>
+
     </div>
     <div class="mxls-body" id="xls-body"></div>
     <div class="xls-footer">
@@ -614,14 +615,13 @@ function toast(msg,type){
    ═══════════════════════════════════════════ */
 var xlsState={
   step:1,
-  rows:[],       // todas las filas del archivo
-  headers:[],    // nombres de columna (fila 0)
-  colName:-1,    // índice columna nombre
-  colCode:-1,    // índice columna código (puede ser -1 = ninguna)
-  articles:[],   // {name,code,dup} artículos parseados
-  selected:new Set(), // índices seleccionados
-  zones:new Set(),    // zonas destino elegidas
-  assign:{}      // idx -> zona
+  rows:[],
+  headers:[],
+  colName:-1,
+  colCode:-1,
+  articles:[],
+  selected:new Set(),
+  assign:{}
 };
 
 function openXlsModal(ev){
@@ -643,7 +643,6 @@ function openXlsModal(ev){
       xlsState.step=1;
       xlsState.articles=[];
       xlsState.selected=new Set();
-      xlsState.zones=new Set();
       xlsState.assign={};
       // autodetectar columnas por nombre de cabecera
       xlsState.colName=-1;xlsState.colCode=-1;
@@ -818,77 +817,91 @@ function xlsRenderArtGridFast(){
   renderArtGrid(document.getElementById('xls-body'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
 }
 
-/* Paso 4: elegir zonas y asignar */
+/* Paso 4: asignar zona a cada artículo individualmente */
 function renderStep4(body,msg,btnNext){
-  var nSel=xlsState.selected.size;
-  var zoneGrid='<div class="zone-grid-x">';
-  AZ.forEach(function(z){
-    zoneGrid+='<div class="zone-btn-x'+(xlsState.zones.has(z)?' zsel':'')+'" onclick="xlsToggleZone(\''+z+'\')">'+z+'</div>';
+  var arts=xlsState.articles;
+  var selArr=[...xlsState.selected];
+  var filterQ=(document.getElementById('xassign-filter')?document.getElementById('xassign-filter').value:'').toLowerCase();
+
+  // pre-rellenar assign con zona vacía si no tiene valor aún
+  selArr.forEach(function(i){if(!xlsState.assign[i])xlsState.assign[i]=''});
+
+  // contar sin zona asignada
+  var sinZona=selArr.filter(function(i){return!xlsState.assign[i]}).length;
+
+  var html='<p style="font-size:.82rem;color:var(--text2);margin-bottom:4px">Asigna una zona a cada artículo. Puedes usar el botón <strong>Zona a todos</strong> para asignar rápidamente la misma zona a los que no tengan.</p>';
+
+  // barra de herramientas rápida
+  var zonaOpts=AZ.map(function(z){return'<option value="'+z+'">Zona '+z+'</option>'}).join('');
+  html+='<div style="display:flex;gap:7px;align-items:center;margin-bottom:10px;flex-wrap:wrap">'+
+    '<input type="text" id="xassign-filter" placeholder="Filtrar artículos..." oninput="xlsAssignFilter()" value="'+filterQ+'" style="flex:1;min-width:140px;font-family:IBM Plex Mono,monospace;font-size:.76rem;padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none">'+
+    '<select id="xbulk-zone" style="font-size:.76rem;padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);font-family:IBM Plex Sans,sans-serif">'+zonaOpts+'</select>'+
+    '<button onclick="xlsAssignBulk()" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:5px 11px;font-size:.75rem;cursor:pointer;font-family:IBM Plex Sans,sans-serif;font-weight:600;white-space:nowrap">Zona a todos</button>'+
+  '</div>';
+
+  html+='<div class="assign-list" id="xassign-list">';
+  selArr.forEach(function(i){
+    var a=arts[i];
+    if(filterQ&&a.name.toLowerCase().indexOf(filterQ)===-1&&a.code.toLowerCase().indexOf(filterQ)===-1)return;
+    var cur=xlsState.assign[i]||'';
+    var opts='<option value="" disabled'+(cur===''?' selected':'')+'>Zona…</option>';
+    opts+=AZ.map(function(z){return'<option value="'+z+'"'+(z===cur?' selected':'')+'>Zona '+z+'</option>'}).join('');
+    var hasZone=cur!=='';
+    html+='<div class="assign-row" id="arow-'+i+'" style="'+(hasZone?'border-color:#a7d3b8;':'border-color:#fcd34d;')+'">'+
+      '<div class="assign-row-info">'+
+        '<div class="assign-row-n">'+eh(a.name)+'</div>'+
+        (a.code?'<div class="assign-row-c">CN '+eh(a.code)+'</div>':'')+
+      '</div>'+
+      '<select onchange="xlsAssignOne('+i+',this.value)" style="font-size:.76rem;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);font-family:IBM Plex Sans,sans-serif;min-width:80px">'+opts+'</select>'+
+    '</div>';
   });
-  zoneGrid+='</div>';
+  html+='</div>';
 
-  var assignHtml='';
-  if(xlsState.zones.size>1){
-    assignHtml='<div class="col-picker-t" style="margin-bottom:8px">Asigna cada artículo a su zona</div>';
-    assignHtml+='<div class="assign-list">';
-    xlsState.selected.forEach(function(i){
-      var a=xlsState.articles[i];
-      var cur=xlsState.assign[i]||[...xlsState.zones][0];
-      var opts=AZ.filter(function(z){return xlsState.zones.has(z)}).map(function(z){return'<option value="'+z+'"'+(z===cur?' selected':'')+'>Zona '+z+'</option>'}).join('');
-      assignHtml+='<div class="assign-row"><div class="assign-row-info"><div class="assign-row-n">'+eh(a.name)+'</div>'+(a.code?'<div class="assign-row-c">CN '+eh(a.code)+'</div>':'')+
-        '</div><select onchange="xlsState.assign['+i+']=this.value">'+opts+'</select></div>';
-    });
-    assignHtml+='</div>';
-  }else if(xlsState.zones.size===1){
-    assignHtml='<p style="font-size:.8rem;color:var(--green);margin-bottom:10px">Todos los artículos irán a la Zona '+[...xlsState.zones][0]+'.</p>';
-    xlsState.selected.forEach(function(i){xlsState.assign[i]=[...xlsState.zones][0]});
-  }
+  body.innerHTML=html;
 
-  body.innerHTML=
-    '<p style="font-size:.82rem;color:var(--text2);margin-bottom:12px">Elige una o varias zonas de destino para los <strong>'+nSel+'</strong> artículos seleccionados.</p>'+
-    zoneGrid+assignHtml;
-
-  xlsUpdateZoneFooter(msg,btnNext);
+  var pendientes=selArr.filter(function(i){return!xlsState.assign[i]}).length;
+  btnNext.disabled=pendientes>0;
+  msg.textContent=pendientes>0?pendientes+' artículo'+(pendientes>1?'s sin':'sin')+' zona asignada':'Todos los artículos tienen zona';
 }
 
-window.xlsToggleZone=function(z){
-  if(xlsState.zones.has(z))xlsState.zones.delete(z);
-  else xlsState.zones.add(z);
-  // si solo hay 1 zona, asignar todo a ella automáticamente
-  if(xlsState.zones.size===1){xlsState.selected.forEach(function(i){xlsState.assign[i]=[...xlsState.zones][0]})}
+window.xlsAssignOne=function(i,z){
+  xlsState.assign[i]=z;
+  var row=document.getElementById('arow-'+i);
+  if(row)row.style.borderColor=z?'#a7d3b8':'#fcd34d';
+  var pendientes=[...xlsState.selected].filter(function(j){return!xlsState.assign[j]}).length;
+  var btn=document.getElementById('xbtn-next');
+  var msg=document.getElementById('xls-footer-msg');
+  btn.disabled=pendientes>0;
+  msg.textContent=pendientes>0?pendientes+' artículo'+(pendientes>1?'s sin':'sin')+' zona asignada':'Todos los artículos tienen zona';
+};
+
+window.xlsAssignBulk=function(){
+  var z=document.getElementById('xbulk-zone').value;
+  if(!z)return;
+  // asignar a todos los seleccionados que estén sin zona
+  [...xlsState.selected].forEach(function(i){if(!xlsState.assign[i])xlsState.assign[i]=z});
   renderStep4(document.getElementById('xls-body'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
 };
 
-function xlsUpdateZoneFooter(msg,btnNext){
-  var ok=xlsState.zones.size>0;
-  btnNext.disabled=!ok;
-  msg.textContent=ok?xlsState.zones.size+' zona'+( xlsState.zones.size>1?'s':'')+' seleccionada'+( xlsState.zones.size>1?'s':''):'Selecciona al menos una zona';
-}
+window.xlsAssignFilter=function(){
+  renderStep4(document.getElementById('xls-body'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
+};
 
 /* Paso 5: resumen y confirmación */
 function renderStep5(body,msg,btnNext){
-  // calcular asignaciones finales
-  if(xlsState.zones.size===1){
-    var z=[...xlsState.zones][0];
-    xlsState.selected.forEach(function(i){xlsState.assign[i]=z});
-  }
   var byZone={};
   xlsState.selected.forEach(function(i){
-    var z=xlsState.assign[i]||[...xlsState.zones][0];
+    var z=xlsState.assign[i];
+    if(!z)return;
     if(!byZone[z])byZone[z]=[];
     byZone[z].push(xlsState.articles[i]);
   });
 
   var total=xlsState.selected.size;
-  var dupWarnings=[];
-  xlsState.selected.forEach(function(i){if(xlsState.articles[i].dup)dupWarnings.push(xlsState.articles[i].name)});
 
-  var html='<div class="sum-ok"><div class="sum-ok-n">'+total+'</div><div class="sum-ok-t">artículos listos para añadir</div></div>';
-  if(dupWarnings.length){
-    html+='<div class="sum-warn">&#9888; '+dupWarnings.length+' artículo'+(dupWarnings.length>1?'s ya existen':'ya existe')+' en el almacén y se omitirá'+(dupWarnings.length>1?'n':'')+'.</div>';
-  }
+  var html='<div class="sum-ok"><div class="sum-ok-n">'+total+'</div><div class="sum-ok-t">artículos listos para añadir al almacén</div></div>';
   html+='<div class="summary-block">';
-  Object.keys(byZone).sort().forEach(function(z){
+  Object.keys(byZone).sort(function(a,b){return AZ.indexOf(a)-AZ.indexOf(b)}).forEach(function(z){
     html+='<div class="sum-zone"><div class="sum-zone-lbl"><span>Zona '+eh(z)+'</span> '+byZone[z].length+' artículo'+(byZone[z].length>1?'s':'')+'</div>';
     byZone[z].forEach(function(a){
       html+='<div class="sum-item">'+eh(a.name)+(a.code?'<span class="sum-item-c">CN '+eh(a.code)+'</span>':'')+'</div>';
@@ -924,8 +937,8 @@ function xlsCommit(){
   var added=0,skipped=0;
   xlsState.selected.forEach(function(i){
     var a=xlsState.articles[i];
-    var z=xlsState.assign[i]||[...xlsState.zones][0];
-    // re-verificar duplicados en tiempo real
+    var z=xlsState.assign[i];
+    if(!z){skipped++;return}
     if(dupName(a.name,null)||dupCode(a.code,null)){skipped++;return}
     if(!db[z])db[z]=[];
     db[z].push({_id:uid(),name:a.name,code:a.code||''});
@@ -935,7 +948,7 @@ function xlsCommit(){
   closeXlsModal();
   renderMap();renderZone();
   var msg=added+' artículos añadidos al almacén';
-  if(skipped)msg+=', '+skipped+' omitidos por duplicado';
+  if(skipped)msg+=', '+skipped+' omitidos';
   toast(msg,'ok');
 }
 
