@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FarmaStock - Control de Almacen</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#f0f2f5;--surface:#fff;--border:#c8cfd8;--accent:#1a3a5c;--accent2:#2563a8;--hi:#e8f0fc;--hi2:#d0e4ff;--green:#0d7a4e;--green-bg:#e6f5ef;--red:#b91c1c;--red-bg:#fee2e2;--yellow:#92400e;--yellow-bg:#fef3c7;--text:#1a2433;--text2:#4a5568;--text3:#8a9ab0;--ze:#f7f9fc;--zh:#dbeafe;--za:#bfdbfe;--zf:#dcfce7;--r:6px;--sh:0 2px 8px rgba(26,58,92,.10);--shl:0 8px 32px rgba(26,58,92,.18)}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -18,7 +19,10 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 .hbtn{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:var(--r);padding:5px 11px;font-size:.73rem;font-family:'IBM Plex Sans',sans-serif;font-weight:500;cursor:pointer;transition:background .15s;white-space:nowrap}
 .hbtn:hover{background:rgba(255,255,255,.24)}
 .hbtn.imp{background:rgba(122,184,245,.2)}
+.hbtn.xls{background:rgba(13,122,78,.35);border-color:rgba(13,122,78,.5)}
+.hbtn.xls:hover{background:rgba(13,122,78,.55)}
 #ifi{display:none}
+#ifx{display:none}
 .layout{display:grid;grid-template-columns:1fr 390px;flex:1;min-height:0}
 .mapp{padding:22px 18px 22px 22px;display:flex;flex-direction:column;gap:12px}
 .ptitle{font-size:.67rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:8px}
@@ -119,6 +123,88 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 @media(max-width:860px){.layout{grid-template-columns:1fr}.sidebar{height:auto;position:static;border-left:none;border-top:1.5px solid var(--border)}}
+
+/* ── Modal XLS ── */
+.mxls{display:none;position:fixed;inset:0;background:rgba(10,20,40,.52);z-index:600;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.mxls.act{display:flex}
+.mxls-box{background:#fff;border-radius:14px;box-shadow:var(--shl);width:100%;max-width:760px;overflow:hidden;animation:mi .22s cubic-bezier(.22,1,.36,1);margin:auto}
+.mxls-hdr{background:var(--accent);color:#fff;padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+.mxls-hdr h2{font-size:.92rem;font-weight:600;letter-spacing:.03em}
+.mxls-hdr button{background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;border-radius:50%;width:28px;height:28px;font-size:1rem;line-height:1;transition:background .14s}
+.mxls-hdr button:hover{background:rgba(255,255,255,.28)}
+.mxls-steps{display:flex;padding:0 22px;background:var(--hi);border-bottom:1.5px solid var(--border)}
+.mxls-step-tab{padding:10px 0;margin-right:20px;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2.5px solid transparent;cursor:default;white-space:nowrap}
+.mxls-step-tab.act{color:var(--accent);border-bottom-color:var(--accent2)}
+.mxls-body{padding:20px 22px;min-height:340px}
+.xls-drop{border:2px dashed var(--border);border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:18px}
+.xls-drop:hover,.xls-drop.drag{border-color:var(--accent2);background:var(--hi)}
+.xls-drop-icon{font-size:2rem;margin-bottom:10px;opacity:.5}
+.xls-drop p{font-size:.82rem;color:var(--text2);margin-bottom:5px}
+.xls-drop small{font-size:.72rem;color:var(--text3)}
+.col-picker{background:var(--hi);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+.col-picker-t{font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.col-row{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.col-row:last-child{margin-bottom:0}
+.col-row label{font-size:.78rem;color:var(--text2);width:120px;flex-shrink:0}
+.col-row select{flex:1;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none}
+.col-row select:focus{border-color:var(--accent2)}
+.preview-tbl-wrap{overflow:auto;max-height:160px;border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:14px}
+.preview-tbl{width:100%;border-collapse:collapse;font-size:.74rem}
+.preview-tbl th{background:var(--accent);color:#fff;padding:5px 9px;text-align:left;font-weight:600;white-space:nowrap}
+.preview-tbl td{padding:4px 9px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.preview-tbl tr:last-child td{border-bottom:none}
+.preview-tbl tr:nth-child(even) td{background:var(--hi)}
+.art-filter-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.art-filter-row input{flex:1;font-family:'IBM Plex Mono',monospace;font-size:.78rem;padding:6px 9px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none}
+.art-filter-row input:focus{border-color:var(--accent2)}
+.art-filter-row span{font-size:.74rem;color:var(--text3);white-space:nowrap}
+.art-sel-links{display:flex;gap:10px;margin-bottom:8px}
+.art-sel-links a{font-size:.74rem;color:var(--accent2);cursor:pointer;text-decoration:underline}
+.art-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;max-height:300px;overflow-y:auto;padding-right:2px}
+.art-card{border:1.5px solid var(--border);border-radius:var(--r);padding:8px 10px;cursor:pointer;transition:border-color .12s,background .12s;display:flex;align-items:flex-start;gap:8px;background:#fff}
+.art-card:hover{border-color:#93c5fd;background:var(--hi)}
+.art-card.xsel{border-color:var(--accent2);background:var(--hi2)}
+.art-card.xdup{opacity:.45;cursor:not-allowed}
+.xchk{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .12s;background:#fff}
+.art-card.xsel .xchk{background:var(--accent2);border-color:var(--accent2)}
+.xchk-tick{display:none}
+.art-card.xsel .xchk-tick{display:block}
+.xart-info{flex:1;min-width:0}
+.xart-n{font-size:.76rem;font-weight:600;color:var(--text);line-height:1.3;word-break:break-word}
+.xart-c{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--text3);margin-top:2px}
+.xdup-badge{font-size:.6rem;background:var(--yellow-bg);color:var(--yellow);border-radius:3px;padding:1px 5px;margin-top:3px;display:inline-block}
+.zone-grid-x{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px}
+.zone-btn-x{border:1.5px solid var(--border);border-radius:var(--r);padding:10px 4px;text-align:center;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--accent);background:var(--ze);transition:all .12s;font-family:'IBM Plex Mono',monospace}
+.zone-btn-x:hover{background:var(--zh);border-color:var(--accent2)}
+.zone-btn-x.zsel{background:var(--za);border-color:var(--accent2);color:var(--accent2)}
+.assign-list{display:flex;flex-direction:column;gap:5px;max-height:360px;overflow-y:auto;margin-bottom:14px}
+.assign-row{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:7px 10px}
+.assign-row-info{flex:1;min-width:0}
+.assign-row-n{font-size:.76rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.assign-row-c{font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--text3)}
+.assign-row select{font-size:.76rem;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none;font-family:'IBM Plex Sans',sans-serif}
+.assign-row select:focus{border-color:var(--accent2)}
+.summary-block{background:var(--hi);border-radius:var(--r);padding:10px 14px;max-height:280px;overflow-y:auto;margin-bottom:14px}
+.sum-zone{margin-bottom:10px}
+.sum-zone:last-child{margin-bottom:0}
+.sum-zone-lbl{font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.sum-zone-lbl span{background:var(--accent);color:#fff;border-radius:4px;padding:1px 7px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:600}
+.sum-item{font-size:.77rem;color:var(--text);padding:2px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.sum-item:last-child{border-bottom:none}
+.sum-item-c{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--text3);margin-left:auto}
+.sum-ok{background:var(--green-bg);border:1.5px solid #a7d3b8;border-radius:var(--r);padding:12px 16px;text-align:center;margin-bottom:14px}
+.sum-ok-n{font-size:1.8rem;font-weight:600;color:var(--green);line-height:1}
+.sum-ok-t{font-size:.79rem;color:var(--green);margin-top:3px}
+.sum-warn{background:var(--yellow-bg);border:1.5px solid #fcd34d;border-radius:var(--r);padding:8px 12px;font-size:.76rem;color:var(--yellow);margin-bottom:10px}
+.xls-footer{display:flex;gap:8px;align-items:center;border-top:1.5px solid var(--border);padding:14px 22px;background:var(--bg)}
+.xls-footer-l{flex:1;font-size:.75rem;color:var(--text3)}
+.xbtn{border:1.5px solid var(--border);background:#fff;color:var(--text2);border-radius:var(--r);padding:7px 14px;font-size:.79rem;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-weight:500;transition:background .12s}
+.xbtn:hover{background:var(--bg)}
+.xbtn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.xbtn.primary:hover{background:var(--accent2);border-color:var(--accent2)}
+.xbtn.primary:disabled{opacity:.4;cursor:not-allowed}
+.xbtn.success{background:var(--green);color:#fff;border-color:var(--green)}
+.xbtn.success:hover{background:#0a6040}
 </style>
 </head>
 <body>
@@ -127,9 +213,11 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
   <div class="sep"></div>
   <div class="sub">Control de Almacen</div>
   <div class="hbtns">
+    <button class="hbtn xls" onclick="document.getElementById('ifx').click()">&#8659; Desde Excel</button>
     <button class="hbtn" onclick="exportData()">&#11015; Exportar</button>
     <button class="hbtn imp" onclick="document.getElementById('ifi').click()">&#11014; Importar</button>
     <input type="file" id="ifi" accept=".json" onchange="importData(event)">
+    <input type="file" id="ifx" accept=".xls,.xlsx,.csv" onchange="openXlsModal(event)">
   </div>
 </header>
 
@@ -207,6 +295,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
   </div>
 </div>
 
+<!-- Modal mover artículo -->
 <div class="mo" id="mm">
   <div class="md">
     <div class="mt">Mover articulo</div>
@@ -214,6 +303,31 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
     <div class="mii" id="mii"></div>
     <div class="zg" id="zg"></div>
     <div class="mf"><button class="bmc" onclick="closeMM()">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- Modal importar desde Excel -->
+<div class="mxls" id="mxls">
+  <div class="mxls-box">
+    <div class="mxls-hdr">
+      <h2>Importar desde Excel / CSV</h2>
+      <button onclick="closeXlsModal()">&#10005;</button>
+    </div>
+    <div class="mxls-steps" id="xls-tabs">
+      <div class="mxls-step-tab act" id="xtab-1">1. Archivo</div>
+      <div class="mxls-step-tab" id="xtab-2">2. Columnas</div>
+      <div class="mxls-step-tab" id="xtab-3">3. Seleccion</div>
+      <div class="mxls-step-tab" id="xtab-4">4. Ubicacion</div>
+      <div class="mxls-step-tab" id="xtab-5">5. Confirmar</div>
+    </div>
+    <div class="mxls-body" id="xls-body"></div>
+    <div class="xls-footer">
+      <div class="xls-footer-l" id="xls-footer-msg"></div>
+      <div style="display:flex;gap:7px">
+        <button class="xbtn" id="xbtn-back" onclick="xlsBack()" style="display:none">&#8592; Atras</button>
+        <button class="xbtn primary" id="xbtn-next" onclick="xlsNext()" disabled>Siguiente &#8594;</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -493,6 +607,336 @@ function toast(msg,type){
   var t=document.getElementById('toast');
   t.textContent=msg;t.className='toast show'+(type?' '+type:'');
   clearTimeout(toastT);toastT=setTimeout(function(){t.className='toast'},2600);
+}
+
+/* ═══════════════════════════════════════════
+   IMPORTACIÓN DESDE EXCEL — flujo en 5 pasos
+   ═══════════════════════════════════════════ */
+var xlsState={
+  step:1,
+  rows:[],       // todas las filas del archivo
+  headers:[],    // nombres de columna (fila 0)
+  colName:-1,    // índice columna nombre
+  colCode:-1,    // índice columna código (puede ser -1 = ninguna)
+  articles:[],   // {name,code,dup} artículos parseados
+  selected:new Set(), // índices seleccionados
+  zones:new Set(),    // zonas destino elegidas
+  assign:{}      // idx -> zona
+};
+
+function openXlsModal(ev){
+  var f=ev.target.files[0];
+  ev.target.value='';
+  if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=new Uint8Array(e.target.result);
+      var wb=XLSX.read(data,{type:'array'});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(!raw||raw.length<2){toast('El archivo esta vacio o no tiene filas de datos','err');return}
+      // normalizar: quitar filas donde todas las celdas son vacías
+      raw=raw.filter(function(r){return r.some(function(c){return String(c).trim()!==''})});
+      xlsState.rows=raw;
+      xlsState.headers=raw[0].map(function(c,i){return String(c).trim()||'Columna '+(i+1)});
+      xlsState.step=1;
+      xlsState.articles=[];
+      xlsState.selected=new Set();
+      xlsState.zones=new Set();
+      xlsState.assign={};
+      // autodetectar columnas por nombre de cabecera
+      xlsState.colName=-1;xlsState.colCode=-1;
+      xlsState.headers.forEach(function(h,i){
+        var hl=h.toLowerCase();
+        if(xlsState.colName===-1&&(hl.indexOf('denominacion')!==-1||hl.indexOf('descripcion')!==-1||hl.indexOf('nombre')!==-1||hl.indexOf('articulo')!==-1||hl.indexOf('product')!==-1))xlsState.colName=i;
+        if(xlsState.colCode===-1&&(hl.indexOf('codigo')!==-1||hl.indexOf('cod')!==-1||hl.indexOf('cn')!==-1||hl.indexOf('ean')!==-1||hl.indexOf('referencia')!==-1))xlsState.colCode=i;
+      });
+      document.getElementById('mxls').classList.add('act');
+      xlsRender();
+    }catch(err){toast('Error al leer el archivo: '+err.message,'err')}
+  };
+  reader.readAsArrayBuffer(f);
+}
+
+function closeXlsModal(){
+  document.getElementById('mxls').classList.remove('act');
+}
+document.getElementById('mxls').addEventListener('click',function(e){if(e.target===this)closeXlsModal()});
+
+function xlsSetStep(n){
+  xlsState.step=n;
+  for(var i=1;i<=5;i++){
+    var t=document.getElementById('xtab-'+i);
+    if(t)t.className='mxls-step-tab'+(i===n?' act':'');
+  }
+}
+
+function xlsRender(){
+  xlsSetStep(xlsState.step);
+  var body=document.getElementById('xls-body');
+  var msg=document.getElementById('xls-footer-msg');
+  var btnBack=document.getElementById('xbtn-back');
+  var btnNext=document.getElementById('xbtn-next');
+  btnBack.style.display=xlsState.step>1?'':'none';
+  btnNext.textContent=xlsState.step<5?'Siguiente &#8594;':'Anadir al almacen';
+  btnNext.innerHTML=xlsState.step<5?'Siguiente &#8594;':'&#10003; Anadir al almacen';
+  btnNext.className='xbtn '+(xlsState.step===5?'success':'primary');
+
+  if(xlsState.step===1) renderStep1(body,msg,btnNext);
+  else if(xlsState.step===2) renderStep2(body,msg,btnNext);
+  else if(xlsState.step===3) renderStep3(body,msg,btnNext);
+  else if(xlsState.step===4) renderStep4(body,msg,btnNext);
+  else if(xlsState.step===5) renderStep5(body,msg,btnNext);
+}
+
+/* Paso 1: previsualización del archivo */
+function renderStep1(body,msg,btnNext){
+  var rows=xlsState.rows;
+  var preview=rows.slice(0,Math.min(6,rows.length));
+  var cols=xlsState.headers;
+  var tbl='<div class="preview-tbl-wrap"><table class="preview-tbl"><thead><tr>';
+  cols.forEach(function(h){tbl+='<th>'+eh(h)+'</th>'});
+  tbl+='</tr></thead><tbody>';
+  preview.slice(1).forEach(function(r){
+    tbl+='<tr>';
+    cols.forEach(function(_,i){tbl+='<td>'+eh(String(r[i]||''))+'</td>'});
+    tbl+='</tr>';
+  });
+  tbl+='</tbody></table></div>';
+  body.innerHTML=
+    '<p style="font-size:.82rem;color:var(--text2);margin-bottom:14px">Archivo cargado correctamente. Revisa la previsualización de las primeras filas:</p>'+
+    tbl+
+    '<p style="font-size:.76rem;color:var(--text3);margin-top:8px">'+
+      (rows.length-1)+' filas de datos · '+cols.length+' columnas · Hoja: cargada'+
+    '</p>';
+  msg.textContent=(rows.length-1)+' filas encontradas';
+  btnNext.disabled=false;
+}
+
+/* Paso 2: elegir columnas */
+function renderStep2(body,msg,btnNext){
+  var cols=xlsState.headers;
+  var opts='<option value="-1">-- Ninguna --</option>';
+  cols.forEach(function(h,i){opts+='<option value="'+i+'">'+eh(h)+'</option>'});
+  var optsName='<option value="-1">-- Selecciona --</option>';
+  cols.forEach(function(h,i){optsName+='<option value="'+i+'"'+(i===xlsState.colName?' selected':'')+'>'+eh(h)+'</option>'});
+  var optsCode='<option value="-1">-- Ninguna --</option>';
+  cols.forEach(function(h,i){optsCode+='<option value="'+i+'"'+(i===xlsState.colCode?' selected':'')+'>'+eh(h)+'</option>'});
+
+  body.innerHTML=
+    '<p style="font-size:.82rem;color:var(--text2);margin-bottom:14px">Indica qué columna contiene el <strong>nombre</strong> y qué columna contiene el <strong>código</strong> de cada artículo.</p>'+
+    '<div class="col-picker">'+
+      '<div class="col-picker-t">Asignacion de columnas</div>'+
+      '<div class="col-row"><label>Nombre del artículo *</label><select id="xsel-name" onchange="xlsColChange()">'+optsName+'</select></div>'+
+      '<div class="col-row"><label>Código (CN, EAN…)</label><select id="xsel-code" onchange="xlsColChange()">'+optsCode+'</select></div>'+
+    '</div>'+
+    '<p style="font-size:.74rem;color:var(--text3)">El código es opcional. Si tu archivo no tiene código de artículo, deja "Ninguna".</p>';
+  xlsColChange();
+
+  function xlsColChange(){
+    xlsState.colName=parseInt(document.getElementById('xsel-name').value);
+    xlsState.colCode=parseInt(document.getElementById('xsel-code').value);
+    var ok=xlsState.colName>=0;
+    btnNext.disabled=!ok;
+    msg.textContent=ok?'Columna nombre: '+cols[xlsState.colName]:'Selecciona la columna de nombre para continuar';
+  }
+  window.xlsColChange=xlsColChange;
+}
+
+/* Paso 3: seleccionar artículos */
+function renderStep3(body,msg,btnNext){
+  // parsear artículos
+  var rows=xlsState.rows.slice(1);
+  xlsState.articles=rows.map(function(r){
+    var name=String(r[xlsState.colName]||'').trim();
+    var code=xlsState.colCode>=0?String(r[xlsState.colCode]||'').trim():'';
+    if(!name)return null;
+    // detectar duplicado con inventario actual
+    var dupN=dupName(name,null);
+    var dupC=code?dupCode(code,null):null;
+    return{name:name,code:code,dup:dupN||dupC||null};
+  }).filter(Boolean);
+
+  // pre-seleccionar los no duplicados
+  if(xlsState.selected.size===0){
+    xlsState.articles.forEach(function(_,i){if(!xlsState.articles[i].dup)xlsState.selected.add(i)});
+  }
+
+  renderArtGrid(body,msg,btnNext);
+}
+
+function renderArtGrid(body,msg,btnNext){
+  var arts=xlsState.articles;
+  var filterQ=(document.getElementById('xart-filter')?document.getElementById('xart-filter').value:'').toLowerCase();
+
+  var selLinks='<div class="art-sel-links">'+
+    '<a onclick="xlsSelAll()">Seleccionar todos</a>'+
+    '<a onclick="xlsSelNone()">Ninguno</a>'+
+    '<a onclick="xlsSelNoDup()">Solo sin duplicado</a>'+
+  '</div>';
+
+  var grid='<div class="art-grid" id="xart-grid">';
+  var shown=0;
+  arts.forEach(function(a,i){
+    if(filterQ&&a.name.toLowerCase().indexOf(filterQ)===-1&&a.code.toLowerCase().indexOf(filterQ)===-1)return;
+    shown++;
+    var isSel=xlsState.selected.has(i);
+    var isDup=!!a.dup;
+    var card='<div class="art-card'+(isSel?' xsel':'')+(isDup?' xdup':'')+'" data-xi="'+i+'" onclick="xlsToggleArt('+i+')">';
+    card+='<div class="xchk"><svg class="xchk-tick" width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    card+='<div class="xart-info"><div class="xart-n">'+eh(a.name)+'</div>';
+    if(a.code)card+='<div class="xart-c">CN '+eh(a.code)+'</div>';
+    if(isDup)card+='<div class="xdup-badge">Ya existe en Zona '+eh(a.dup.zone)+'</div>';
+    card+='</div></div>';
+    grid+=card;
+  });
+  grid+='</div>';
+
+  body.innerHTML=
+    '<div class="art-filter-row"><input type="text" id="xart-filter" placeholder="Filtrar artículos..." oninput="xlsFilterChange()" value="'+filterQ+'"><span>'+shown+' artículos</span></div>'+
+    selLinks+grid;
+
+  var nSel=xlsState.selected.size;
+  btnNext.disabled=nSel===0;
+  msg.textContent=nSel+' artículos seleccionados de '+arts.length;
+  if(nSel>0)btnNext.disabled=false;
+}
+
+window.xlsToggleArt=function(i){
+  if(xlsState.articles[i].dup)return;
+  if(xlsState.selected.has(i))xlsState.selected.delete(i);
+  else xlsState.selected.add(i);
+  xlsRenderArtGridFast();
+};
+window.xlsSelAll=function(){xlsState.articles.forEach(function(_,i){if(!xlsState.articles[i].dup)xlsState.selected.add(i)});xlsRenderArtGridFast()};
+window.xlsSelNone=function(){xlsState.selected.clear();xlsRenderArtGridFast()};
+window.xlsSelNoDup=function(){xlsState.selected.clear();xlsState.articles.forEach(function(_,i){if(!xlsState.articles[i].dup)xlsState.selected.add(i)});xlsRenderArtGridFast()};
+window.xlsFilterChange=function(){xlsRenderArtGridFast()};
+
+function xlsRenderArtGridFast(){
+  renderArtGrid(document.getElementById('xls-body'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
+}
+
+/* Paso 4: elegir zonas y asignar */
+function renderStep4(body,msg,btnNext){
+  var nSel=xlsState.selected.size;
+  var zoneGrid='<div class="zone-grid-x">';
+  AZ.forEach(function(z){
+    zoneGrid+='<div class="zone-btn-x'+(xlsState.zones.has(z)?' zsel':'')+'" onclick="xlsToggleZone(\''+z+'\')">'+z+'</div>';
+  });
+  zoneGrid+='</div>';
+
+  var assignHtml='';
+  if(xlsState.zones.size>1){
+    assignHtml='<div class="col-picker-t" style="margin-bottom:8px">Asigna cada artículo a su zona</div>';
+    assignHtml+='<div class="assign-list">';
+    xlsState.selected.forEach(function(i){
+      var a=xlsState.articles[i];
+      var cur=xlsState.assign[i]||[...xlsState.zones][0];
+      var opts=AZ.filter(function(z){return xlsState.zones.has(z)}).map(function(z){return'<option value="'+z+'"'+(z===cur?' selected':'')+'>Zona '+z+'</option>'}).join('');
+      assignHtml+='<div class="assign-row"><div class="assign-row-info"><div class="assign-row-n">'+eh(a.name)+'</div>'+(a.code?'<div class="assign-row-c">CN '+eh(a.code)+'</div>':'')+
+        '</div><select onchange="xlsState.assign['+i+']=this.value">'+opts+'</select></div>';
+    });
+    assignHtml+='</div>';
+  }else if(xlsState.zones.size===1){
+    assignHtml='<p style="font-size:.8rem;color:var(--green);margin-bottom:10px">Todos los artículos irán a la Zona '+[...xlsState.zones][0]+'.</p>';
+    xlsState.selected.forEach(function(i){xlsState.assign[i]=[...xlsState.zones][0]});
+  }
+
+  body.innerHTML=
+    '<p style="font-size:.82rem;color:var(--text2);margin-bottom:12px">Elige una o varias zonas de destino para los <strong>'+nSel+'</strong> artículos seleccionados.</p>'+
+    zoneGrid+assignHtml;
+
+  xlsUpdateZoneFooter(msg,btnNext);
+}
+
+window.xlsToggleZone=function(z){
+  if(xlsState.zones.has(z))xlsState.zones.delete(z);
+  else xlsState.zones.add(z);
+  // si solo hay 1 zona, asignar todo a ella automáticamente
+  if(xlsState.zones.size===1){xlsState.selected.forEach(function(i){xlsState.assign[i]=[...xlsState.zones][0]})}
+  renderStep4(document.getElementById('xls-body'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
+};
+
+function xlsUpdateZoneFooter(msg,btnNext){
+  var ok=xlsState.zones.size>0;
+  btnNext.disabled=!ok;
+  msg.textContent=ok?xlsState.zones.size+' zona'+( xlsState.zones.size>1?'s':'')+' seleccionada'+( xlsState.zones.size>1?'s':''):'Selecciona al menos una zona';
+}
+
+/* Paso 5: resumen y confirmación */
+function renderStep5(body,msg,btnNext){
+  // calcular asignaciones finales
+  if(xlsState.zones.size===1){
+    var z=[...xlsState.zones][0];
+    xlsState.selected.forEach(function(i){xlsState.assign[i]=z});
+  }
+  var byZone={};
+  xlsState.selected.forEach(function(i){
+    var z=xlsState.assign[i]||[...xlsState.zones][0];
+    if(!byZone[z])byZone[z]=[];
+    byZone[z].push(xlsState.articles[i]);
+  });
+
+  var total=xlsState.selected.size;
+  var dupWarnings=[];
+  xlsState.selected.forEach(function(i){if(xlsState.articles[i].dup)dupWarnings.push(xlsState.articles[i].name)});
+
+  var html='<div class="sum-ok"><div class="sum-ok-n">'+total+'</div><div class="sum-ok-t">artículos listos para añadir</div></div>';
+  if(dupWarnings.length){
+    html+='<div class="sum-warn">&#9888; '+dupWarnings.length+' artículo'+(dupWarnings.length>1?'s ya existen':'ya existe')+' en el almacén y se omitirá'+(dupWarnings.length>1?'n':'')+'.</div>';
+  }
+  html+='<div class="summary-block">';
+  Object.keys(byZone).sort().forEach(function(z){
+    html+='<div class="sum-zone"><div class="sum-zone-lbl"><span>Zona '+eh(z)+'</span> '+byZone[z].length+' artículo'+(byZone[z].length>1?'s':'')+'</div>';
+    byZone[z].forEach(function(a){
+      html+='<div class="sum-item">'+eh(a.name)+(a.code?'<span class="sum-item-c">CN '+eh(a.code)+'</span>':'')+'</div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  body.innerHTML=html;
+  msg.textContent='Revisa y confirma para añadir al inventario';
+  btnNext.disabled=false;
+}
+
+/* Navegación entre pasos */
+function xlsNext(){
+  if(xlsState.step===2){
+    // confirmar columnas y parsear artículos
+    xlsState.colName=parseInt(document.getElementById('xsel-name').value);
+    xlsState.colCode=parseInt(document.getElementById('xsel-code').value);
+  }
+  if(xlsState.step===5){
+    xlsCommit();
+    return;
+  }
+  xlsState.step++;
+  xlsRender();
+}
+function xlsBack(){
+  if(xlsState.step>1){xlsState.step--;xlsRender();}
+}
+
+/* Commit: añadir artículos al db */
+function xlsCommit(){
+  var added=0,skipped=0;
+  xlsState.selected.forEach(function(i){
+    var a=xlsState.articles[i];
+    var z=xlsState.assign[i]||[...xlsState.zones][0];
+    // re-verificar duplicados en tiempo real
+    if(dupName(a.name,null)||dupCode(a.code,null)){skipped++;return}
+    if(!db[z])db[z]=[];
+    db[z].push({_id:uid(),name:a.name,code:a.code||''});
+    added++;
+  });
+  saveDB();
+  closeXlsModal();
+  renderMap();renderZone();
+  var msg=added+' artículos añadidos al almacén';
+  if(skipped)msg+=', '+skipped+' omitidos por duplicado';
+  toast(msg,'ok');
 }
 
 ensureIds();renderMap();renderZone();
