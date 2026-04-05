@@ -347,60 +347,39 @@ function ensureIds(){
   if(ch)saveDB();
 }
 
-function dupName(name,xid){
-  // devuelve zona si el nombre ya existe en 2 o más zonas (o en 1 zona distinta al xid si xid es null)
+/* Cuenta cuántas zonas distintas tienen ya este nombre (excluyendo xid) */
+function contarZonasNombre(name,xid){
   var n=name.trim().toLowerCase();
-  var encontrados=[];
-  for(var z in db){
-    for(var i=0;i<db[z].length;i++){
-      var it=db[z][i];
-      if(it._id&&it._id===xid)continue;
-      if(it.name.trim().toLowerCase()===n)encontrados.push({zone:z,item:it});
-    }
-  }
-  // bloquear si ya hay 2 o más entradas con ese nombre
-  if(encontrados.length>=2)return encontrados[0];
-  return null;
+  var zonas=new Set();
+  for(var z in db){for(var i=0;i<db[z].length;i++){var it=db[z][i];if(it._id===xid)continue;if(it.name.trim().toLowerCase()===n)zonas.add(z);}}
+  return zonas.size;
+}
+/* Cuenta cuántas zonas distintas tienen ya este código (excluyendo xid) */
+function contarZonasCodigo(code,xid){
+  if(!code||!code.trim())return 0;
+  var c=code.trim().toLowerCase();
+  var zonas=new Set();
+  for(var z in db){for(var i=0;i<db[z].length;i++){var it=db[z][i];if(it._id===xid)continue;if(it.code&&it.code.trim().toLowerCase()===c)zonas.add(z);}}
+  return zonas.size;
+}
+/* ¿Está este nombre ya en esta zona concreta? */
+function enEstaZona(name,zone,xid){
+  var n=name.trim().toLowerCase();
+  var items=db[zone]||[];
+  for(var i=0;i<items.length;i++){if(items[i]._id!==xid&&items[i].name.trim().toLowerCase()===n)return true;}
+  return false;
+}
+/* dupName/dupCode ahora solo bloquean si hay >=2 zonas con ese nombre/codigo */
+function dupName(name,xid){
+  var n=name.trim().toLowerCase();var res=null;
+  for(var z in db){for(var i=0;i<db[z].length;i++){var it=db[z][i];if(it._id===xid)continue;if(it.name.trim().toLowerCase()===n){if(!res)res={count:1,zone:z,item:it};else{res.count++;}}}}
+  return(res&&res.count>=2)?res:null;
 }
 function dupCode(code,xid){
   if(!code||!code.trim())return null;
-  var c=code.trim().toLowerCase();
-  var encontrados=[];
-  for(var z in db){
-    for(var i=0;i<db[z].length;i++){
-      var it=db[z][i];
-      if(it._id&&it._id===xid)continue;
-      if(it.code&&it.code.trim().toLowerCase()===c)encontrados.push({zone:z,item:it});
-    }
-  }
-  // bloquear si ya hay 2 o más entradas con ese código
-  if(encontrados.length>=2)return encontrados[0];
-  return null;
-}
-function dupNameExacto(name,xid){
-  var n=name.trim().toLowerCase();
-  var res=[];
-  for(var z in db){
-    for(var i=0;i<db[z].length;i++){
-      var it=db[z][i];
-      if(it._id&&it._id===xid)continue;
-      if(it.name.trim().toLowerCase()===n)res.push({zone:z,item:it});
-    }
-  }
-  return res;
-}
-function dupCodeExacto(code,xid){
-  if(!code||!code.trim())return[];
-  var c=code.trim().toLowerCase();
-  var res=[];
-  for(var z in db){
-    for(var i=0;i<db[z].length;i++){
-      var it=db[z][i];
-      if(it._id&&it._id===xid)continue;
-      if(it.code&&it.code.trim().toLowerCase()===c)res.push({zone:z,item:it});
-    }
-  }
-  return res;
+  var c=code.trim().toLowerCase();var res=null;
+  for(var z in db){for(var i=0;i<db[z].length;i++){var it=db[z][i];if(it._id===xid)continue;if(it.code&&it.code.trim().toLowerCase()===c){if(!res)res={count:1,zone:z,item:it};else{res.count++;}}}}
+  return(res&&res.count>=2)?res:null;
 }
 function byId(id){
   for(var z in db){
@@ -501,21 +480,15 @@ function addItem(){
   var name=document.getElementById('iname').value.trim();
   var code=document.getElementById('icode').value.trim();
   if(!name){toast('Introduce el nombre del articulo','err');return}
-  // comprobar si ya existe en alguna zona
-  var existeN=dupNameExacto(name,null);
-  var existeC=code?dupCodeExacto(code,null):null;
-  if(existeN&&existeN.length>=2){toast('"'+name+'" ya esta en 2 zonas (maximo permitido)','err');return}
-  if(existeC&&existeC.length>=2){toast('CN '+code+' ya esta en 2 zonas (maximo permitido)','err');return}
-  if(existeN&&existeN.some(function(e){return e.zone===sel})){toast('"'+name+'" ya existe en esta zona','err');return}
-  if(existeC&&existeC.some(function(e){return e.zone===sel})){toast('CN '+code+' ya existe en esta zona','err');return}
+  if(enEstaZona(name,sel,null)){toast('"'+name+'" ya existe en esta zona','err');return}
+  if(contarZonasNombre(name,null)>=2){toast('"'+name+'" ya esta en 2 zonas (maximo permitido)','err');return}
+  if(code&&contarZonasCodigo(code,null)>=2){toast('CN '+code+' ya esta en 2 zonas (maximo permitido)','err');return}
   if(!db[sel])db[sel]=[];
   db[sel].push({_id:uid(),name:name,code:code});
   saveDB();
   document.getElementById('iname').value='';
   document.getElementById('icode').value='';
-  var msg='Anadido a Zona '+sel;
-  if(existeN)msg+=' (tambien en Zona '+existeN[0].zone+')';
-  toast(msg,'ok');
+  toast('Anadido a Zona '+sel,'ok');
   renderMap();renderZone();
 }
 document.getElementById('icode').addEventListener('keydown',function(e){if(e.key==='Enter')addItem()});
@@ -673,9 +646,10 @@ function importData(ev){
       for(var z in inc){
         inc[z].forEach(function(it){
           var n=it.name.trim().toLowerCase();
-          if(sn.has(n))throw new Error('Nombre duplicado: "'+it.name+'"');
-          sn.set(n,z);
-          if(it.code&&it.code.trim()){var c=it.code.trim().toLowerCase();if(sc.has(c))throw new Error('CN duplicado: '+it.code);sc.set(c,z)}
+          var cnt=sn.get(n)||0;
+          if(cnt>=2)throw new Error('Nombre en mas de 2 zonas: "'+it.name+'"');
+          sn.set(n,cnt+1);
+          if(it.code&&it.code.trim()){var c=it.code.trim().toLowerCase();var cc=sc.get(c)||0;if(cc>=2)throw new Error('CN en mas de 2 zonas: '+it.code);sc.set(c,cc+1)}
         });
       }
       var cur=Object.values(db).reduce(function(a,x){return a+x.length},0);
@@ -754,9 +728,9 @@ function xlsParsearArticulos(){
     var name=String(r[xlsState.colName]||'').trim();
     var code=xlsState.colCode>=0?String(r[xlsState.colCode]||'').trim():'';
     if(!name)return null;
-    var dupN=dupName(name,null);
-    var dupC=code?dupCode(code,null):null;
-    return{name:name,code:code,dup:(dupN||dupC)||null,zona:'',zona2:''};
+    // solo marcar dup si YA hay 2 zonas con ese nombre (no se puede añadir más)
+    var bloqueado=(contarZonasNombre(name,null)>=2)||(code&&contarZonasCodigo(code,null)>=2);
+    return{name:name,code:code,dup:bloqueado?{zone:'máx'}:null,zona:'',zona2:''};
   }).filter(Boolean);
 }
 
@@ -919,19 +893,20 @@ function xlsBack(){
 function xlsCommit(){
   var added=0,skipped=0;
   xlsState.articles.forEach(function(a){
-    if(a.dup||!a.zona){skipped++;return}
-    // comprobar que no supera 2 zonas ya existentes
-    var enN=dupNameExacto(a.name,null);
-    var enC=a.code?dupCodeExacto(a.code,null):[];
-    if(enN.length>=2||(enC.length>=2)){skipped++;return}
-    if(!db[a.zona])db[a.zona]=[];
-    db[a.zona].push({_id:uid(),name:a.name,code:a.code||''});
-    added++;
-    // zona2: se permite siempre que sea distinta y no haya ya 2
-    if(a.zona2&&a.zona2!==a.zona){
-      if(!db[a.zona2])db[a.zona2]=[];
-      db[a.zona2].push({_id:uid(),name:a.name,code:a.code||''});
+    if(!a.zona){skipped++;return}
+    // zona 1
+    if(contarZonasNombre(a.name,null)<2&&!enEstaZona(a.name,a.zona,null)){
+      if(!db[a.zona])db[a.zona]=[];
+      db[a.zona].push({_id:uid(),name:a.name,code:a.code||''});
       added++;
+    }else{skipped++;return}
+    // zona 2 opcional
+    if(a.zona2&&a.zona2!==a.zona){
+      if(contarZonasNombre(a.name,null)<2&&!enEstaZona(a.name,a.zona2,null)){
+        if(!db[a.zona2])db[a.zona2]=[];
+        db[a.zona2].push({_id:uid(),name:a.name,code:a.code||''});
+        added++;
+      }
     }
   });
   saveDB();
