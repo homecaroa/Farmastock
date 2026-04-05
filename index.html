@@ -125,86 +125,61 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 @media(max-width:860px){.layout{grid-template-columns:1fr}.sidebar{height:auto;position:static;border-left:none;border-top:1.5px solid var(--border)}}
 
 /* ── Modal XLS ── */
-.mxls{display:none;position:fixed;inset:0;background:rgba(10,20,40,.52);z-index:600;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.mxls{display:none;position:fixed;inset:0;background:rgba(10,20,40,.52);z-index:600;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
 .mxls.act{display:flex}
-.mxls-box{background:#fff;border-radius:14px;box-shadow:var(--shl);width:100%;max-width:760px;overflow:hidden;animation:mi .22s cubic-bezier(.22,1,.36,1);margin:auto}
-.mxls-hdr{background:var(--accent);color:#fff;padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
-.mxls-hdr h2{font-size:.92rem;font-weight:600;letter-spacing:.03em}
-.mxls-hdr button{background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;border-radius:50%;width:28px;height:28px;font-size:1rem;line-height:1;transition:background .14s}
+.mxls-box{background:#fff;border-radius:14px;box-shadow:var(--shl);width:100%;max-width:820px;overflow:hidden;animation:mi .22s cubic-bezier(.22,1,.36,1);margin:auto;display:flex;flex-direction:column;max-height:calc(100vh - 32px)}
+.mxls-hdr{background:var(--accent);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mxls-hdr-left{display:flex;flex-direction:column;gap:2px}
+.mxls-hdr h2{font-size:.92rem;font-weight:600;letter-spacing:.03em;margin:0}
+.mxls-hdr .mxls-fname{font-size:.72rem;color:#a8c4e0}
+.mxls-hdr button{background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;border-radius:50%;width:28px;height:28px;font-size:1rem;line-height:1;transition:background .14s;flex-shrink:0}
 .mxls-hdr button:hover{background:rgba(255,255,255,.28)}
-.mxls-steps{display:flex;padding:0 22px;background:var(--hi);border-bottom:1.5px solid var(--border)}
-.mxls-step-tab{padding:10px 0;margin-right:20px;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2.5px solid transparent;cursor:default;white-space:nowrap}
-.mxls-step-tab.act{color:var(--accent);border-bottom-color:var(--accent2)}
-.mxls-body{padding:20px 22px;min-height:340px}
-.xls-drop{border:2px dashed var(--border);border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:18px}
-.xls-drop:hover,.xls-drop.drag{border-color:var(--accent2);background:var(--hi)}
-.xls-drop-icon{font-size:2rem;margin-bottom:10px;opacity:.5}
-.xls-drop p{font-size:.82rem;color:var(--text2);margin-bottom:5px}
-.xls-drop small{font-size:.72rem;color:var(--text3)}
-.col-picker{background:var(--hi);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
-.col-picker-t{font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
-.col-row{display:flex;gap:10px;align-items:center;margin-bottom:8px}
-.col-row:last-child{margin-bottom:0}
-.col-row label{font-size:.78rem;color:var(--text2);width:120px;flex-shrink:0}
-.col-row select{flex:1;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none}
-.col-row select:focus{border-color:var(--accent2)}
-.preview-tbl-wrap{overflow:auto;max-height:160px;border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:14px}
-.preview-tbl{width:100%;border-collapse:collapse;font-size:.74rem}
-.preview-tbl th{background:var(--accent);color:#fff;padding:5px 9px;text-align:left;font-weight:600;white-space:nowrap}
-.preview-tbl td{padding:4px 9px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
-.preview-tbl tr:last-child td{border-bottom:none}
-.preview-tbl tr:nth-child(even) td{background:var(--hi)}
-.art-filter-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-.art-filter-row input{flex:1;font-family:'IBM Plex Mono',monospace;font-size:.78rem;padding:6px 9px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none}
-.art-filter-row input:focus{border-color:var(--accent2)}
-.art-filter-row span{font-size:.74rem;color:var(--text3);white-space:nowrap}
-.art-sel-links{display:flex;gap:10px;margin-bottom:8px}
-.art-sel-links a{font-size:.74rem;color:var(--accent2);cursor:pointer;text-decoration:underline}
-.art-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;max-height:300px;overflow-y:auto;padding-right:2px}
-.art-card{border:1.5px solid var(--border);border-radius:var(--r);padding:8px 10px;cursor:pointer;transition:border-color .12s,background .12s;display:flex;align-items:flex-start;gap:8px;background:#fff}
-.art-card:hover{border-color:#93c5fd;background:var(--hi)}
-.art-card.xsel{border-color:var(--accent2);background:var(--hi2)}
-.art-card.xdup{opacity:.45;cursor:not-allowed}
-.xchk{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .12s;background:#fff}
-.art-card.xsel .xchk{background:var(--accent2);border-color:var(--accent2)}
-.xchk-tick{display:none}
-.art-card.xsel .xchk-tick{display:block}
-.xart-info{flex:1;min-width:0}
-.xart-n{font-size:.76rem;font-weight:600;color:var(--text);line-height:1.3;word-break:break-word}
-.xart-c{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--text3);margin-top:2px}
-.xdup-badge{font-size:.6rem;background:var(--yellow-bg);color:var(--yellow);border-radius:3px;padding:1px 5px;margin-top:3px;display:inline-block}
-.zone-grid-x{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px}
-.zone-btn-x{border:1.5px solid var(--border);border-radius:var(--r);padding:10px 4px;text-align:center;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--accent);background:var(--ze);transition:all .12s;font-family:'IBM Plex Mono',monospace}
-.zone-btn-x:hover{background:var(--zh);border-color:var(--accent2)}
-.zone-btn-x.zsel{background:var(--za);border-color:var(--accent2);color:var(--accent2)}
-.assign-list{display:flex;flex-direction:column;gap:5px;max-height:360px;overflow-y:auto;margin-bottom:14px}
-.assign-row{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:7px 10px}
-.assign-row-info{flex:1;min-width:0}
-.assign-row-n{font-size:.76rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.assign-row-c{font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--text3)}
-.assign-row select{font-size:.76rem;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none;font-family:'IBM Plex Sans',sans-serif}
-.assign-row select:focus{border-color:var(--accent2)}
-.summary-block{background:var(--hi);border-radius:var(--r);padding:10px 14px;max-height:280px;overflow-y:auto;margin-bottom:14px}
-.sum-zone{margin-bottom:10px}
-.sum-zone:last-child{margin-bottom:0}
-.sum-zone-lbl{font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;display:flex;align-items:center;gap:6px}
-.sum-zone-lbl span{background:var(--accent);color:#fff;border-radius:4px;padding:1px 7px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:600}
-.sum-item{font-size:.77rem;color:var(--text);padding:2px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.sum-item:last-child{border-bottom:none}
-.sum-item-c{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--text3);margin-left:auto}
-.sum-ok{background:var(--green-bg);border:1.5px solid #a7d3b8;border-radius:var(--r);padding:12px 16px;text-align:center;margin-bottom:14px}
-.sum-ok-n{font-size:1.8rem;font-weight:600;color:var(--green);line-height:1}
-.sum-ok-t{font-size:.79rem;color:var(--green);margin-top:3px}
-.sum-warn{background:var(--yellow-bg);border:1.5px solid #fcd34d;border-radius:var(--r);padding:8px 12px;font-size:.76rem;color:var(--yellow);margin-bottom:10px}
-.xls-footer{display:flex;gap:8px;align-items:center;border-top:1.5px solid var(--border);padding:14px 22px;background:var(--bg)}
+/* pantalla columnas */
+.xcol-screen{padding:20px 22px}
+.xcol-info{font-size:.82rem;color:var(--text2);margin-bottom:14px;line-height:1.5}
+.xcol-picker{background:var(--hi);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+.xcol-t{font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.xcol-row{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.xcol-row:last-child{margin-bottom:0}
+.xcol-row label{font-size:.78rem;color:var(--text2);width:130px;flex-shrink:0}
+.xcol-row select{flex:1;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;padding:6px 8px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none}
+.xcol-row select:focus{border-color:var(--accent2)}
+/* pantalla tabla */
+.xtbl-toolbar{display:flex;gap:8px;align-items:center;padding:10px 20px;border-bottom:1.5px solid var(--border);background:var(--hi);flex-shrink:0;flex-wrap:wrap}
+.xtbl-toolbar input{flex:1;min-width:160px;font-family:'IBM Plex Mono',monospace;font-size:.78rem;padding:6px 9px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none}
+.xtbl-toolbar input:focus{border-color:var(--accent2)}
+.xtbl-bulk{display:flex;gap:6px;align-items:center}
+.xtbl-bulk select{font-size:.76rem;padding:5px 7px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);font-family:'IBM Plex Sans',sans-serif;outline:none}
+.xtbl-bulk button{background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:5px 11px;font-size:.74rem;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-weight:600;white-space:nowrap}
+.xtbl-bulk button:hover{background:var(--accent2)}
+.xtbl-stat{font-size:.74rem;color:var(--text3);white-space:nowrap;margin-left:auto}
+/* tabla de artículos */
+.xtbl-wrap{flex:1;overflow-y:auto}
+.xtbl{width:100%;border-collapse:collapse}
+.xtbl thead th{position:sticky;top:0;background:var(--accent);color:#fff;padding:8px 12px;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-align:left;white-space:nowrap;z-index:2}
+.xtbl thead th:last-child{width:120px}
+.xtbl tbody tr{border-bottom:1px solid var(--border);transition:background .08s}
+.xtbl tbody tr:hover{background:var(--hi)}
+.xtbl tbody tr.xdup-row{opacity:.5}
+.xtbl td{padding:8px 12px;font-size:.78rem;color:var(--text);vertical-align:middle}
+.xtbl td.xtd-name{font-weight:600;max-width:300px}
+.xtbl td.xtd-code{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--text3);white-space:nowrap}
+.xtbl td.xtd-zona{white-space:nowrap}
+.xtbl td.xtd-zona select{font-size:.76rem;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);font-family:'IBM Plex Sans',sans-serif;outline:none;width:100%;transition:border-color .12s}
+.xtbl td.xtd-zona select:focus{border-color:var(--accent2)}
+.xtbl td.xtd-zona select.ok{border-color:#a7d3b8;background:#f0faf5}
+.xtbl td.xtd-zona select.pend{border-color:#fcd34d;background:#fffbeb}
+.xdup-tag{font-size:.6rem;background:var(--yellow-bg);color:var(--yellow);border-radius:3px;padding:1px 5px;margin-left:5px;vertical-align:middle;white-space:nowrap}
+/* footer */
+.xls-footer{display:flex;gap:8px;align-items:center;border-top:1.5px solid var(--border);padding:12px 20px;background:var(--bg);flex-shrink:0}
 .xls-footer-l{flex:1;font-size:.75rem;color:var(--text3)}
 .xbtn{border:1.5px solid var(--border);background:#fff;color:var(--text2);border-radius:var(--r);padding:7px 14px;font-size:.79rem;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-weight:500;transition:background .12s}
 .xbtn:hover{background:var(--bg)}
 .xbtn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
 .xbtn.primary:hover{background:var(--accent2);border-color:var(--accent2)}
-.xbtn.primary:disabled{opacity:.4;cursor:not-allowed}
 .xbtn.success{background:var(--green);color:#fff;border-color:var(--green)}
 .xbtn.success:hover{background:#0a6040}
+.xbtn:disabled{opacity:.4;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -310,18 +285,13 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 <div class="mxls" id="mxls">
   <div class="mxls-box">
     <div class="mxls-hdr">
-      <h2>Importar desde Excel / CSV</h2>
+      <div class="mxls-hdr-left">
+        <h2>Importar desde Excel / CSV</h2>
+        <span class="mxls-fname" id="xls-fname"></span>
+      </div>
       <button onclick="closeXlsModal()">&#10005;</button>
     </div>
-    <div class="mxls-steps" id="xls-tabs">
-      <div class="mxls-step-tab act" id="xtab-1">1. Archivo</div>
-      <div class="mxls-step-tab" id="xtab-2">2. Columnas</div>
-      <div class="mxls-step-tab" id="xtab-3">3. Seleccion</div>
-      <div class="mxls-step-tab" id="xtab-4">4. Ubicacion</div>
-      <div class="mxls-step-tab" id="xtab-5">5. Confirmar</div>
-
-    </div>
-    <div class="mxls-body" id="xls-body"></div>
+    <div id="xls-screen"></div>
     <div class="xls-footer">
       <div class="xls-footer-l" id="xls-footer-msg"></div>
       <div style="display:flex;gap:7px">
@@ -611,23 +581,23 @@ function toast(msg,type){
 }
 
 /* ═══════════════════════════════════════════
-   IMPORTACIÓN DESDE EXCEL — flujo en 5 pasos
+   IMPORTACIÓN DESDE EXCEL — tabla directa
    ═══════════════════════════════════════════ */
 var xlsState={
-  step:1,
+  screen:'cols',
   rows:[],
   headers:[],
   colName:-1,
   colCode:-1,
   articles:[],
-  selected:new Set(),
-  assign:{}
+  fname:''
 };
 
 function openXlsModal(ev){
   var f=ev.target.files[0];
   ev.target.value='';
   if(!f)return;
+  xlsState.fname=f.name;
   var reader=new FileReader();
   reader.onload=function(e){
     try{
@@ -635,321 +605,217 @@ function openXlsModal(ev){
       var wb=XLSX.read(data,{type:'array'});
       var ws=wb.Sheets[wb.SheetNames[0]];
       var raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-      if(!raw||raw.length<2){toast('El archivo esta vacio o no tiene filas de datos','err');return}
-      // normalizar: quitar filas donde todas las celdas son vacías
+      if(!raw||raw.length<2){toast('El archivo no tiene datos suficientes','err');return}
       raw=raw.filter(function(r){return r.some(function(c){return String(c).trim()!==''})});
       xlsState.rows=raw;
-      xlsState.headers=raw[0].map(function(c,i){return String(c).trim()||'Columna '+(i+1)});
-      xlsState.step=1;
+      xlsState.headers=raw[0].map(function(c,i){return String(c).trim()||'Col '+(i+1)});
       xlsState.articles=[];
-      xlsState.selected=new Set();
-      xlsState.assign={};
-      // autodetectar columnas por nombre de cabecera
       xlsState.colName=-1;xlsState.colCode=-1;
       xlsState.headers.forEach(function(h,i){
         var hl=h.toLowerCase();
         if(xlsState.colName===-1&&(hl.indexOf('denominacion')!==-1||hl.indexOf('descripcion')!==-1||hl.indexOf('nombre')!==-1||hl.indexOf('articulo')!==-1||hl.indexOf('product')!==-1))xlsState.colName=i;
-        if(xlsState.colCode===-1&&(hl.indexOf('codigo')!==-1||hl.indexOf('cod')!==-1||hl.indexOf('cn')!==-1||hl.indexOf('ean')!==-1||hl.indexOf('referencia')!==-1))xlsState.colCode=i;
+        if(xlsState.colCode===-1&&(hl.indexOf('codigo')!==-1||hl.indexOf('cod')!==-1||hl===('cn')||hl.indexOf('ean')!==-1||hl.indexOf('referencia')!==-1))xlsState.colCode=i;
       });
+      document.getElementById('xls-fname').textContent=xlsState.fname+' · '+(raw.length-1)+' filas';
       document.getElementById('mxls').classList.add('act');
+      if(xlsState.colName>=0){
+        xlsParsearArticulos();
+        xlsState.screen='table';
+      }else{
+        xlsState.screen='cols';
+      }
       xlsRender();
     }catch(err){toast('Error al leer el archivo: '+err.message,'err')}
   };
   reader.readAsArrayBuffer(f);
 }
 
-function closeXlsModal(){
-  document.getElementById('mxls').classList.remove('act');
-}
+function closeXlsModal(){document.getElementById('mxls').classList.remove('act')}
 document.getElementById('mxls').addEventListener('click',function(e){if(e.target===this)closeXlsModal()});
 
-function xlsSetStep(n){
-  xlsState.step=n;
-  for(var i=1;i<=5;i++){
-    var t=document.getElementById('xtab-'+i);
-    if(t)t.className='mxls-step-tab'+(i===n?' act':'');
-  }
-}
-
-function xlsRender(){
-  xlsSetStep(xlsState.step);
-  var body=document.getElementById('xls-body');
-  var msg=document.getElementById('xls-footer-msg');
-  var btnBack=document.getElementById('xbtn-back');
-  var btnNext=document.getElementById('xbtn-next');
-  btnBack.style.display=xlsState.step>1?'':'none';
-  btnNext.textContent=xlsState.step<5?'Siguiente &#8594;':'Anadir al almacen';
-  btnNext.innerHTML=xlsState.step<5?'Siguiente &#8594;':'&#10003; Anadir al almacen';
-  btnNext.className='xbtn '+(xlsState.step===5?'success':'primary');
-
-  if(xlsState.step===1) renderStep1(body,msg,btnNext);
-  else if(xlsState.step===2) renderStep2(body,msg,btnNext);
-  else if(xlsState.step===3) renderStep3(body,msg,btnNext);
-  else if(xlsState.step===4) renderStep4(body,msg,btnNext);
-  else if(xlsState.step===5) renderStep5(body,msg,btnNext);
-}
-
-/* Paso 1: previsualización del archivo */
-function renderStep1(body,msg,btnNext){
-  var rows=xlsState.rows;
-  var preview=rows.slice(0,Math.min(6,rows.length));
-  var cols=xlsState.headers;
-  var tbl='<div class="preview-tbl-wrap"><table class="preview-tbl"><thead><tr>';
-  cols.forEach(function(h){tbl+='<th>'+eh(h)+'</th>'});
-  tbl+='</tr></thead><tbody>';
-  preview.slice(1).forEach(function(r){
-    tbl+='<tr>';
-    cols.forEach(function(_,i){tbl+='<td>'+eh(String(r[i]||''))+'</td>'});
-    tbl+='</tr>';
-  });
-  tbl+='</tbody></table></div>';
-  body.innerHTML=
-    '<p style="font-size:.82rem;color:var(--text2);margin-bottom:14px">Archivo cargado correctamente. Revisa la previsualización de las primeras filas:</p>'+
-    tbl+
-    '<p style="font-size:.76rem;color:var(--text3);margin-top:8px">'+
-      (rows.length-1)+' filas de datos · '+cols.length+' columnas · Hoja: cargada'+
-    '</p>';
-  msg.textContent=(rows.length-1)+' filas encontradas';
-  btnNext.disabled=false;
-}
-
-/* Paso 2: elegir columnas */
-function renderStep2(body,msg,btnNext){
-  var cols=xlsState.headers;
-  var opts='<option value="-1">-- Ninguna --</option>';
-  cols.forEach(function(h,i){opts+='<option value="'+i+'">'+eh(h)+'</option>'});
-  var optsName='<option value="-1">-- Selecciona --</option>';
-  cols.forEach(function(h,i){optsName+='<option value="'+i+'"'+(i===xlsState.colName?' selected':'')+'>'+eh(h)+'</option>'});
-  var optsCode='<option value="-1">-- Ninguna --</option>';
-  cols.forEach(function(h,i){optsCode+='<option value="'+i+'"'+(i===xlsState.colCode?' selected':'')+'>'+eh(h)+'</option>'});
-
-  body.innerHTML=
-    '<p style="font-size:.82rem;color:var(--text2);margin-bottom:14px">Indica qué columna contiene el <strong>nombre</strong> y qué columna contiene el <strong>código</strong> de cada artículo.</p>'+
-    '<div class="col-picker">'+
-      '<div class="col-picker-t">Asignacion de columnas</div>'+
-      '<div class="col-row"><label>Nombre del artículo *</label><select id="xsel-name" onchange="xlsColChange()">'+optsName+'</select></div>'+
-      '<div class="col-row"><label>Código (CN, EAN…)</label><select id="xsel-code" onchange="xlsColChange()">'+optsCode+'</select></div>'+
-    '</div>'+
-    '<p style="font-size:.74rem;color:var(--text3)">El código es opcional. Si tu archivo no tiene código de artículo, deja "Ninguna".</p>';
-  xlsColChange();
-
-  function xlsColChange(){
-    xlsState.colName=parseInt(document.getElementById('xsel-name').value);
-    xlsState.colCode=parseInt(document.getElementById('xsel-code').value);
-    var ok=xlsState.colName>=0;
-    btnNext.disabled=!ok;
-    msg.textContent=ok?'Columna nombre: '+cols[xlsState.colName]:'Selecciona la columna de nombre para continuar';
-  }
-  window.xlsColChange=xlsColChange;
-}
-
-/* Paso 3: seleccionar artículos */
-function renderStep3(body,msg,btnNext){
-  // parsear artículos
+function xlsParsearArticulos(){
   var rows=xlsState.rows.slice(1);
   xlsState.articles=rows.map(function(r){
     var name=String(r[xlsState.colName]||'').trim();
     var code=xlsState.colCode>=0?String(r[xlsState.colCode]||'').trim():'';
     if(!name)return null;
-    // detectar duplicado con inventario actual
     var dupN=dupName(name,null);
     var dupC=code?dupCode(code,null):null;
-    return{name:name,code:code,dup:dupN||dupC||null};
+    return{name:name,code:code,dup:(dupN||dupC)||null,zona:''};
   }).filter(Boolean);
-
-  // pre-seleccionar los no duplicados
-  if(xlsState.selected.size===0){
-    xlsState.articles.forEach(function(_,i){if(!xlsState.articles[i].dup)xlsState.selected.add(i)});
-  }
-
-  renderArtGrid(body,msg,btnNext);
 }
 
-function renderArtGrid(body,msg,btnNext){
+function xlsRender(){
+  var scr=document.getElementById('xls-screen');
+  var msg=document.getElementById('xls-footer-msg');
+  var btnBack=document.getElementById('xbtn-back');
+  var btnNext=document.getElementById('xbtn-next');
+  if(xlsState.screen==='cols'){
+    btnBack.style.display='none';
+    btnNext.innerHTML='Ver artículos &#8594;';
+    btnNext.className='xbtn primary';
+    renderScreenCols(scr,msg,btnNext);
+  }else{
+    btnBack.style.display='none';
+    btnNext.innerHTML='&#10003; Guardar en almacén';
+    btnNext.className='xbtn success';
+    renderScreenTable(scr,msg,btnNext);
+  }
+}
+
+function renderScreenCols(scr,msg,btnNext){
+  var cols=xlsState.headers;
+  var mkOpts=function(sel,allowNone){
+    var o=allowNone?'<option value="-1">-- Ninguna --</option>':'<option value="-1">-- Selecciona --</option>';
+    cols.forEach(function(h,i){o+='<option value="'+i+'"'+(i===sel?' selected':'')+'>'+eh(h)+'</option>'});
+    return o;
+  };
+  scr.innerHTML=
+    '<div class="xcol-screen">'+
+    '<p class="xcol-info">No se detectaron las columnas automáticamente. Indica cuál contiene el <strong>nombre</strong> del artículo y cuál el <strong>código</strong>.</p>'+
+    '<div class="xcol-picker">'+
+      '<div class="xcol-t">Asignar columnas</div>'+
+      '<div class="xcol-row"><label>Nombre del artículo *</label><select id="xsel-name" onchange="xlsColsChange()">'+mkOpts(xlsState.colName,false)+'</select></div>'+
+      '<div class="xcol-row"><label>Código (CN, EAN…)</label><select id="xsel-code" onchange="xlsColsChange()">'+mkOpts(xlsState.colCode,true)+'</select></div>'+
+    '</div>'+
+    '<p style="font-size:.74rem;color:var(--text3)">El código es opcional.</p>'+
+    '</div>';
+  xlsColsChange();
+}
+window.xlsColsChange=function(){
+  var n=parseInt(document.getElementById('xsel-name').value);
+  var c=parseInt(document.getElementById('xsel-code').value);
+  xlsState.colName=n;xlsState.colCode=c;
+  var ok=n>=0;
+  document.getElementById('xbtn-next').disabled=!ok;
+  document.getElementById('xls-footer-msg').textContent=ok?xlsState.headers[n]+' seleccionada como nombre':'Selecciona la columna de nombre';
+};
+
+function renderScreenTable(scr,msg,btnNext){
   var arts=xlsState.articles;
-  var filterQ=(document.getElementById('xart-filter')?document.getElementById('xart-filter').value:'').toLowerCase();
+  var filterQ=(document.getElementById('xtbl-filter')?document.getElementById('xtbl-filter').value:'').toLowerCase();
+  var bulkOpts='<option value="">Elige zona</option>'+AZ.map(function(z){return'<option value="'+z+'">Zona '+z+'</option>'}).join('');
 
-  var selLinks='<div class="art-sel-links">'+
-    '<a onclick="xlsSelAll()">Seleccionar todos</a>'+
-    '<a onclick="xlsSelNone()">Ninguno</a>'+
-    '<a onclick="xlsSelNoDup()">Solo sin duplicado</a>'+
-  '</div>';
+  var toolbar=
+    '<div class="xtbl-toolbar">'+
+      '<input type="text" id="xtbl-filter" placeholder="Filtrar por nombre o CN..." oninput="xlsTblFilter()" value="'+filterQ+'">'+
+      '<div class="xtbl-bulk">'+
+        '<select id="xtbl-bulk-zone">'+bulkOpts+'</select>'+
+        '<button onclick="xlsBulkZone()">Zona a todos</button>'+
+      '</div>'+
+      '<span class="xtbl-stat" id="xtbl-stat"></span>'+
+    '</div>';
 
-  var grid='<div class="art-grid" id="xart-grid">';
+  var rows='';
   var shown=0;
   arts.forEach(function(a,i){
     if(filterQ&&a.name.toLowerCase().indexOf(filterQ)===-1&&a.code.toLowerCase().indexOf(filterQ)===-1)return;
     shown++;
-    var isSel=xlsState.selected.has(i);
     var isDup=!!a.dup;
-    var card='<div class="art-card'+(isSel?' xsel':'')+(isDup?' xdup':'')+'" data-xi="'+i+'" onclick="xlsToggleArt('+i+')">';
-    card+='<div class="xchk"><svg class="xchk-tick" width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
-    card+='<div class="xart-info"><div class="xart-n">'+eh(a.name)+'</div>';
-    if(a.code)card+='<div class="xart-c">CN '+eh(a.code)+'</div>';
-    if(isDup)card+='<div class="xdup-badge">Ya existe en Zona '+eh(a.dup.zone)+'</div>';
-    card+='</div></div>';
-    grid+=card;
+    var hasZona=a.zona!=='';
+    var selOpts='<option value=""'+(a.zona===''?' selected':'')+'>Zona\u2026</option>'+
+      AZ.map(function(z){return'<option value="'+z+'"'+(z===a.zona?' selected':'')+'>Zona '+z+'</option>'}).join('');
+    rows+=
+      '<tr'+(isDup?' class="xdup-row"':'')+'>'+
+        '<td class="xtd-name">'+eh(a.name)+(isDup?'<span class="xdup-tag">Ya existe · Zona '+eh(a.dup.zone)+'</span>':'')+'</td>'+
+        '<td class="xtd-code">'+(a.code?eh(a.code):'\u2013')+'</td>'+
+        '<td class="xtd-zona">'+
+          (isDup
+            ?'<span style="font-size:.72rem;color:var(--text3);font-style:italic">Se omitirá</span>'
+            :'<select class="'+(hasZona?'ok':'pend')+'" data-i="'+i+'" onchange="xlsSetZona('+i+',this.value)">'+selOpts+'</select>'
+          )+
+        '</td>'+
+      '</tr>';
   });
-  grid+='</div>';
 
-  body.innerHTML=
-    '<div class="art-filter-row"><input type="text" id="xart-filter" placeholder="Filtrar artículos..." oninput="xlsFilterChange()" value="'+filterQ+'"><span>'+shown+' artículos</span></div>'+
-    selLinks+grid;
-
-  var nSel=xlsState.selected.size;
-  btnNext.disabled=nSel===0;
-  msg.textContent=nSel+' artículos seleccionados de '+arts.length;
-  if(nSel>0)btnNext.disabled=false;
-}
-
-window.xlsToggleArt=function(i){
-  if(xlsState.articles[i].dup)return;
-  if(xlsState.selected.has(i))xlsState.selected.delete(i);
-  else xlsState.selected.add(i);
-  xlsRenderArtGridFast();
-};
-window.xlsSelAll=function(){xlsState.articles.forEach(function(_,i){if(!xlsState.articles[i].dup)xlsState.selected.add(i)});xlsRenderArtGridFast()};
-window.xlsSelNone=function(){xlsState.selected.clear();xlsRenderArtGridFast()};
-window.xlsSelNoDup=function(){xlsState.selected.clear();xlsState.articles.forEach(function(_,i){if(!xlsState.articles[i].dup)xlsState.selected.add(i)});xlsRenderArtGridFast()};
-window.xlsFilterChange=function(){xlsRenderArtGridFast()};
-
-function xlsRenderArtGridFast(){
-  renderArtGrid(document.getElementById('xls-body'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
-}
-
-/* Paso 4: asignar zona a cada artículo individualmente */
-function renderStep4(body,msg,btnNext){
-  var arts=xlsState.articles;
-  var selArr=[...xlsState.selected];
-  var filterQ=(document.getElementById('xassign-filter')?document.getElementById('xassign-filter').value:'').toLowerCase();
-
-  // pre-rellenar assign con zona vacía si no tiene valor aún
-  selArr.forEach(function(i){if(!xlsState.assign[i])xlsState.assign[i]=''});
-
-  // contar sin zona asignada
-  var sinZona=selArr.filter(function(i){return!xlsState.assign[i]}).length;
-
-  var html='<p style="font-size:.82rem;color:var(--text2);margin-bottom:4px">Asigna una zona a cada artículo. Puedes usar el botón <strong>Zona a todos</strong> para asignar rápidamente la misma zona a los que no tengan.</p>';
-
-  // barra de herramientas rápida
-  var zonaOpts=AZ.map(function(z){return'<option value="'+z+'">Zona '+z+'</option>'}).join('');
-  html+='<div style="display:flex;gap:7px;align-items:center;margin-bottom:10px;flex-wrap:wrap">'+
-    '<input type="text" id="xassign-filter" placeholder="Filtrar artículos..." oninput="xlsAssignFilter()" value="'+filterQ+'" style="flex:1;min-width:140px;font-family:IBM Plex Mono,monospace;font-size:.76rem;padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);outline:none">'+
-    '<select id="xbulk-zone" style="font-size:.76rem;padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);font-family:IBM Plex Sans,sans-serif">'+zonaOpts+'</select>'+
-    '<button onclick="xlsAssignBulk()" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:5px 11px;font-size:.75rem;cursor:pointer;font-family:IBM Plex Sans,sans-serif;font-weight:600;white-space:nowrap">Zona a todos</button>'+
-  '</div>';
-
-  html+='<div class="assign-list" id="xassign-list">';
-  selArr.forEach(function(i){
-    var a=arts[i];
-    if(filterQ&&a.name.toLowerCase().indexOf(filterQ)===-1&&a.code.toLowerCase().indexOf(filterQ)===-1)return;
-    var cur=xlsState.assign[i]||'';
-    var opts='<option value="" disabled'+(cur===''?' selected':'')+'>Zona…</option>';
-    opts+=AZ.map(function(z){return'<option value="'+z+'"'+(z===cur?' selected':'')+'>Zona '+z+'</option>'}).join('');
-    var hasZone=cur!=='';
-    html+='<div class="assign-row" id="arow-'+i+'" style="'+(hasZone?'border-color:#a7d3b8;':'border-color:#fcd34d;')+'">'+
-      '<div class="assign-row-info">'+
-        '<div class="assign-row-n">'+eh(a.name)+'</div>'+
-        (a.code?'<div class="assign-row-c">CN '+eh(a.code)+'</div>':'')+
-      '</div>'+
-      '<select onchange="xlsAssignOne('+i+',this.value)" style="font-size:.76rem;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);font-family:IBM Plex Sans,sans-serif;min-width:80px">'+opts+'</select>'+
+  scr.innerHTML=
+    toolbar+
+    '<div class="xtbl-wrap">'+
+      '<table class="xtbl">'+
+        '<thead><tr>'+
+          '<th>Artículo</th>'+
+          '<th>Código Nacional</th>'+
+          '<th>Zona de ubicación</th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table>'+
     '</div>';
-  });
-  html+='</div>';
 
-  body.innerHTML=html;
-
-  var pendientes=selArr.filter(function(i){return!xlsState.assign[i]}).length;
-  btnNext.disabled=pendientes>0;
-  msg.textContent=pendientes>0?pendientes+' artículo'+(pendientes>1?'s sin':'sin')+' zona asignada':'Todos los artículos tienen zona';
+  xlsUpdateFooter(msg,btnNext,shown);
 }
 
-window.xlsAssignOne=function(i,z){
-  xlsState.assign[i]=z;
-  var row=document.getElementById('arow-'+i);
-  if(row)row.style.borderColor=z?'#a7d3b8':'#fcd34d';
-  var pendientes=[...xlsState.selected].filter(function(j){return!xlsState.assign[j]}).length;
-  var btn=document.getElementById('xbtn-next');
-  var msg=document.getElementById('xls-footer-msg');
-  btn.disabled=pendientes>0;
-  msg.textContent=pendientes>0?pendientes+' artículo'+(pendientes>1?'s sin':'sin')+' zona asignada':'Todos los artículos tienen zona';
+window.xlsSetZona=function(i,z){
+  xlsState.articles[i].zona=z;
+  var sel=document.querySelector('select[data-i="'+i+'"]');
+  if(sel){sel.className=z?'ok':'pend';}
+  xlsUpdateFooter(document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'),null);
 };
 
-window.xlsAssignBulk=function(){
-  var z=document.getElementById('xbulk-zone').value;
+window.xlsBulkZone=function(){
+  var z=document.getElementById('xtbl-bulk-zone').value;
   if(!z)return;
-  // asignar a todos los seleccionados que estén sin zona
-  [...xlsState.selected].forEach(function(i){if(!xlsState.assign[i])xlsState.assign[i]=z});
-  renderStep4(document.getElementById('xls-body'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
+  var filterQ=(document.getElementById('xtbl-filter')?document.getElementById('xtbl-filter').value:'').toLowerCase();
+  xlsState.articles.forEach(function(a){
+    if(a.dup||a.zona)return;
+    if(filterQ&&a.name.toLowerCase().indexOf(filterQ)===-1&&a.code.toLowerCase().indexOf(filterQ)===-1)return;
+    a.zona=z;
+  });
+  renderScreenTable(document.getElementById('xls-screen'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
 };
 
-window.xlsAssignFilter=function(){
-  renderStep4(document.getElementById('xls-body'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
+window.xlsTblFilter=function(){
+  renderScreenTable(document.getElementById('xls-screen'),document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'));
 };
 
-/* Paso 5: resumen y confirmación */
-function renderStep5(body,msg,btnNext){
-  var byZone={};
-  xlsState.selected.forEach(function(i){
-    var z=xlsState.assign[i];
-    if(!z)return;
-    if(!byZone[z])byZone[z]=[];
-    byZone[z].push(xlsState.articles[i]);
-  });
-
-  var total=xlsState.selected.size;
-
-  var html='<div class="sum-ok"><div class="sum-ok-n">'+total+'</div><div class="sum-ok-t">artículos listos para añadir al almacén</div></div>';
-  html+='<div class="summary-block">';
-  Object.keys(byZone).sort(function(a,b){return AZ.indexOf(a)-AZ.indexOf(b)}).forEach(function(z){
-    html+='<div class="sum-zone"><div class="sum-zone-lbl"><span>Zona '+eh(z)+'</span> '+byZone[z].length+' artículo'+(byZone[z].length>1?'s':'')+'</div>';
-    byZone[z].forEach(function(a){
-      html+='<div class="sum-item">'+eh(a.name)+(a.code?'<span class="sum-item-c">CN '+eh(a.code)+'</span>':'')+'</div>';
-    });
-    html+='</div>';
-  });
-  html+='</div>';
-  body.innerHTML=html;
-  msg.textContent='Revisa y confirma para añadir al inventario';
-  btnNext.disabled=false;
+function xlsUpdateFooter(msg,btnNext,shown){
+  var arts=xlsState.articles;
+  var sinDup=arts.filter(function(a){return!a.dup});
+  var conZona=sinDup.filter(function(a){return a.zona!==''});
+  var pendientes=sinDup.length-conZona.length;
+  if(pendientes>0){
+    msg.textContent=pendientes+' artículo'+(pendientes>1?'s':'')+' sin zona asignada';
+    btnNext.disabled=true;
+  }else{
+    msg.textContent=conZona.length+' artículo'+(conZona.length!==1?'s':'')+' listos para guardar';
+    btnNext.disabled=conZona.length===0;
+  }
+  var statEl=document.getElementById('xtbl-stat');
+  if(statEl){
+    var total=shown!==null?shown:arts.length;
+    statEl.textContent=total+' artículos · '+conZona.length+'/'+sinDup.length+' con zona';
+  }
 }
 
-/* Navegación entre pasos */
 function xlsNext(){
-  if(xlsState.step===2){
-    // confirmar columnas y parsear artículos
+  if(xlsState.screen==='cols'){
     xlsState.colName=parseInt(document.getElementById('xsel-name').value);
     xlsState.colCode=parseInt(document.getElementById('xsel-code').value);
-  }
-  if(xlsState.step===5){
+    xlsParsearArticulos();
+    xlsState.screen='table';
+    xlsRender();
+  }else{
     xlsCommit();
-    return;
   }
-  xlsState.step++;
-  xlsRender();
 }
 function xlsBack(){
-  if(xlsState.step>1){xlsState.step--;xlsRender();}
+  if(xlsState.screen==='table'){xlsState.screen='cols';xlsRender();}
 }
 
-/* Commit: añadir artículos al db */
 function xlsCommit(){
   var added=0,skipped=0;
-  xlsState.selected.forEach(function(i){
-    var a=xlsState.articles[i];
-    var z=xlsState.assign[i];
-    if(!z){skipped++;return}
+  xlsState.articles.forEach(function(a){
+    if(a.dup||!a.zona){skipped++;return}
     if(dupName(a.name,null)||dupCode(a.code,null)){skipped++;return}
-    if(!db[z])db[z]=[];
-    db[z].push({_id:uid(),name:a.name,code:a.code||''});
+    if(!db[a.zona])db[a.zona]=[];
+    db[a.zona].push({_id:uid(),name:a.name,code:a.code||''});
     added++;
   });
   saveDB();
   closeXlsModal();
   renderMap();renderZone();
-  var msg=added+' artículos añadidos al almacén';
-  if(skipped)msg+=', '+skipped+' omitidos';
-  toast(msg,'ok');
+  var m=added+' artículo'+(added!==1?'s':'')+' añadido'+(added!==1?'s':'')+' al almacén';
+  if(skipped)m+=', '+skipped+' omitido'+(skipped!==1?'s':'');
+  toast(m,'ok');
 }
 
 ensureIds();renderMap();renderZone();
