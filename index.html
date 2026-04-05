@@ -127,7 +127,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 /* ── Modal XLS ── */
 .mxls{display:none;position:fixed;inset:0;background:rgba(10,20,40,.52);z-index:600;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
 .mxls.act{display:flex}
-.mxls-box{background:#fff;border-radius:14px;box-shadow:var(--shl);width:100%;max-width:820px;overflow:hidden;animation:mi .22s cubic-bezier(.22,1,.36,1);margin:auto;display:flex;flex-direction:column;max-height:calc(100vh - 32px)}
+.mxls-box{background:#fff;border-radius:14px;box-shadow:var(--shl);width:100%;max-width:820px;animation:mi .22s cubic-bezier(.22,1,.36,1);margin:auto;display:flex;flex-direction:column;height:calc(100vh - 32px);max-height:700px}
 .mxls-hdr{background:var(--accent);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mxls-hdr-left{display:flex;flex-direction:column;gap:2px}
 .mxls-hdr h2{font-size:.92rem;font-weight:600;letter-spacing:.03em;margin:0}
@@ -207,20 +207,21 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
     <div class="wc">
       <svg class="wsvg" viewBox="0 0 620 800" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="2" width="616" height="796" fill="none" stroke="#1a3a5c" stroke-width="2.5" rx="4"/>
-        <!-- Columna derecha de arriba a abajo -->
+        <!-- Columna derecha -->
         <rect class="zone-rect" data-zone="9"  x="468" y="20"  width="144" height="150" rx="3"/><text class="zlbl" x="540" y="95">9</text><text class="zcnt" id="c-9"  x="540" y="111"></text>
         <rect class="zone-rect" data-zone="8"  x="468" y="174" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="204">8</text><text class="zcnt" id="c-8"  x="540" y="220"></text>
         <rect class="zone-rect" data-zone="7"  x="468" y="238" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="268">7</text><text class="zcnt" id="c-7"  x="540" y="284"></text>
         <rect class="zone-rect" data-zone="7b" x="370" y="238" width="90"  height="60"  rx="3"/><text class="zlbl" x="415" y="268">7b</text><text class="zcnt" id="c-7b" x="415" y="284"></text>
+        <!-- 6 en columna principal. 6.2 SÓLO en lateral, entre 6 y 5 -->
         <rect class="zone-rect" data-zone="6"  x="468" y="302" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="332">6</text><text class="zcnt" id="c-6"  x="540" y="348"></text>
-        <!-- 6.2: fila propia entre 6 (termina y=362) y 5 (empieza y=396) -->
-        <rect class="zone-rect" data-zone="6.2" x="370" y="366" width="90"  height="26"  rx="3"/><text class="zlbl" x="415" y="379">6.2</text><text class="zcnt" id="c-6.2" x="415" y="388"></text>
-        <rect class="zone-rect" data-zone="5"  x="468" y="366" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="396">5</text><text class="zcnt" id="c-5"  x="540" y="412"></text>
-        <rect class="zone-rect" data-zone="5b" x="370" y="396" width="90"  height="30"  rx="3"/><text class="zlbl" x="415" y="411">5b</text><text class="zcnt" id="c-5b" x="415" y="423"></text>
-        <rect class="zone-rect" data-zone="4"  x="468" y="430" width="144" height="56"  rx="3"/><text class="zlbl" x="540" y="458">4</text><text class="zcnt" id="c-4"  x="540" y="474"></text>
-        <rect class="zone-rect" data-zone="3"  x="468" y="490" width="144" height="52"  rx="3"/><text class="zlbl" x="540" y="516">3</text><text class="zcnt" id="c-3"  x="540" y="532"></text>
-        <rect class="zone-rect" data-zone="2"  x="468" y="546" width="144" height="52"  rx="3"/><text class="zlbl" x="540" y="572">2</text><text class="zcnt" id="c-2"  x="540" y="588"></text>
-        <rect class="zone-rect" data-zone="1"  x="468" y="602" width="144" height="52"  rx="3"/><text class="zlbl" x="540" y="628">1</text><text class="zcnt" id="c-1"  x="540" y="644"></text>
+        <rect class="zone-rect" data-zone="6.2" x="370" y="366" width="90"  height="32"  rx="3"/><text class="zlbl" x="415" y="382">6.2</text><text class="zcnt" id="c-6.2" x="415" y="392"></text>
+        <!-- 5 empieza en y=402 (tras el hueco de 6.2). 5b al mismo nivel -->
+        <rect class="zone-rect" data-zone="5"  x="468" y="402" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="432">5</text><text class="zcnt" id="c-5"  x="540" y="448"></text>
+        <rect class="zone-rect" data-zone="5b" x="370" y="402" width="90"  height="60"  rx="3"/><text class="zlbl" x="415" y="432">5b</text><text class="zcnt" id="c-5b" x="415" y="448"></text>
+        <rect class="zone-rect" data-zone="4"  x="468" y="466" width="144" height="56"  rx="3"/><text class="zlbl" x="540" y="494">4</text><text class="zcnt" id="c-4"  x="540" y="510"></text>
+        <rect class="zone-rect" data-zone="3"  x="468" y="526" width="144" height="52"  rx="3"/><text class="zlbl" x="540" y="552">3</text><text class="zcnt" id="c-3"  x="540" y="568"></text>
+        <rect class="zone-rect" data-zone="2"  x="468" y="582" width="144" height="52"  rx="3"/><text class="zlbl" x="540" y="608">2</text><text class="zcnt" id="c-2"  x="540" y="624"></text>
+        <rect class="zone-rect" data-zone="1"  x="468" y="638" width="144" height="52"  rx="3"/><text class="zlbl" x="540" y="664">1</text><text class="zcnt" id="c-1"  x="540" y="680"></text>
         <!-- Parte superior -->
         <rect class="zone-rect" data-zone="10" x="294" y="20"  width="84"  height="76"  rx="3"/><text class="zlbl" x="336" y="58">10</text><text class="zcnt" id="c-10" x="336" y="74"></text>
         <rect class="zone-rect" data-zone="11" x="160" y="20"  width="130" height="76"  rx="3"/><text class="zlbl" x="225" y="58">11</text><text class="zcnt" id="c-11" x="225" y="74"></text>
@@ -231,14 +232,14 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
         <rect class="zone-rect" data-zone="15" x="20"  y="354" width="136" height="56"  rx="3"/><text class="zlbl" x="88"  y="382">15</text><text class="zcnt" id="c-15" x="88"  y="398"></text>
         <rect class="zone-rect" data-zone="16" x="20"  y="414" width="136" height="56"  rx="3"/><text class="zlbl" x="88"  y="442">16</text><text class="zcnt" id="c-16" x="88"  y="458"></text>
         <rect class="zone-rect" data-zone="17" x="20"  y="474" width="136" height="44"  rx="3"/><text class="zlbl" x="88"  y="496">17</text><text class="zcnt" id="c-17" x="88"  y="512"></text>
-        <!-- Parte inferior izquierda -->
+        <!-- Inferior izquierda -->
         <rect class="zone-rect" data-zone="18" x="20"  y="548" width="118" height="66"  rx="3"/><text class="zlbl" x="79"  y="581">18</text><text class="zcnt" id="c-18" x="79"  y="597"></text>
         <rect class="zone-rect" data-zone="19" x="142" y="548" width="96"  height="66"  rx="3"/><text class="zlbl" x="190" y="581">19</text><text class="zcnt" id="c-19" x="190" y="597"></text>
-        <!-- 20, 22, 21 en fila separados del bloque derecho (zona 1 termina y=654) -->
-        <rect class="zone-rect" data-zone="20" x="248" y="700" width="66"  height="46"  rx="3"/><text class="zlbl" x="281" y="723">20</text><text class="zcnt" id="c-20" x="281" y="737"></text>
-        <rect class="zone-rect" data-zone="22" x="318" y="700" width="66"  height="46"  rx="3"/><text class="zlbl" x="351" y="723">22</text><text class="zcnt" id="c-22" x="351" y="737"></text>
-        <rect class="zone-rect" data-zone="21" x="388" y="700" width="66"  height="46"  rx="3"/><text class="zlbl" x="421" y="723">21</text><text class="zcnt" id="c-21" x="421" y="737"></text>
-        <rect class="zone-rect" data-zone="23" x="248" y="750" width="206" height="40"  rx="3"/><text class="zlbl" x="351" y="770">23</text><text class="zcnt" id="c-23" x="351" y="784"></text>
+        <!-- 20/22/21 + 23 separados (zona 1 termina y=690, bloque empieza y=710) -->
+        <rect class="zone-rect" data-zone="20" x="248" y="710" width="66"  height="44"  rx="3"/><text class="zlbl" x="281" y="732">20</text><text class="zcnt" id="c-20" x="281" y="746"></text>
+        <rect class="zone-rect" data-zone="22" x="318" y="710" width="66"  height="44"  rx="3"/><text class="zlbl" x="351" y="732">22</text><text class="zcnt" id="c-22" x="351" y="746"></text>
+        <rect class="zone-rect" data-zone="21" x="388" y="710" width="66"  height="44"  rx="3"/><text class="zlbl" x="421" y="732">21</text><text class="zcnt" id="c-21" x="421" y="746"></text>
+        <rect class="zone-rect" data-zone="23" x="248" y="758" width="206" height="36"  rx="3"/><text class="zlbl" x="351" y="776">23</text><text class="zcnt" id="c-23" x="351" y="788"></text>
       </svg>
     </div>
   </div>
@@ -718,7 +719,7 @@ function xlsParsearArticulos(){
     if(!name)return null;
     var dupN=dupName(name,null);
     var dupC=code?dupCode(code,null):null;
-    return{name:name,code:code,dup:(dupN||dupC)||null,zona:''};
+    return{name:name,code:code,dup:(dupN||dupC)||null,zona:'',zona2:''};
   }).filter(Boolean);
 }
 
@@ -772,6 +773,12 @@ function renderScreenTable(scr,msg,btnNext){
   var arts=xlsState.articles;
   var filterQ=(document.getElementById('xtbl-filter')?document.getElementById('xtbl-filter').value:'').toLowerCase();
   var bulkOpts='<option value="">Elige zona</option>'+AZ.map(function(z){return'<option value="'+z+'">Zona '+z+'</option>'}).join('');
+  var mkSel=function(i,which,val){
+    var attr='data-i="'+i+'" data-w="'+which+'"';
+    var opts='<option value=""'+(val===''?' selected':'')+'>— Sin ubicar —</option>'+
+      AZ.map(function(z){return'<option value="'+z+'"'+(z===val?' selected':'')+'>Zona '+z+'</option>'}).join('');
+    return'<select class="'+(val?'ok':'pend')+'" '+attr+' onchange="xlsSetZona('+i+',\''+which+'\',this.value)" style="font-size:.74rem;padding:3px 4px;border:1.5px solid var(--border);border-radius:4px;background:#fff;color:var(--text);font-family:IBM Plex Sans,sans-serif;width:100%;box-sizing:border-box">'+opts+'</select>';
+  };
 
   var toolbar=
     '<div class="xtbl-toolbar">'+
@@ -789,19 +796,12 @@ function renderScreenTable(scr,msg,btnNext){
     if(filterQ&&a.name.toLowerCase().indexOf(filterQ)===-1&&a.code.toLowerCase().indexOf(filterQ)===-1)return;
     shown++;
     var isDup=!!a.dup;
-    var hasZona=a.zona!=='';
-  var selOpts='<option value=""'+(a.zona===''?' selected':'')+'>— Sin ubicar —</option>'+
-      AZ.map(function(z){return'<option value="'+z+'"'+(z===a.zona?' selected':'')+'>Zona '+z+'</option>'}).join('');
     rows+=
       '<tr'+(isDup?' class="xdup-row"':'')+'>'+
         '<td class="xtd-name">'+eh(a.name)+(isDup?'<span class="xdup-tag">Ya existe · Zona '+eh(a.dup.zone)+'</span>':'')+'</td>'+
         '<td class="xtd-code">'+(a.code?eh(a.code):'\u2013')+'</td>'+
-        '<td class="xtd-zona">'+
-          (isDup
-            ?'<span style="font-size:.72rem;color:var(--text3);font-style:italic">Se omitirá</span>'
-            :'<select class="'+(hasZona?'ok':'pend')+'" data-i="'+i+'" onchange="xlsSetZona('+i+',this.value)">'+selOpts+'</select>'
-          )+
-        '</td>'+
+        '<td class="xtd-zona" style="width:110px">'+(isDup?'<span style="font-size:.72rem;color:var(--text3);font-style:italic">Se omitirá</span>':mkSel(i,'zona',a.zona))+'</td>'+
+        '<td class="xtd-zona" style="width:110px">'+(isDup?'':mkSel(i,'zona2',a.zona2))+'</td>'+
       '</tr>';
   });
 
@@ -812,7 +812,8 @@ function renderScreenTable(scr,msg,btnNext){
         '<thead><tr>'+
           '<th>Artículo</th>'+
           '<th>Código Nacional</th>'+
-          '<th>Zona de ubicación</th>'+
+          '<th>Zona 1</th>'+
+          '<th>Zona 2 (opcional)</th>'+
         '</tr></thead>'+
         '<tbody>'+rows+'</tbody>'+
       '</table>'+
@@ -821,9 +822,9 @@ function renderScreenTable(scr,msg,btnNext){
   xlsUpdateFooter(msg,btnNext,shown);
 }
 
-window.xlsSetZona=function(i,z){
-  xlsState.articles[i].zona=z;
-  var sel=document.querySelector('select[data-i="'+i+'"]');
+window.xlsSetZona=function(i,which,z){
+  xlsState.articles[i][which]=z;
+  var sel=document.querySelector('select[data-i="'+i+'"][data-w="'+which+'"]');
   if(sel){sel.className=z?'ok':'pend';}
   xlsUpdateFooter(document.getElementById('xls-footer-msg'),document.getElementById('xbtn-next'),null);
 };
@@ -883,14 +884,21 @@ function xlsCommit(){
   xlsState.articles.forEach(function(a){
     if(a.dup||!a.zona){skipped++;return}
     if(dupName(a.name,null)||dupCode(a.code,null)){skipped++;return}
+    var id=uid();
     if(!db[a.zona])db[a.zona]=[];
-    db[a.zona].push({_id:uid(),name:a.name,code:a.code||''});
+    db[a.zona].push({_id:id,name:a.name,code:a.code||''});
     added++;
+    // zona2 opcional: mismo artículo con nuevo _id
+    if(a.zona2&&a.zona2!==a.zona){
+      if(!db[a.zona2])db[a.zona2]=[];
+      db[a.zona2].push({_id:uid(),name:a.name,code:a.code||''});
+      added++;
+    }
   });
   saveDB();
   closeXlsModal();
   renderMap();renderZone();
-  var m=added+' artículo'+(added!==1?'s':'')+' añadido'+(added!==1?'s':'')+' al almacén';
+  var m=added+' entrada'+(added!==1?'s':'')+' añadida'+(added!==1?'s':'')+' al almacén';
   if(skipped)m+=', '+skipped+' omitido'+(skipped!==1?'s':'');
   toast(m,'ok');
 }
