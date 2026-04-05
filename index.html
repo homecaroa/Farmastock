@@ -101,7 +101,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 .imt{color:var(--text3);font-size:.77rem;text-align:center;margin-top:18px;font-style:italic}
 .mo{display:none;position:fixed;inset:0;background:rgba(10,20,40,.46);z-index:500;align-items:center;justify-content:center}
 .mo.act{display:flex}
-.md{background:#fff;border-radius:12px;box-shadow:var(--shl);padding:22px 24px;width:340px;max-width:94vw;animation:mi .2s cubic-bezier(.22,1,.36,1)}
+.md{background:#fff;border-radius:12px;box-shadow:var(--shl);padding:22px 24px;width:360px;max-width:94vw;animation:mi .2s cubic-bezier(.22,1,.36,1)}
 @keyframes mi{from{transform:scale(.9) translateY(14px);opacity:0}to{transform:none;opacity:1}}
 .mt{font-size:1rem;font-weight:600;color:var(--accent);margin-bottom:3px}
 .mst{font-size:.76rem;color:var(--text3);margin-bottom:14px}
@@ -112,7 +112,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 .zb:hover{background:var(--zh);border-color:var(--accent2)}
 .zb.cur{background:var(--hi2);border-color:var(--accent2);color:var(--accent2);cursor:default}
 .zb.cur::after{content:'aqui';display:block;font-size:.5rem;font-weight:400;color:var(--text3);font-family:'IBM Plex Sans',sans-serif}
-.mf{display:flex;justify-content:flex-end}
+.mf{display:flex;justify-content:flex-end;gap:7px}
 .bmc{background:none;border:1px solid var(--border);border-radius:var(--r);padding:7px 16px;font-size:.78rem;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:var(--text2);transition:background .12s}
 .bmc:hover{background:var(--bg)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#fff;padding:9px 20px;border-radius:22px;font-size:.79rem;font-weight:500;box-shadow:var(--shl);transition:transform .28s cubic-bezier(.22,1,.36,1),opacity .28s;opacity:0;z-index:9999;pointer-events:none}
@@ -168,7 +168,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 .xtbl td.xtd-zona select{font-size:.76rem;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);font-family:'IBM Plex Sans',sans-serif;outline:none;width:100%;transition:border-color .12s}
 .xtbl td.xtd-zona select:focus{border-color:var(--accent2)}
 .xtbl td.xtd-zona select.ok{border-color:#a7d3b8;background:#f0faf5}
-.xtbl td.xtd-zona select.pend{border-color:#fcd34d;background:#fffbeb}
+.xtbl td.xtd-zona select.pend{border-color:var(--border);background:#fff}
 .xdup-tag{font-size:.6rem;background:var(--yellow-bg);color:var(--yellow);border-radius:3px;padding:1px 5px;margin-left:5px;vertical-align:middle;white-space:nowrap}
 /* footer */
 .xls-footer{display:flex;gap:8px;align-items:center;border-top:1.5px solid var(--border);padding:12px 20px;background:var(--bg);flex-shrink:0}
@@ -207,32 +207,40 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
     <div class="wc">
       <svg class="wsvg" viewBox="0 0 620 780" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="2" width="616" height="776" fill="none" stroke="#1a3a5c" stroke-width="2.5" rx="4"/>
+        <!-- Columna derecha -->
         <rect class="zone-rect" data-zone="1"  x="468" y="680" width="144" height="54"  rx="3"/><text class="zlbl" x="540" y="707">1</text><text class="zcnt" id="c-1"  x="540" y="722"></text>
         <rect class="zone-rect" data-zone="2"  x="468" y="622" width="144" height="54"  rx="3"/><text class="zlbl" x="540" y="649">2</text><text class="zcnt" id="c-2"  x="540" y="664"></text>
         <rect class="zone-rect" data-zone="3"  x="468" y="564" width="144" height="54"  rx="3"/><text class="zlbl" x="540" y="591">3</text><text class="zcnt" id="c-3"  x="540" y="606"></text>
         <rect class="zone-rect" data-zone="4"  x="468" y="500" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="530">4</text><text class="zcnt" id="c-4"  x="540" y="546"></text>
+        <!-- Zona 5 y su lateral 5b -->
         <rect class="zone-rect" data-zone="5"  x="468" y="424" width="144" height="72"  rx="3"/><text class="zlbl" x="540" y="460">5</text><text class="zcnt" id="c-5"  x="540" y="476"></text>
         <rect class="zone-rect" data-zone="5b" x="370" y="424" width="90"  height="72"  rx="3"/><text class="zlbl" x="415" y="460">5b</text><text class="zcnt" id="c-5b" x="415" y="476"></text>
+        <!-- Zona 6 y su lateral 6.2 al mismo nivel (entre 5 y 6 = a la altura de 6) -->
         <rect class="zone-rect" data-zone="6"  x="468" y="348" width="144" height="72"  rx="3"/><text class="zlbl" x="540" y="384">6</text><text class="zcnt" id="c-6"  x="540" y="400"></text>
+        <rect class="zone-rect" data-zone="6.2" x="370" y="348" width="90"  height="72"  rx="3"/><text class="zlbl" x="415" y="381">6.2</text><text class="zcnt" id="c-6.2" x="415" y="397"></text>
+        <!-- Zona 7 y su lateral 7b -->
         <rect class="zone-rect" data-zone="7"  x="468" y="272" width="144" height="72"  rx="3"/><text class="zlbl" x="540" y="308">7</text><text class="zcnt" id="c-7"  x="540" y="324"></text>
+        <rect class="zone-rect" data-zone="7b" x="370" y="272" width="90"  height="72"  rx="3"/><text class="zlbl" x="415" y="308">7b</text><text class="zcnt" id="c-7b" x="415" y="324"></text>
         <rect class="zone-rect" data-zone="8"  x="468" y="196" width="144" height="72"  rx="3"/><text class="zlbl" x="540" y="232">8</text><text class="zcnt" id="c-8"  x="540" y="248"></text>
         <rect class="zone-rect" data-zone="9"  x="468" y="20"  width="144" height="172" rx="3"/><text class="zlbl" x="540" y="106">9</text><text class="zcnt" id="c-9"  x="540" y="122"></text>
+        <!-- Parte superior -->
         <rect class="zone-rect" data-zone="10" x="294" y="20"  width="84"  height="76"  rx="3"/><text class="zlbl" x="336" y="58">10</text><text class="zcnt" id="c-10" x="336" y="74"></text>
-        <rect class="zone-rect" data-zone="11" x="210" y="20"  width="80"  height="76"  rx="3"/><text class="zlbl" x="250" y="58">11</text><text class="zcnt" id="c-11" x="250" y="74"></text>
-        <rect x="138" y="20" width="22" height="520" fill="#eef3f9" stroke="#1a3a5c" stroke-width="1.2"/>
-        <text class="caslbl" x="149" y="280" transform="rotate(-90,149,280)">CASONERA</text>
-        <rect class="zone-rect" data-zone="12" x="20"  y="20"  width="114" height="130" rx="3"/><text class="zlbl" x="77"  y="85">12</text><text class="zcnt" id="c-12" x="77"  y="101"></text>
-        <rect class="zone-rect" data-zone="13" x="20"  y="154" width="114" height="136" rx="3"/><text class="zlbl" x="77"  y="222">13</text><text class="zcnt" id="c-13" x="77"  y="238"></text>
-        <rect class="zone-rect" data-zone="14" x="20"  y="294" width="114" height="60"  rx="3"/><text class="zlbl" x="77"  y="324">14</text><text class="zcnt" id="c-14" x="77"  y="340"></text>
-        <rect class="zone-rect" data-zone="15" x="20"  y="358" width="114" height="60"  rx="3"/><text class="zlbl" x="77"  y="388">15</text><text class="zcnt" id="c-15" x="77"  y="404"></text>
-        <rect class="zone-rect" data-zone="16" x="20"  y="422" width="114" height="60"  rx="3"/><text class="zlbl" x="77"  y="452">16</text><text class="zcnt" id="c-16" x="77"  y="468"></text>
-        <rect class="zone-rect" data-zone="17" x="20"  y="486" width="36"  height="44"  rx="3"/><text class="zlbl" x="38"  y="508">17</text><text class="zcnt" id="c-17" x="38"  y="522"></text>
-        <rect class="zone-rect" data-zone="18" x="42"  y="560" width="96"  height="72"  rx="3"/><text class="zlbl" x="90"  y="596">18</text><text class="zcnt" id="c-18" x="90"  y="612"></text>
+        <rect class="zone-rect" data-zone="11" x="160" y="20"  width="130" height="76"  rx="3"/><text class="zlbl" x="225" y="58">11</text><text class="zcnt" id="c-11" x="225" y="74"></text>
+        <!-- Columna izquierda -->
+        <rect class="zone-rect" data-zone="12" x="20"  y="20"  width="136" height="130" rx="3"/><text class="zlbl" x="88"  y="85">12</text><text class="zcnt" id="c-12" x="88"  y="101"></text>
+        <rect class="zone-rect" data-zone="13" x="20"  y="154" width="136" height="136" rx="3"/><text class="zlbl" x="88"  y="222">13</text><text class="zcnt" id="c-13" x="88"  y="238"></text>
+        <rect class="zone-rect" data-zone="14" x="20"  y="294" width="136" height="60"  rx="3"/><text class="zlbl" x="88"  y="324">14</text><text class="zcnt" id="c-14" x="88"  y="340"></text>
+        <rect class="zone-rect" data-zone="15" x="20"  y="358" width="136" height="60"  rx="3"/><text class="zlbl" x="88"  y="388">15</text><text class="zcnt" id="c-15" x="88"  y="404"></text>
+        <rect class="zone-rect" data-zone="16" x="20"  y="422" width="136" height="60"  rx="3"/><text class="zlbl" x="88"  y="452">16</text><text class="zcnt" id="c-16" x="88"  y="468"></text>
+        <rect class="zone-rect" data-zone="17" x="20"  y="486" width="136" height="44"  rx="3"/><text class="zlbl" x="88"  y="508">17</text><text class="zcnt" id="c-17" x="88"  y="522"></text>
+        <!-- Parte inferior izquierda -->
+        <rect class="zone-rect" data-zone="18" x="20"  y="560" width="118" height="72"  rx="3"/><text class="zlbl" x="79"  y="596">18</text><text class="zcnt" id="c-18" x="79"  y="612"></text>
         <rect class="zone-rect" data-zone="19" x="142" y="560" width="96"  height="72"  rx="3"/><text class="zlbl" x="190" y="596">19</text><text class="zcnt" id="c-19" x="190" y="612"></text>
-        <rect class="zone-rect" data-zone="20" x="278" y="666" width="70"  height="50"  rx="3"/><text class="zlbl" x="313" y="691">20</text><text class="zcnt" id="c-20" x="313" y="706"></text>
-        <rect class="zone-rect" data-zone="21" x="352" y="666" width="70"  height="50"  rx="3"/><text class="zlbl" x="387" y="691">21</text><text class="zcnt" id="c-21" x="387" y="706"></text>
-        <rect class="zone-rect" data-zone="22" x="352" y="720" width="70"  height="50"  rx="3"/><text class="zlbl" x="387" y="745">22</text><text class="zcnt" id="c-22" x="387" y="760"></text>
-        <rect class="zone-rect" data-zone="23" x="278" y="730" width="144" height="46"  rx="3"/><text class="zlbl" x="350" y="753">23</text><text class="zcnt" id="c-23" x="350" y="768"></text>
+        <!-- Centro inferior: 20, 22, 21 en fila pegados · 23 debajo abarcándolos -->
+        <rect class="zone-rect" data-zone="20" x="248" y="680" width="72"  height="50"  rx="3"/><text class="zlbl" x="284" y="705">20</text><text class="zcnt" id="c-20" x="284" y="720"></text>
+        <rect class="zone-rect" data-zone="22" x="324" y="680" width="72"  height="50"  rx="3"/><text class="zlbl" x="360" y="705">22</text><text class="zcnt" id="c-22" x="360" y="720"></text>
+        <rect class="zone-rect" data-zone="21" x="400" y="680" width="72"  height="50"  rx="3"/><text class="zlbl" x="436" y="705">21</text><text class="zcnt" id="c-21" x="436" y="720"></text>
+        <rect class="zone-rect" data-zone="23" x="248" y="734" width="224" height="40"  rx="3"/><text class="zlbl" x="360" y="754">23</text><text class="zcnt" id="c-23" x="360" y="768"></text>
       </svg>
     </div>
   </div>
@@ -248,8 +256,13 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
     </div>
     <div class="zd">
       <div id="zh" style="display:none" class="zhdr">
-        <div class="zid" id="zid">-</div>
-        <div class="zsub" id="zsub">0 articulos</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div>
+            <div class="zid" id="zid">-</div>
+            <div class="zsub" id="zsub">0 articulos</div>
+          </div>
+          <button class="bc" id="btn-movezone" onclick="openMZ()" style="display:none;font-size:.7rem;padding:4px 9px;white-space:nowrap" title="Mover toda la zona">&#8660; Mover zona</button>
+        </div>
       </div>
       <div class="zph" id="zph">
         <svg width="44" height="44" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -281,6 +294,19 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
   </div>
 </div>
 
+<!-- Modal mover zona completa -->
+<div class="mo" id="mz">
+  <div class="md">
+    <div class="mt">Mover zona completa</div>
+    <div class="mst" id="mz-sub"></div>
+    <div class="mii" id="mz-info"></div>
+    <div class="zg" id="mz-zg"></div>
+    <div class="mf">
+      <button class="bmc" onclick="closeMZ()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal importar desde Excel -->
 <div class="mxls" id="mxls">
   <div class="mxls-box">
@@ -306,7 +332,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 
 <script>
 var SK='farmastock_v1';
-var AZ=['1','2','3','4','5','5b','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+var AZ=['1','2','3','4','5','5b','6','6.2','7','7b','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
 var db=loadDB();
 var sel=null;
 var mid=null;
@@ -380,6 +406,8 @@ function renderZone(){
   document.getElementById('zid').textContent='Zona '+sel;
   document.getElementById('zsub').textContent=items.length+(items.length===1?' articulo':' articulos');
   document.getElementById('afz').textContent=sel;
+  var btnMZ=document.getElementById('btn-movezone');
+  if(btnMZ)btnMZ.style.display=items.length>0?'':'none';
   il.innerHTML='';
   if(!items.length){il.innerHTML='<div class="imt">Sin articulos en esta zona.<br>Anade el primero.</div>';return}
   items.forEach(function(item){
@@ -513,6 +541,57 @@ function execMove(tz){
   renderMap();renderZone();
 }
 document.getElementById('mm').addEventListener('click',function(e){if(e.target===this)closeMM()});
+
+/* Mover zona completa */
+function openMZ(){
+  if(!sel)return;
+  var items=gz(sel);
+  if(!items.length)return;
+  document.getElementById('mz-sub').textContent='Mueve los '+items.length+' artículos de Zona '+sel+' a otra zona';
+  document.getElementById('mz-info').innerHTML=
+    '<strong>Zona '+eh(sel)+'</strong>'+
+    items.slice(0,5).map(function(it){return'<span style="display:block;font-size:.74rem;color:var(--text2)">· '+eh(it.name)+'</span>'}).join('')+
+    (items.length>5?'<span style="font-size:.72rem;color:var(--text3)">...y '+(items.length-5)+' más</span>':'');
+  var g=document.getElementById('mz-zg');g.innerHTML='';
+  AZ.forEach(function(zz){
+    var b=document.createElement('button');
+    b.className='zb'+(zz===sel?' cur':'');
+    b.textContent=zz;
+    if(zz!==sel)b.addEventListener('click',function(){execMoveZone(zz)});
+    g.appendChild(b);
+  });
+  document.getElementById('mz').classList.add('act');
+}
+function closeMZ(){document.getElementById('mz').classList.remove('act')}
+function execMoveZone(tz){
+  if(!sel)return;
+  var items=gz(sel);
+  if(!items.length){closeMZ();return}
+  // detectar conflictos de nombre/código en destino
+  var conflicts=[];
+  items.forEach(function(it){
+    if(dupName(it.name,it._id)||dupCode(it.code,it._id))conflicts.push(it.name);
+  });
+  if(conflicts.length){
+    if(!confirm('Hay '+conflicts.length+' artículo(s) con nombre o CN ya existente en el destino. Se omitirán al mover. ¿Continuar?'))return;
+  }
+  var moved=0,skipped=0;
+  if(!db[tz])db[tz]=[];
+  items.slice().forEach(function(it){
+    if(dupName(it.name,it._id)||dupCode(it.code,it._id)){skipped++;return}
+    db[tz].push(Object.assign({},it));
+    moved++;
+  });
+  delete db[sel];
+  saveDB();closeMZ();
+  var prev=sel;
+  sel=tz;
+  renderMap();renderZone();
+  var msg=moved+' artículo'+(moved!==1?'s':'')+' movido'+(moved!==1?'s':'')+' de Zona '+prev+' a Zona '+tz;
+  if(skipped)msg+=', '+skipped+' omitido'+(skipped!==1?'s':'')+' por duplicado';
+  toast(msg,'ok');
+}
+document.getElementById('mz').addEventListener('click',function(e){if(e.target===this)closeMZ()});
 
 function delItem(id){
   var f=byId(id);if(!f)return;
@@ -713,7 +792,7 @@ function renderScreenTable(scr,msg,btnNext){
     shown++;
     var isDup=!!a.dup;
     var hasZona=a.zona!=='';
-    var selOpts='<option value=""'+(a.zona===''?' selected':'')+'>Zona\u2026</option>'+
+  var selOpts='<option value=""'+(a.zona===''?' selected':'')+'>— Sin ubicar —</option>'+
       AZ.map(function(z){return'<option value="'+z+'"'+(z===a.zona?' selected':'')+'>Zona '+z+'</option>'}).join('');
     rows+=
       '<tr'+(isDup?' class="xdup-row"':'')+'>'+
@@ -771,13 +850,13 @@ function xlsUpdateFooter(msg,btnNext,shown){
   var arts=xlsState.articles;
   var sinDup=arts.filter(function(a){return!a.dup});
   var conZona=sinDup.filter(function(a){return a.zona!==''});
-  var pendientes=sinDup.length-conZona.length;
-  if(pendientes>0){
-    msg.textContent=pendientes+' artículo'+(pendientes>1?'s':'')+' sin zona asignada';
-    btnNext.disabled=true;
+  var sinZona=sinDup.length-conZona.length;
+  // El botón se habilita siempre que haya al menos 1 artículo con zona
+  btnNext.disabled=conZona.length===0;
+  if(sinZona>0){
+    msg.textContent=conZona.length+' con zona · '+sinZona+' sin ubicar (se omitirán)';
   }else{
     msg.textContent=conZona.length+' artículo'+(conZona.length!==1?'s':'')+' listos para guardar';
-    btnNext.disabled=conZona.length===0;
   }
   var statEl=document.getElementById('xtbl-stat');
   if(statEl){
