@@ -212,10 +212,10 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
         <rect class="zone-rect" data-zone="8"  x="468" y="174" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="204">8</text><text class="zcnt" id="c-8"  x="540" y="220"></text>
         <rect class="zone-rect" data-zone="7"  x="468" y="238" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="268">7</text><text class="zcnt" id="c-7"  x="540" y="284"></text>
         <rect class="zone-rect" data-zone="7b" x="370" y="238" width="90"  height="60"  rx="3"/><text class="zlbl" x="415" y="268">7b</text><text class="zcnt" id="c-7b" x="415" y="284"></text>
-        <!-- 6 en columna principal. 6.2 SÓLO en lateral, entre 6 y 5 -->
+        <!-- 6 en columna principal. 6.2 ocupa todo el ancho del hueco entre 6 y 5 -->
         <rect class="zone-rect" data-zone="6"  x="468" y="302" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="332">6</text><text class="zcnt" id="c-6"  x="540" y="348"></text>
-        <rect class="zone-rect" data-zone="6.2" x="370" y="366" width="90"  height="32"  rx="3"/><text class="zlbl" x="415" y="382">6.2</text><text class="zcnt" id="c-6.2" x="415" y="392"></text>
-        <!-- 5 empieza en y=402 (tras el hueco de 6.2). 5b al mismo nivel -->
+        <rect class="zone-rect" data-zone="6.2" x="468" y="366" width="144" height="32"  rx="3"/><text class="zlbl" x="540" y="382">6.2</text><text class="zcnt" id="c-6.2" x="540" y="392"></text>
+        <!-- 5 empieza en y=402. 5b al mismo nivel -->
         <rect class="zone-rect" data-zone="5"  x="468" y="402" width="144" height="60"  rx="3"/><text class="zlbl" x="540" y="432">5</text><text class="zcnt" id="c-5"  x="540" y="448"></text>
         <rect class="zone-rect" data-zone="5b" x="370" y="402" width="90"  height="60"  rx="3"/><text class="zlbl" x="415" y="432">5b</text><text class="zcnt" id="c-5b" x="415" y="448"></text>
         <rect class="zone-rect" data-zone="4"  x="468" y="466" width="144" height="56"  rx="3"/><text class="zlbl" x="540" y="494">4</text><text class="zcnt" id="c-4"  x="540" y="510"></text>
@@ -348,27 +348,59 @@ function ensureIds(){
 }
 
 function dupName(name,xid){
+  // devuelve zona si el nombre ya existe en 2 o más zonas (o en 1 zona distinta al xid si xid es null)
   var n=name.trim().toLowerCase();
+  var encontrados=[];
   for(var z in db){
     for(var i=0;i<db[z].length;i++){
       var it=db[z][i];
       if(it._id&&it._id===xid)continue;
-      if(it.name.trim().toLowerCase()===n)return{zone:z,item:it};
+      if(it.name.trim().toLowerCase()===n)encontrados.push({zone:z,item:it});
     }
   }
+  // bloquear si ya hay 2 o más entradas con ese nombre
+  if(encontrados.length>=2)return encontrados[0];
   return null;
 }
 function dupCode(code,xid){
   if(!code||!code.trim())return null;
   var c=code.trim().toLowerCase();
+  var encontrados=[];
   for(var z in db){
     for(var i=0;i<db[z].length;i++){
       var it=db[z][i];
       if(it._id&&it._id===xid)continue;
-      if(it.code&&it.code.trim().toLowerCase()===c)return{zone:z,item:it};
+      if(it.code&&it.code.trim().toLowerCase()===c)encontrados.push({zone:z,item:it});
     }
   }
+  // bloquear si ya hay 2 o más entradas con ese código
+  if(encontrados.length>=2)return encontrados[0];
   return null;
+}
+function dupNameExacto(name,xid){
+  var n=name.trim().toLowerCase();
+  var res=[];
+  for(var z in db){
+    for(var i=0;i<db[z].length;i++){
+      var it=db[z][i];
+      if(it._id&&it._id===xid)continue;
+      if(it.name.trim().toLowerCase()===n)res.push({zone:z,item:it});
+    }
+  }
+  return res;
+}
+function dupCodeExacto(code,xid){
+  if(!code||!code.trim())return[];
+  var c=code.trim().toLowerCase();
+  var res=[];
+  for(var z in db){
+    for(var i=0;i<db[z].length;i++){
+      var it=db[z][i];
+      if(it._id&&it._id===xid)continue;
+      if(it.code&&it.code.trim().toLowerCase()===c)res.push({zone:z,item:it});
+    }
+  }
+  return res;
 }
 function byId(id){
   for(var z in db){
@@ -469,16 +501,21 @@ function addItem(){
   var name=document.getElementById('iname').value.trim();
   var code=document.getElementById('icode').value.trim();
   if(!name){toast('Introduce el nombre del articulo','err');return}
-  var dn=dupName(name,null);
-  if(dn){toast('"'+dn.item.name+'" ya existe en Zona '+dn.zone,'err');return}
-  var dc=dupCode(code,null);
-  if(dc){toast('CN '+code+' ya esta en Zona '+dc.zone+': '+dc.item.name,'err');return}
+  // comprobar si ya existe en alguna zona
+  var existeN=dupNameExacto(name,null);
+  var existeC=code?dupCodeExacto(code,null):null;
+  if(existeN&&existeN.length>=2){toast('"'+name+'" ya esta en 2 zonas (maximo permitido)','err');return}
+  if(existeC&&existeC.length>=2){toast('CN '+code+' ya esta en 2 zonas (maximo permitido)','err');return}
+  if(existeN&&existeN.some(function(e){return e.zone===sel})){toast('"'+name+'" ya existe en esta zona','err');return}
+  if(existeC&&existeC.some(function(e){return e.zone===sel})){toast('CN '+code+' ya existe en esta zona','err');return}
   if(!db[sel])db[sel]=[];
   db[sel].push({_id:uid(),name:name,code:code});
   saveDB();
   document.getElementById('iname').value='';
   document.getElementById('icode').value='';
-  toast('Anadido a Zona '+sel,'ok');
+  var msg='Anadido a Zona '+sel;
+  if(existeN)msg+=' (tambien en Zona '+existeN[0].zone+')';
+  toast(msg,'ok');
   renderMap();renderZone();
 }
 document.getElementById('icode').addEventListener('keydown',function(e){if(e.key==='Enter')addItem()});
@@ -883,12 +920,14 @@ function xlsCommit(){
   var added=0,skipped=0;
   xlsState.articles.forEach(function(a){
     if(a.dup||!a.zona){skipped++;return}
-    if(dupName(a.name,null)||dupCode(a.code,null)){skipped++;return}
-    var id=uid();
+    // comprobar que no supera 2 zonas ya existentes
+    var enN=dupNameExacto(a.name,null);
+    var enC=a.code?dupCodeExacto(a.code,null):[];
+    if(enN.length>=2||(enC.length>=2)){skipped++;return}
     if(!db[a.zona])db[a.zona]=[];
-    db[a.zona].push({_id:id,name:a.name,code:a.code||''});
+    db[a.zona].push({_id:uid(),name:a.name,code:a.code||''});
     added++;
-    // zona2 opcional: mismo artículo con nuevo _id
+    // zona2: se permite siempre que sea distinta y no haya ya 2
     if(a.zona2&&a.zona2!==a.zona){
       if(!db[a.zona2])db[a.zona2]=[];
       db[a.zona2].push({_id:uid(),name:a.name,code:a.code||''});
