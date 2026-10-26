@@ -16,6 +16,10 @@ Sistema web para la gestión visual del inventario de un almacén de farmacia. P
 - 🔍 **Buscador** — Busca por nombre o CN en todo el almacén y localiza la zona
 - ⬇️ **Exportar** — Descarga el inventario completo como archivo `.json`
 - ⬆️ **Importar** — Carga un backup `.json` con validación previa
+- 🏷️ **Nombres de zona** — «Zona 5 — Analgésicos»; el ID técnico no cambia. Botón ✎ Zona en el panel lateral
+- ⚠️ **Riesgo documentado** — Etiquetado informativo con las clases ADR 2025 y su fuente, filtro y señal en el plano. No sustituye la clasificación ni las obligaciones oficiales (ver `claude.md`)
+- ✎ **Editar plano** — Mueve y redimensiona zonas (ratón, táctil o teclado), con deshacer y restaurar geometría inicial
+- 🗑️ **Eliminar zonas con seguridad** — Una zona con artículos solo se elimina trasladándolos antes a otra zona elegida por ti
 - 💾 **Persistencia local** — Los datos se guardan en `localStorage` del navegador
 
 ---

@@ -29,9 +29,9 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 .ptitle::after{content:'';flex:1;height:1px;background:var(--border)}
 .wc{background:var(--surface);border:2px solid var(--border);border-radius:10px;box-shadow:var(--sh);padding:14px}
 .wsvg{width:100%;height:auto;display:block}
-.zone-rect{fill:var(--ze);stroke:var(--accent);stroke-width:1.5;cursor:grab;transition:fill .15s,stroke-width .15s,filter .15s;user-select:none}
+.zone-rect{fill:var(--ze);stroke:var(--accent);stroke-width:1.5;cursor:pointer;transition:fill .15s,stroke-width .15s,filter .15s;user-select:none}
 .zone-rect:hover{fill:var(--zh);stroke-width:2.5;filter:drop-shadow(0 4px 8px rgba(26,58,92,.15))}
-.zone-rect:active{cursor:grabbing;filter:drop-shadow(0 8px 16px rgba(26,58,92,.25))}
+.zone-rect:active{filter:drop-shadow(0 8px 16px rgba(26,58,92,.25))}
 .zone-rect.has-items{fill:var(--zf)}
 .zone-rect.selected{fill:var(--za);stroke:var(--accent2);stroke-width:3;filter:drop-shadow(0 2px 6px rgba(37,99,168,.2))}
 .zone-rect.dragging{opacity:.7;stroke-width:2.5}
@@ -192,6 +192,61 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 .stat-label{color:var(--text3);font-size:.65rem;text-transform:uppercase;letter-spacing:.05em}
 .stat-zone-list{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 .stat-zone-tag{background:var(--accent);color:#fff;border-radius:3px;padding:2px 6px;font-size:.65rem;font-weight:600}
+
+/* ── v1.5: nombres de zona, riesgo documentado, edicion del plano, baja de zonas ── */
+.zone-rect:focus{outline:none}
+.zone-rect:focus-visible{stroke:#d97706;stroke-width:3.5;filter:drop-shadow(0 0 3px rgba(217,119,6,.7))}
+.zone-rect.edsel{stroke:#d97706;stroke-width:3}
+.zone-rect.rf-match{stroke:#7c3aed;stroke-width:3.5;stroke-dasharray:6 3}
+.rf-dim{opacity:.28}
+.znm{font-family:'IBM Plex Sans',sans-serif;font-size:8px;fill:var(--text2);text-anchor:middle;dominant-baseline:middle;pointer-events:none;user-select:none}
+.zlbl,.zcnt{dominant-baseline:middle}
+.rchips{pointer-events:none}
+.wc.editing{border:2px dashed #d97706;background:#fffbeb}
+.wc.editing .zone-rect{cursor:move}
+.wc.editing .wsvg{touch-action:none}
+.hdl-h{fill:#fff;stroke:#d97706;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.hdl-box{fill:none;stroke:#d97706;stroke-width:1.5;stroke-dasharray:5 3;pointer-events:none;vector-effect:non-scaling-stroke}
+.plan-edit .sidebar,.plan-edit .hbtns{opacity:.45}
+.ptb{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tbtn{background:#fff;color:var(--accent);border:1.5px solid var(--accent);border-radius:var(--r);padding:5px 11px;font-size:.74rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer}
+.tbtn:hover:not(:disabled){background:var(--hi2)}
+.tbtn:disabled{opacity:.4;cursor:not-allowed}
+.tbtn:focus-visible,.hbtn:focus-visible,.bc:focus-visible,.xbtn:focus-visible{outline:3px solid #d97706;outline-offset:2px}
+.tbtn[aria-pressed="true"],.tbtn[aria-pressed="true"]:hover:not(:disabled){background:#b45309;border-color:#b45309;color:#fff}
+#plan-tools{display:none;gap:8px;flex-wrap:wrap}
+.pban{display:none;background:#fef3c7;color:#92400e;border:1.5px solid #d97706;border-radius:var(--r);padding:8px 12px;font-size:.74rem;line-height:1.5}
+.rleg{font-size:.7rem;color:var(--text2)}
+.rleg summary{cursor:pointer;font-weight:600;color:var(--accent)}
+.rleg ul{list-style:none;margin:6px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:3px 12px}
+.rleg li{display:flex;gap:6px;align-items:flex-start}
+.rnote{font-size:.66rem;color:var(--text3);line-height:1.45;margin-top:4px}
+.rchip{display:inline-block;min-width:24px;text-align:center;color:#fff;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:600;padding:1px 4px;line-height:1.3;flex-shrink:0}
+.rb{font-size:.66rem;margin-top:3px;line-height:1.5;color:var(--text2)}
+.rne{color:var(--text3);font-style:italic}
+.rsp{color:var(--green)}
+.rsrc{color:var(--text3);margin-top:1px}
+.rfed select{flex:1;font-size:.74rem;padding:5px 6px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;font-family:'IBM Plex Sans',sans-serif}
+.rfed .rcats,.rfed .rsrcin{display:none}
+.rfed:not([data-est="ne"]) .rsrcin{display:flex}
+.rfed[data-est="cl"] .rcats{display:grid}
+.rcats{gap:3px;max-height:150px;overflow-y:auto;margin-bottom:5px;border:1px solid var(--border);border-radius:var(--r);padding:5px;background:#fff}
+.rcats label{display:flex;gap:6px;align-items:flex-start;font-size:.68rem;cursor:pointer;line-height:1.35}
+.rfsel{width:100%;margin-top:7px;font-size:.74rem;padding:5px 6px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;font-family:'IBM Plex Sans',sans-serif}
+.rfinfo{font-size:.68rem;color:#7c3aed;min-height:1em;margin-top:3px}
+.zb small{display:block;font-size:.5rem;font-weight:400;color:var(--text3);font-family:'IBM Plex Sans',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+.zid{word-break:break-word;font-size:1.1rem;line-height:1.25}
+.sri-z{white-space:normal;max-width:45%;text-align:center;font-size:.66rem;word-break:break-word}
+.xbtn.danger{background:var(--red);color:#fff;border-color:var(--red)}
+.xbtn.danger:hover:not(:disabled){background:#991b1b}
+#mdz p{font-size:.78rem;color:var(--text2);line-height:1.5;margin-bottom:10px}
+#mdz label{font-size:.75rem;color:var(--text3);display:block;margin-bottom:5px}
+#mdz-dst{width:100%;padding:7px 8px;border:1.5px solid var(--border);border-radius:var(--r);font-size:.78rem;background:#fff;margin-bottom:8px}
+#mdz-msg{font-size:.74rem;line-height:1.45;margin-bottom:10px}
+#mdz-msg.ok{color:var(--green)}
+#mdz-msg.bad{color:var(--red)}
+/* La cabecera ya desbordaba en movil (6 botones en una fila: 773px a 390px). */
+@media(max-width:860px){header{height:auto;min-height:54px;flex-wrap:wrap;padding:6px 12px;row-gap:6px}.hbtns{flex-wrap:wrap}.sep{display:none}.mapp{padding:14px 12px}}
 </style>
 </head>
 <body>
@@ -201,7 +256,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
   <div class="sub">Control de Almacen</div>
   <div class="hbtns">
     <button class="hbtn" onclick="openNewZone()">➕ Nueva Zona</button>
-    <button class="hbtn" onclick="toast('🎯 CONTROLES:\n▪ Click derecho en zona = Editar\n▪ Arrastra zona = Mover\n▪ Botón ? = Esta ayuda','')">? Ayuda</button>
+    <button class="hbtn" onclick="toast('Clic en una zona = abrirla · Botón ✎ Zona (o clic derecho) = nombre, color y eliminar · «Editar plano» = mover y redimensionar zonas','')">? Ayuda</button>
     <button class="hbtn" onclick="exportZoneConfig()" title="Guardar solo configuración de zonas">🎨 Zonas</button>
     <button class="hbtn xls" onclick="document.getElementById('ifx').click()">&#8659; Desde Excel</button>
     <button class="hbtn" onclick="exportData()">&#11015; Exportar</button>
@@ -214,11 +269,25 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 <div class="layout">
   <div class="mapp">
     <div class="ptitle">Plano del Almacen</div>
+    <div class="ptb">
+      <button class="tbtn" id="btn-edit" aria-pressed="false" onclick="toggleEdit()">✎ Editar plano</button>
+      <div id="plan-tools">
+        <button class="tbtn" id="btn-undo" onclick="undoGeo()" disabled>↶ Deshacer último cambio</button>
+        <button class="tbtn" id="btn-reset-geo" onclick="restoreGeo()">Restaurar geometría inicial</button>
+      </div>
+    </div>
+    <div class="pban" id="plan-banner" role="status">Modo edición del plano: arrastra una zona para moverla y tira de los tiradores para cambiar su tamaño. Con teclado: Tab para elegir zona, flechas para mover, Mayús+flechas para redimensionar, Esc para soltar. Los artículos no se tocan y el resto de acciones están desactivadas hasta salir.</div>
     <div class="legend">
       <div class="li"><div class="ld e"></div>Vacia</div>
       <div class="li"><div class="ld f"></div>Con articulos</div>
       <div class="li"><div class="ld s"></div>Seleccionada</div>
     </div>
+    <details class="rleg" id="rleg">
+      <summary>Leyenda de riesgo documentado (⚠ en el plano)</summary>
+      <p class="rnote">⚠ junto a un código indica que la zona contiene artículos con peligro documentado; cada código es una clase ADR. Si no caben todos en la zona se muestra «+n»; el detalle completo está al pasar el ratón y en el panel lateral.</p>
+      <ul id="rleg-list"></ul>
+      <p class="rnote"><b>Qué es y qué no es:</b> etiquetado informativo interno con las clases del ADR 2025 (transporte de mercancías peligrosas por carretera, BOE-A-2025-77, apartado 2.1.1.1). Solo refleja lo que una persona ha registrado con su fuente: no se deduce del nombre ni del CN. «No evaluado» no significa «sin peligro». <b>No garantiza el cumplimiento normativo ni sustituye</b> la clasificación, el etiquetado ni las obligaciones oficiales de almacenamiento, manipulación o transporte.</p>
+    </details>
     <div class="wc">
       <svg class="wsvg" viewBox="0 0 620 800" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="2" width="616" height="796" fill="none" stroke="#1a3a5c" stroke-width="2.5" rx="4"/>
@@ -266,6 +335,8 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
         <input type="text" id="si" placeholder="Nombre o codigo nacional..." autocomplete="off">
         <button onclick="doSearch()">Buscar</button>
       </div>
+      <select class="rfsel" id="rf" aria-label="Filtrar artículos por riesgo documentado"></select>
+      <div class="rfinfo" id="rf-info" aria-live="polite"></div>
       <div class="sres" id="sr"></div>
       <div class="stat-panel" id="stat-panel">
         <div class="stat-item">
@@ -285,6 +356,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
             <div class="zid" id="zid">-</div>
             <div class="zsub" id="zsub">0 articulos</div>
           </div>
+          <button class="bc" id="btn-cfgzone" onclick="openZoneEdit(sel)" style="font-size:.7rem;padding:4px 9px;white-space:nowrap" title="Nombre, color y eliminar zona">&#9998; Zona</button>
           <button class="bc" id="btn-movezone" onclick="openMZ()" style="display:none;font-size:.7rem;padding:4px 9px;white-space:nowrap" title="Mover toda la zona">&#8660; Mover zona</button>
         </div>
       </div>
@@ -339,7 +411,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
     <div class="mii" id="mze-info"></div>
     <div style="margin-bottom:14px">
       <label style="font-size:.75rem;color:var(--text3);display:block;margin-bottom:6px">Nombre visible (opcional)</label>
-      <input type="text" id="mze-name" placeholder="Ej: Estantería A" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:IBM Plex Sans,sans-serif;font-size:.78rem;box-sizing:border-box">
+      <input type="text" id="mze-name" placeholder="Ej: Analgésicos" maxlength="40" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:IBM Plex Sans,sans-serif;font-size:.78rem;box-sizing:border-box">
     </div>
     <div style="margin-bottom:14px">
       <label style="font-size:.75rem;color:var(--text3);display:block;margin-bottom:6px">Color (hex)</label>
@@ -348,7 +420,28 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
     <div class="mf">
       <button class="bmc" onclick="closeZoneEdit()">Cancelar</button>
       <button class="xbtn success" onclick="saveZoneConfig()">Guardar</button>
-      <button class="xbtn" style="background:#fee2e2;color:#b91c1c;border-color:#b91c1c" onclick="confirmDelZone()">Eliminar zona</button>
+      <button class="xbtn" style="background:#fee2e2;color:#b91c1c;border-color:#b91c1c" onclick="openDelZone()">Eliminar zona…</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal eliminar zona -->
+<div class="mo" id="mdz" role="dialog" aria-modal="true" aria-labelledby="mdz-t">
+  <div class="md">
+    <div class="mt" id="mdz-t">Eliminar zona</div>
+    <div class="mii" id="mdz-info"></div>
+    <div id="mdz-empty" style="display:none">
+      <p>La zona está vacía. Se quitará del plano y no volverá a aparecer al recargar; solo se recupera con una copia de seguridad. Su ID no se reutilizará.</p>
+    </div>
+    <div id="mdz-full" style="display:none">
+      <p>Artículos en esta zona: <b id="mdz-n">0</b>. <b>No se borran con la zona</b>: elige a qué zona se trasladan y después se eliminará la zona. Si hay algún conflicto, no se hace nada.</p>
+      <label for="mdz-dst">Zona de destino</label>
+      <select id="mdz-dst" onchange="previewDelZone()"></select>
+    </div>
+    <div id="mdz-msg" role="alert"></div>
+    <div class="mf">
+      <button class="bmc" onclick="closeDelZone()">Cancelar</button>
+      <button class="xbtn danger" id="mdz-go" onclick="execDelZone()" disabled>Eliminar zona</button>
     </div>
   </div>
 </div>
@@ -360,7 +453,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
     <div class="mst">Configura una zona personalizada</div>
     <div style="margin-bottom:14px">
       <label style="font-size:.75rem;color:var(--text3);display:block;margin-bottom:6px">ID de zona (ej: 24, A, ESPECIAL)</label>
-      <input type="text" id="nz-id" placeholder="Identificador único" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:IBM Plex Mono,monospace;font-size:.76rem;box-sizing:border-box">
+      <input type="text" id="nz-id" placeholder="Identificador único (máx. 12: letras, números . - _)" maxlength="12" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:IBM Plex Mono,monospace;font-size:.76rem;box-sizing:border-box">
     </div>
     <div style="margin-bottom:14px">
       <label style="font-size:.75rem;color:var(--text3);display:block;margin-bottom:6px">Nombre visible</label>
@@ -413,24 +506,146 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 <script>
 var SK='farmastock_v1';
 var ZK='farmastock_zones_v1';
+var BK='farmastock_v1_respaldo';
 var AZ=['1','2','3','4','5','5b','6','6.2','7','7b','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+/* AZ pasa a ser la lista de zonas que EXISTEN (refreshAZ). BASE_IDS son las del plano original: su geometria inicial sale del SVG (DEFAULT_GEOM). */
+var BASE_IDS=AZ.slice();
+var DEFAULT_GEOM={};
+var VB={w:620,h:800,pad:4,minW:30,minH:24};
+var ID_RE=/^[A-Za-z0-9][A-Za-z0-9._-]{0,11}$/;
+var IDI_RE=/^[A-Za-z0-9_-]{1,40}$/;
+var NAME_MAX=40;
+var loadWarn=[];
+var editMode=false,editSel=null,undoStack=[];
+var riskFilter='';
+var delZoneId=null;
+
+/* Clases del ADR 2025 (BOE-A-2025-77, apartado 2.1.1.1): 9 clases, con subdivisiones en 4, 5 y 6 = 13 epigrafes.
+   Denominaciones tal cual el texto oficial. Los colores son solo para distinguir en pantalla: no son los de las placas oficiales. */
+var RIESGOS=[
+ {id:'1',n:'Materias y objetos explosivos',c:'#9a3412'},
+ {id:'2',n:'Gases',c:'#0f766e'},
+ {id:'3',n:'Líquidos inflamables',c:'#b91c1c'},
+ {id:'4.1',n:'Materias sólidas inflamables, materias autorreactivas, materias polimerizantes y materias explosivas desensibilizadas sólidas',c:'#be185d'},
+ {id:'4.2',n:'Materias que pueden experimentar inflamación espontánea',c:'#a21caf'},
+ {id:'4.3',n:'Materias que en contacto con el agua desprenden gases inflamables',c:'#1d4ed8'},
+ {id:'5.1',n:'Materias comburentes',c:'#a16207'},
+ {id:'5.2',n:'Peróxidos orgánicos',c:'#c2410c'},
+ {id:'6.1',n:'Materias tóxicas',c:'#4c1d95'},
+ {id:'6.2',n:'Materias infecciosas',c:'#15803d'},
+ {id:'7',n:'Materias radiactivas',c:'#4d7c0f'},
+ {id:'8',n:'Materias corrosivas',c:'#1f2937'},
+ {id:'9',n:'Materias y objetos peligrosos diversos',c:'#475569'}
+];
+function rcat(id){for(var i=0;i<RIESGOS.length;i++)if(RIESGOS[i].id===id)return RIESGOS[i];return null}
+
 var db=loadDB();
 var zones=loadZones();
 var sel=null;
 var mid=null;
-var dragZ=null;
-var dragX=0,dragY=0;
 
 function uid(){return Math.random().toString(36).slice(2,10)}
-function loadZones(){try{var r=localStorage.getItem(ZK);if(r)return JSON.parse(r)}catch(e){}return{}}
-function saveZones(){try{localStorage.setItem(ZK,JSON.stringify(zones))}catch(e){}}
-function loadDB(){try{var r=localStorage.getItem(SK);if(r)return JSON.parse(r)}catch(e){}return{}}
-function saveDB(){try{localStorage.setItem(SK,JSON.stringify(db))}catch(e){}}
-function gz(z){return db[z]||[]}
+function ho(o,k){return Object.prototype.hasOwnProperty.call(o,k)}
+function isObj(o){return !!o&&typeof o==='object'&&!Array.isArray(o)}
+function clonar(o){return JSON.parse(JSON.stringify(o))}
+function hasGeom(c){return['x','y','w','h'].every(function(k){return typeof c[k]==='number'&&isFinite(c[k])})}
+function limpiaNombre(s){return s.replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,NAME_MAX)}
+function clampGeom(g){
+  var w=Math.min(VB.w-2*VB.pad,Math.max(VB.minW,g.w)),h=Math.min(VB.h-2*VB.pad,Math.max(VB.minH,g.h));
+  var x=Math.min(VB.w-VB.pad-w,Math.max(VB.pad,g.x)),y=Math.min(VB.h-VB.pad-h,Math.max(VB.pad,g.y));
+  return{x:Math.round(x),y:Math.round(y),w:Math.round(w),h:Math.round(h)};
+}
+
+/* Riesgo documentado de un articulo. Sin campo = "No evaluado". Solo se guarda si hay fuente: sin fuente no hay verificacion. */
+function normRiesgo(r){
+  if(!isObj(r))return null;
+  var est=r.estado;
+  if(est!=='sin_peligro'&&est!=='clasificado')return null;
+  var cat=[];
+  if(Array.isArray(r.cat))RIESGOS.forEach(function(c){if(r.cat.indexOf(c.id)!==-1)cat.push(c.id)});
+  if(est==='clasificado'&&!cat.length)return null;
+  var f=typeof r.fuente==='string'?r.fuente.trim().slice(0,200):'';
+  if(!f)return null;
+  return{estado:est,cat:est==='clasificado'?cat:[],fuente:f,obs:typeof r.obs==='string'?r.obs.trim().slice(0,300):'',fecha:(typeof r.fecha==='string'&&/^\d{4}-\d{2}-\d{2}/.test(r.fecha))?r.fecha.slice(0,10):''};
+}
+/* Valida un articulo cargado o importado. Conserva los campos que no conoce. */
+function normItem(it,st){
+  if(!isObj(it)||typeof it.name!=='string'||!it.name.trim())return null;
+  if(typeof it.code!=='string')it.code=(it.code==null?'':String(it.code));
+  if(it._id!==undefined&&!(typeof it._id==='string'&&IDI_RE.test(it._id)))delete it._id;
+  if(ho(it,'riesgo')){var r=normRiesgo(it.riesgo);if(r)it.riesgo=r;else{delete it.riesgo;if(st)st.risk++}}
+  return it;
+}
+
+function parseLS(k){try{var r=localStorage.getItem(k);return r?JSON.parse(r):null}catch(e){return null}}
+function respaldar(raw){try{if(!localStorage.getItem(BK))localStorage.setItem(BK,raw)}catch(e){}}
+function loadDB(){
+  var raw=null,res={},st={bad:0,risk:0};
+  try{raw=localStorage.getItem(SK)}catch(e){}
+  if(!raw)return res;
+  var p=null;try{p=JSON.parse(raw)}catch(e){}
+  if(!isObj(p)){respaldar(raw);loadWarn.push('Los datos guardados no se pudieron leer; se conserva una copia en el navegador ('+BK+')');return res}
+  for(var z in p){
+    if(!ho(p,z))continue;
+    if(!ID_RE.test(z)||!Array.isArray(p[z])){st.bad++;continue}
+    var out=[];
+    p[z].forEach(function(it){var n=normItem(it,st);if(n)out.push(n);else st.bad++});
+    if(out.length)res[z]=out;
+  }
+  if(st.bad||st.risk){
+    respaldar(raw);
+    loadWarn.push('Al cargar se descartaron '+st.bad+' registro(s) inválido(s) y '+st.risk+' riesgo(s) mal formado(s); copia original en '+BK);
+  }
+  return res;
+}
+/* Metadatos de zona (nombre, color, geometria y alta/baja). Forma: {id:{name,color,x,y,w,h,custom?,g0?}|{deleted:true}} */
+function sanitizeZones(raw){
+  var out={};
+  if(!isObj(raw))return out;
+  for(var id in raw){
+    if(!ho(raw,id)||!ID_RE.test(id)||!isObj(raw[id]))continue;
+    var c=raw[id],o={};
+    if(c.deleted===true){out[id]={deleted:true};continue}
+    o.name=typeof c.name==='string'?limpiaNombre(c.name):'';
+    o.color=(typeof c.color==='string'&&/^#[0-9A-Fa-f]{6}$/.test(c.color))?c.color:'';
+    if(hasGeom(c)){var g=clampGeom(c);o.x=g.x;o.y=g.y;o.w=g.w;o.h=g.h}
+    if(c.custom===true){
+      o.custom=true;
+      var g0=(isObj(c.g0)&&hasGeom(c.g0))?clampGeom(c.g0):(hasGeom(o)?{x:o.x,y:o.y,w:o.w,h:o.h}:null);
+      if(g0)o.g0=g0;
+    }
+    out[id]=o;
+  }
+  return out;
+}
+function loadZones(){return sanitizeZones(parseLS(ZK))}
+function persist(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast('No se pudo guardar en este navegador ('+((e&&e.name)||'error')+')','err');return false}}
+function saveDB(){return persist(SK,db)}
+function saveZones(){return persist(ZK,zones)}
+/* Escribe articulos y zonas juntos o ninguno: si falla la segunda escritura se restaura la primera. */
+function commitStrict(cdb,cz){
+  var pd=null,pz=null;
+  try{
+    pd=localStorage.getItem(SK);pz=localStorage.getItem(ZK);
+    localStorage.setItem(SK,JSON.stringify(cdb));
+    localStorage.setItem(ZK,JSON.stringify(cz));
+    return true;
+  }catch(e){
+    try{
+      if(pd===null)localStorage.removeItem(SK);else localStorage.setItem(SK,pd);
+      if(pz===null)localStorage.removeItem(ZK);else localStorage.setItem(ZK,pz);
+    }catch(e2){}
+    return false;
+  }
+}
+function gz(z){return ho(db,z)?db[z]:[]}
 
 function ensureIds(){
-  var ch=false;
-  for(var z in db){db[z].forEach(function(it){if(!it._id){it._id=uid();ch=true}})}
+  var ch=false,seen={};
+  for(var z in db){db[z].forEach(function(it){
+    if(!it._id||ho(seen,it._id)){it._id=uid();ch=true}
+    seen[it._id]=1;
+  })}
   if(ch)saveDB();
 }
 
@@ -485,7 +700,8 @@ function renderZone(){
   var ph=document.getElementById('zph');
   var af=document.getElementById('af');
   var il=document.getElementById('il');
-  if(!sel){
+  if(!sel||!zoneExists(sel)){
+    sel=null;
     hdr.style.display='none';ph.style.display='flex';
     af.classList.remove('vis');il.classList.remove('vis');
     return;
@@ -493,7 +709,7 @@ function renderZone(){
   var items=gz(sel);
   hdr.style.display='block';ph.style.display='none';
   af.classList.add('vis');il.classList.add('vis');
-  document.getElementById('zid').textContent='Zona '+sel;
+  document.getElementById('zid').textContent=zlabel(sel);
   document.getElementById('zsub').textContent=items.length+(items.length===1?' articulo':' articulos');
   document.getElementById('afz').textContent=sel;
   var btnMZ=document.getElementById('btn-movezone');
@@ -509,6 +725,7 @@ function renderZone(){
         '<div class="ii">'+
           '<div class="in">'+eh(item.name)+'</div>'+
           '<div class="ico">'+(item.code?'CN: '+eh(item.code):'<em style="color:#bbb">Sin codigo</em>')+'</div>'+
+          riskHTML(item)+
         '</div>'+
         '<div class="ca">'+
           '<button class="bc" data-a="edit" data-id="'+id+'" title="Editar">&#9999;</button>'+
@@ -521,18 +738,64 @@ function renderZone(){
         '<div class="er"><input type="text" id="en-'+id+'" value="'+ea(item.name)+'" placeholder="Nombre"></div>'+
         '<div class="er">'+
           '<input type="text" id="ec-'+id+'" value="'+ea(item.code||'')+'" placeholder="CN (opcional)" maxlength="20">'+
+        '</div>'+
+        riskFormHTML(item,id)+
+        '<div class="er" style="margin-top:7px">'+
           '<button class="bse" data-a="save" data-id="'+id+'">Guardar</button>'+
-          '<button class="bce" data-a="cancel" data-id="'+id+'">&#10005;</button>'+
+          '<button class="bce" data-a="cancel" data-id="'+id+'">Cancelar</button>'+
         '</div>'+
       '</div>';
     il.appendChild(d);
   });
 }
 
+/* ── Riesgo documentado (informativo; ver nota en claude.md) ── */
+function chipHTML(id){var c=rcat(id);return c?'<span class="rchip" style="background:'+c.c+'" title="Clase '+c.id+' · '+eh(c.n)+'">'+c.id+'</span>':''}
+function riskHTML(it){
+  var r=it.riesgo;
+  if(!r)return'<div class="rb rne">Riesgo: no evaluado</div>';
+  if(r.estado==='sin_peligro')return'<div class="rb rsp">&#10004; Sin peligro identificado · Fuente: '+eh(r.fuente)+(r.obs?' · '+eh(r.obs):'')+'</div>';
+  return'<div class="rb">&#9888; '+r.cat.map(function(id){var c=rcat(id);return chipHTML(id)+' '+eh(c?c.n:'')}).join('; ')+
+    '<div class="rsrc">Fuente: '+eh(r.fuente)+(r.obs?' · '+eh(r.obs):'')+'</div></div>';
+}
+function riskFormHTML(it,id){
+  var r=it.riesgo,est=r?(r.estado==='sin_peligro'?'sp':'cl'):'ne';
+  var cats=RIESGOS.map(function(c){
+    var on=r&&r.cat&&r.cat.indexOf(c.id)!==-1;
+    return'<label><input type="checkbox" data-rc="'+c.id+'"'+(on?' checked':'')+'> '+chipHTML(c.id)+' <span>'+eh(c.n)+'</span></label>';
+  }).join('');
+  return'<div class="rfed" id="rf-'+id+'" data-est="'+est+'">'+
+    '<div class="iet" style="margin-top:8px">Riesgo documentado</div>'+
+    '<div class="er"><select id="rs-'+id+'" data-rs="'+id+'" aria-label="Estado de la evaluación de riesgo">'+
+      '<option value="ne"'+(est==='ne'?' selected':'')+'>No evaluado</option>'+
+      '<option value="sp"'+(est==='sp'?' selected':'')+'>Sin peligro identificado (verificado)</option>'+
+      '<option value="cl"'+(est==='cl'?' selected':'')+'>Con peligro documentado</option>'+
+    '</select></div>'+
+    '<div class="rcats" id="rc-'+id+'">'+cats+'</div>'+
+    '<div class="er rsrcin"><input type="text" id="rsrc-'+id+'" value="'+ea(r?r.fuente:'')+'" placeholder="Fuente de la clasificación (obligatoria)" maxlength="200"></div>'+
+    '<div class="er rsrcin"><input type="text" id="robs-'+id+'" value="'+ea(r?r.obs:'')+'" placeholder="Observaciones (opcional)" maxlength="300"></div>'+
+  '</div>';
+}
+/* Lee el formulario de riesgo. Devuelve {ok:true,riesgo|null} o {ok:false,msg}. */
+function leerRiesgoForm(id){
+  var s=document.getElementById('rs-'+id);
+  if(!s)return{ok:true,keep:true};
+  if(s.value==='ne')return{ok:true,riesgo:null};
+  var fuente=document.getElementById('rsrc-'+id).value.trim();
+  var obs=document.getElementById('robs-'+id).value.trim();
+  if(!fuente)return{ok:false,msg:'Indica la fuente de la clasificación (ficha de seguridad, ficha técnica, etc.)'};
+  var cat=[];
+  document.querySelectorAll('#rc-'+id+' input[data-rc]:checked').forEach(function(c){cat.push(c.getAttribute('data-rc'))});
+  if(s.value==='cl'&&!cat.length)return{ok:false,msg:'Marca al menos una clase de peligro'};
+  var r=normRiesgo({estado:s.value==='sp'?'sin_peligro':'clasificado',cat:s.value==='sp'?[]:cat,fuente:fuente,obs:obs,fecha:new Date().toISOString().slice(0,10)});
+  return r?{ok:true,riesgo:r}:{ok:false,msg:'Datos de riesgo no válidos'};
+}
+
 function eh(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function ea(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function ea(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;')}
 
 document.getElementById('il').addEventListener('click',function(e){
+  if(editMode)return;
   var btn=e.target.closest('[data-a]');
   if(!btn)return;
   var a=btn.getAttribute('data-a');
@@ -543,17 +806,19 @@ document.getElementById('il').addEventListener('click',function(e){
   else if(a==='save')saveEdit(id);
   else if(a==='cancel')closeEdit(id);
 });
-
-document.querySelectorAll('.zone-rect').forEach(function(r){
-  r.addEventListener('click',function(){
-    sel=r.getAttribute('data-zone');
-    document.getElementById('iname').value='';
-    document.getElementById('icode').value='';
-    document.getElementById('sr').innerHTML='';
-    document.getElementById('si').value='';
-    renderMap();renderZone();
-  });
+document.getElementById('il').addEventListener('change',function(e){
+  var s=e.target.closest('select[data-rs]');
+  if(s){var box=document.getElementById('rf-'+s.getAttribute('data-rs'));if(box)box.setAttribute('data-est',s.value)}
 });
+
+function selectZone(z){
+  sel=z;
+  document.getElementById('iname').value='';
+  document.getElementById('icode').value='';
+  document.getElementById('sr').innerHTML='';
+  document.getElementById('si').value='';
+  renderMap();renderZone();
+}
 
 function addItem(){
   if(!sel)return;
@@ -583,6 +848,15 @@ function closeEdit(id){
   var el=document.getElementById('ice-'+id);
   if(el)el.classList.remove('vis');
 }
+/* Recuperada de la v1.3: la v1.4 la perdio y el boton ✕ lanzaba ReferenceError (no se podia eliminar ningun articulo). */
+function delItem(id){
+  var f=byId(id);if(!f)return;
+  if(!confirm('Eliminar "'+f.item.name+'" de '+zlabel(f.zone)+'?'))return;
+  db[f.zone].splice(f.idx,1);
+  if(!db[f.zone].length)delete db[f.zone];
+  saveDB();toast('"'+f.item.name+'" eliminado','');renderMap();renderZone();
+}
+
 function saveEdit(id){
   var name=document.getElementById('en-'+id).value.trim();
   var code=document.getElementById('ec-'+id).value.trim();
@@ -591,9 +865,14 @@ function saveEdit(id){
   if(dn){toast('"'+dn.item.name+'" ya existe en Zona '+dn.zone,'err');return}
   var dc=dupCode(code,id);
   if(dc){toast('CN '+code+' ya esta en Zona '+dc.zone+': '+dc.item.name,'err');return}
+  var rk=leerRiesgoForm(id);
+  if(!rk.ok){toast(rk.msg,'err');return}
   var f=byId(id);
   if(!f)return;
-  db[f.zone][f.idx]={_id:id,name:name,code:code};
+  /* Se parte del articulo existente: reemplazarlo por un objeto nuevo descartaria el riesgo y cualquier campo futuro. */
+  var nuevo=Object.assign({},f.item,{_id:id,name:name,code:code});
+  if(!rk.keep){if(rk.riesgo)nuevo.riesgo=rk.riesgo;else delete nuevo.riesgo}
+  db[f.zone][f.idx]=nuevo;
   saveDB();toast('Articulo actualizado','ok');renderMap();renderZone();
 }
 
@@ -609,7 +888,7 @@ function openMM(id){
   AZ.forEach(function(zz){
     var b=document.createElement('button');
     b.className='zb'+(zz===f.zone?' cur':'');
-    b.textContent=zz;
+    b.innerHTML=eh(zz)+(zname(zz)?'<small>'+eh(zname(zz))+'</small>':'');b.title=zlabel(zz);
     if(zz!==f.zone)b.addEventListener('click',function(){execMove(zz)});
     g.appendChild(b);
   });
@@ -645,7 +924,7 @@ function openMZ(){
   AZ.forEach(function(zz){
     var b=document.createElement('button');
     b.className='zb'+(zz===sel?' cur':'');
-    b.textContent=zz;
+    b.innerHTML=eh(zz)+(zname(zz)?'<small>'+eh(zname(zz))+'</small>':'');b.title=zlabel(zz);
     if(zz!==sel)b.addEventListener('click',function(){execMoveZone(zz)});
     g.appendChild(b);
   });
@@ -664,14 +943,15 @@ function execMoveZone(tz){
   if(conflicts.length){
     if(!confirm('Hay '+conflicts.length+' artículo(s) con nombre o CN ya existente en el destino. Se omitirán al mover. ¿Continuar?'))return;
   }
-  var moved=0,skipped=0;
+  var moved=0,skipped=0,quedan=[];
   if(!db[tz])db[tz]=[];
   items.slice().forEach(function(it){
-    if(dupName(it.name,it._id)||dupCode(it.code,it._id)){skipped++;return}
+    if(dupName(it.name,it._id)||dupCode(it.code,it._id)){skipped++;quedan.push(it);return}
     db[tz].push(Object.assign({},it));
     moved++;
   });
-  delete db[sel];
+  /* Los omitidos se quedan donde estaban: antes se borraba la zona entera y con ella los artículos omitidos. */
+  if(quedan.length)db[sel]=quedan;else delete db[sel];
   saveDB();closeMZ();
   var prev=sel;
   sel=tz;
@@ -683,126 +963,357 @@ function execMoveZone(tz){
 document.getElementById('mz').addEventListener('click',function(e){if(e.target===this)closeMZ()});
 
 /* ═══════════════════════════════════════════
-   EDICIÓN DE ZONAS - Drag & Drop
+   ZONAS: registro, nombres, geometria, alta y baja
+   Modelo (farmastock_zones_v1): {id:{name,color,x,y,w,h,custom?,g0?}} | {id:{deleted:true}}
+   - "Zonas que existen" y "geometria por defecto" son cosas distintas:
+       existe = zona base no marcada como borrada, o zona custom;
+       geometria por defecto = DEFAULT_GEOM (leida del SVG de arriba) o g0 (la de creacion, en zonas custom).
+   - Borrar deja una "tumba" {deleted:true}: el ID no se reutiliza y la zona no reaparece al recargar.
+   - La geometria es dato (zones[id]); el DOM es solo su reflejo.
    ═══════════════════════════════════════════ */
 var currentZoneEdit=null;
 
-function getZoneConfig(zoneId){
-  if(!zones[zoneId])zones[zoneId]={name:'',color:''};
-  return zones[zoneId];
+function SVG(){return document.querySelector('.wsvg')}
+function mkSvg(tag,attrs){var e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e}
+function zoneExists(id){
+  if(typeof id!=='string'||!ID_RE.test(id))return false;
+  if(ho(zones,id)&&zones[id].deleted)return false;
+  return BASE_IDS.indexOf(id)!==-1||(ho(zones,id)&&zones[id].custom===true);
+}
+function idsExistentes(){
+  var ids=BASE_IDS.filter(zoneExists);
+  for(var id in zones){if(ho(zones,id)&&BASE_IDS.indexOf(id)===-1&&zoneExists(id))ids.push(id)}
+  ids.sort(function(a,b){return a.localeCompare(b,undefined,{numeric:true})});
+  return ids;
+}
+function refreshAZ(){var ids=idsExistentes();AZ.length=0;ids.forEach(function(i){AZ.push(i)})}
+function zname(id){return(ho(zones,id)&&typeof zones[id].name==='string')?zones[id].name:''}
+function zlabel(id){var n=zname(id);return'Zona '+id+(n?' — '+n:'')}
+function getZoneConfig(id){if(!ho(zones,id))zones[id]={name:'',color:''};return zones[id]}
+function geomOf(id){
+  var c=ho(zones,id)?zones[id]:null;
+  if(c&&hasGeom(c))return{x:c.x,y:c.y,w:c.w,h:c.h};
+  return DEFAULT_GEOM[id]?Object.assign({},DEFAULT_GEOM[id]):null;
+}
+function geomInicial(id){
+  if(DEFAULT_GEOM[id])return Object.assign({},DEFAULT_GEOM[id]);
+  var c=ho(zones,id)?zones[id]:null;
+  return(c&&c.g0)?Object.assign({},c.g0):geomOf(id);
+}
+function captureDefaults(){
+  BASE_IDS.forEach(function(id){
+    var r=document.getElementById('zone-'+id);
+    if(r)DEFAULT_GEOM[id]={x:+r.getAttribute('x'),y:+r.getAttribute('y'),w:+r.getAttribute('width'),h:+r.getAttribute('height')};
+  });
 }
 
-function setZoneColor(zoneId,color){
-  var el=document.getElementById('zone-'+zoneId);
-  if(el&&color){el.style.fill=color}
+/* Hueco libre del plano para una zona nueva (sin solaparse con las existentes). */
+function findFreeSpot(w,h){
+  var rs=idsExistentes().map(geomOf).filter(Boolean),m=3;
+  for(var y=VB.pad;y<=VB.h-VB.pad-h;y+=4){
+    for(var x=VB.pad;x<=VB.w-VB.pad-w;x+=4){
+      var hit=rs.some(function(r){return x<r.x+r.w+m&&x+w+m>r.x&&y<r.y+r.h+m&&y+h+m>r.y});
+      if(!hit)return{x:x,y:y,w:w,h:h};
+    }
+  }
+  return null;
 }
 
+function buildZoneDom(id){
+  if(document.getElementById('zone-'+id))return;
+  var g=geomOf(id);if(!g)return;
+  var svg=SVG(),hdl=document.getElementById('hdl');
+  var rect=mkSvg('rect',{'class':'zone-rect',id:'zone-'+id,'data-zone':id,rx:3});
+  var lbl=mkSvg('text',{'class':'zlbl','data-zone':id});lbl.textContent=id;
+  var cnt=mkSvg('text',{'class':'zcnt',id:'c-'+id,'data-zone':id});
+  [rect,lbl,cnt].forEach(function(e){hdl?svg.insertBefore(e,hdl):svg.appendChild(e)});
+  applyGeometry(id);
+}
+function removeZoneDom(id){
+  SVG().querySelectorAll('[data-zone="'+id+'"]').forEach(function(e){e.remove()});
+}
+/* Hace que el SVG refleje exactamente las zonas que existen. */
+function syncZonesDom(){
+  SVG().querySelectorAll('.zone-rect').forEach(function(r){
+    var id=r.getAttribute('data-zone');
+    if(!zoneExists(id))removeZoneDom(id);
+  });
+  idsExistentes().forEach(buildZoneDom);
+}
+function applyGeometry(id){
+  var r=document.getElementById('zone-'+id),g=geomOf(id);
+  if(!r||!g)return;
+  r.setAttribute('x',g.x);r.setAttribute('y',g.y);r.setAttribute('width',g.w);r.setAttribute('height',g.h);
+  layoutZone(id);
+}
+function applyAllGeometry(){idsExistentes().forEach(applyGeometry)}
+
+/* Coherencia entre articulos y zonas. Se ejecuta al cargar y al importar.
+   Ningun articulo puede quedar en una zona que no existe (seria invisible): se restaura la zona. */
+function reconcileZones(){
+  var msgs=[],id,c;
+  for(id in zones){
+    if(!ho(zones,id))continue;
+    c=zones[id];
+    if(c.deleted||BASE_IDS.indexOf(id)!==-1)continue;
+    if(c.custom!==true){
+      if(hasGeom(c)){c.custom=true;c.g0={x:c.x,y:c.y,w:c.w,h:c.h}}   // zonas creadas con la v1.4
+      else delete zones[id];
+    }else if(!hasGeom(c)){
+      var gg=findFreeSpot(100,60)||{x:VB.pad,y:VB.pad,w:100,h:60};
+      c.x=gg.x;c.y=gg.y;c.w=gg.w;c.h=gg.h;c.g0=Object.assign({},gg);
+    }
+  }
+  Object.keys(db).forEach(function(z){
+    if(!db[z].length||!ID_RE.test(z)||zoneExists(z))return;
+    if(BASE_IDS.indexOf(z)!==-1){
+      zones[z]={name:'',color:''};
+      msgs.push('Zona '+z+' restaurada porque contiene artículos');
+    }else{
+      var g=findFreeSpot(100,60)||{x:VB.pad,y:VB.pad,w:100,h:60};
+      zones[z]=Object.assign({name:'',color:'',custom:true},g,{g0:Object.assign({},g)});
+      msgs.push('Zona '+z+' creada porque contiene artículos');
+    }
+  });
+  return msgs;
+}
+
+/* ── Texto de cada zona en el plano: id, chips de riesgo, nombre y contador ──
+   Se apilan de arriba abajo mientras quepan; prioridad: id > chips > contador > nombre.
+   Lo que no cabe sigue disponible en el <title> (al pasar el raton) y en el panel lateral. */
+function zoneCats(id){
+  var set={};
+  gz(id).forEach(function(it){if(it.riesgo&&it.riesgo.estado==='clasificado')it.riesgo.cat.forEach(function(c){set[c]=1})});
+  return RIESGOS.filter(function(c){return set[c.id]}).map(function(c){return c.id});
+}
+function zoneEls(id){
+  var svg=SVG(),rect=document.getElementById('zone-'+id);
+  if(!rect)return null;
+  var q=function(c){return svg.querySelector('.'+c+'[data-zone="'+id+'"]')};
+  /* El contador de las zonas base no trae data-zone en el HTML: sin ponerselo, ni se reposiciona ni se retira al eliminar la zona. */
+  var cnt=document.getElementById('c-'+id);
+  if(cnt&&!cnt.hasAttribute('data-zone'))cnt.setAttribute('data-zone',id);
+  var lbl=q('zlbl'),nm=q('znm'),ch=q('rchips');
+  if(!nm){nm=mkSvg('text',{'class':'znm','data-zone':id});(cnt||lbl).after(nm)}
+  if(!ch){ch=mkSvg('g',{'class':'rchips','data-zone':id});nm.after(ch)}
+  return{rect:rect,lbl:lbl,cnt:cnt,nm:nm,ch:ch};
+}
+function layoutZone(id){
+  var E=zoneEls(id),g=geomOf(id);
+  if(!E||!g)return;
+  var n=gz(id).length,name=zname(id),cats=zoneCats(id);
+  var avail=g.h-4,need=14,GAP=2,showCh=false,mark=false,showCt=false,showNm=false;
+  /* Si los chips no caben apilados (zona muy baja) queda al menos el triangulo ⚠ en la esquina: la zona nunca pierde la señal. */
+  if(cats.length){if(need+12<=avail){showCh=true;need+=12}else mark=true}
+  if(n>0&&need+GAP+9<=avail){showCt=true;need+=GAP+9}
+  if(name&&need+GAP+9<=avail){showNm=true;need+=GAP+9}
+  var cx=g.x+g.w/2,y=g.y+(g.h-need)/2;
+  E.ch.textContent='';
+  var tri=function(x0,y0){
+    E.ch.appendChild(mkSvg('path',{d:'M'+x0+' '+(y0+10)+' L'+(x0+5)+' '+y0+' L'+(x0+10)+' '+(y0+10)+' Z',fill:'#fef3c7',stroke:'#92400e','stroke-width':1.2,'stroke-linejoin':'round'}));
+    var bang=mkSvg('text',{x:x0+5,y:y0+7.6,'font-size':6,'font-weight':700,fill:'#92400e','text-anchor':'middle'});bang.textContent='!';E.ch.appendChild(bang);
+  };
+  if(mark)tri(g.x+g.w-14,g.y+2);
+  if(showCh){
+    var TRI=12,CW=19,slots=Math.max(0,Math.floor((g.w-8-TRI)/CW)),shown=cats.slice(),over=0;
+    if(cats.length>slots){shown=slots>=1?cats.slice(0,slots-1):[];over=cats.length-shown.length}
+    var total=TRI+(shown.length+(over?1:0))*CW,x0=cx-total/2;
+    tri(x0,y);
+    var cur=x0+TRI;
+    shown.forEach(function(cid){
+      var c=rcat(cid);
+      E.ch.appendChild(mkSvg('rect',{x:cur,y:y,width:17,height:11,rx:2,fill:c.c}));
+      var t=mkSvg('text',{x:cur+8.5,y:y+5.8,'font-size':7,'font-weight':700,fill:'#fff','text-anchor':'middle','dominant-baseline':'middle','font-family':'IBM Plex Mono,monospace'});t.textContent=cid;E.ch.appendChild(t);
+      cur+=CW;
+    });
+    if(over){
+      E.ch.appendChild(mkSvg('rect',{x:cur,y:y,width:17,height:11,rx:2,fill:'#fff',stroke:'#1a3a5c','stroke-width':1}));
+      var to=mkSvg('text',{x:cur+8.5,y:y+5.8,'font-size':7,'font-weight':700,fill:'#1a3a5c','text-anchor':'middle','dominant-baseline':'middle'});to.textContent='+'+over;E.ch.appendChild(to);
+    }
+    y+=12;
+  }
+  if(E.lbl){E.lbl.setAttribute('x',cx);E.lbl.setAttribute('y',y+7);}
+  y+=14+GAP;
+  if(E.nm){
+    if(showNm){
+      var maxc=Math.max(3,Math.floor((g.w-8)/4.7));
+      E.nm.textContent=name.length>maxc?name.slice(0,maxc-1)+'…':name;
+      E.nm.setAttribute('x',cx);E.nm.setAttribute('y',y+4.5);E.nm.style.display='';
+      y+=9+GAP;
+    }else{E.nm.textContent='';E.nm.style.display='none'}
+  }
+  if(E.cnt){
+    E.cnt.setAttribute('x',cx);E.cnt.setAttribute('y',y+4.5);
+    E.cnt.style.display=showCt?'':'none';
+  }
+}
+
+/* ── Plano: pintar estado, accesibilidad y filtro de riesgo ── */
+function renderMapWithConfig(){
+  var f=riskFilter,hits=0;
+  var svg=SVG();
+  svg.querySelectorAll('.zone-rect').forEach(function(r){
+    var z=r.getAttribute('data-zone');
+    var cfg=getZoneConfig(z);
+    var items=gz(z),n=items.length;
+    var el=document.getElementById('c-'+z);
+    r.classList.toggle('has-items',n>0);
+    r.classList.toggle('selected',z===sel);
+    r.classList.toggle('edsel',editMode&&z===editSel);
+    if(el)el.textContent=n>0?n+' art.':'';
+    r.style.fill=cfg.color||'';
+    var m=f?items.some(function(it){return matchRisk(it,f)}):false;
+    if(m)hits++;
+    r.classList.toggle('rf-match',m);
+    layoutZone(z);
+    var E=zoneEls(z);
+    [E.rect,E.lbl,E.cnt,E.nm,E.ch].forEach(function(e){if(e)e.classList.toggle('rf-dim',!!f&&!m)});
+    var cats=zoneCats(z);
+    var desc=zlabel(z)+', '+n+' artículo'+(n!==1?'s':'')+(cats.length?'. Peligro documentado, clase'+(cats.length>1?'s':'')+' ADR '+cats.join(', '):'');
+    r.setAttribute('tabindex','0');r.setAttribute('role','button');r.setAttribute('aria-label',desc);
+    var t=r.querySelector('title');if(!t){t=mkSvg('title',{});r.insertBefore(t,r.firstChild)}
+    t.textContent=desc.replace(/\. /g,'\n');
+  });
+  var inf=document.getElementById('rf-info');
+  if(inf)inf.textContent=f?hits+(hits===1?' zona resaltada':' zonas resaltadas')+' en el plano':'';
+  if(editMode)showHandles();
+  updateStats();
+}
+
+function updateStats(){
+  var total=0;
+  var used=new Set();
+  for(var z in db){
+    var n=db[z].length;
+    total+=n;
+    if(n>0)used.add(z);
+  }
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-zones').textContent=used.size;
+}
+
+/* ── Configurar zona (nombre y color) ── */
 function openZoneEdit(zoneId){
+  if(editMode||!zoneExists(zoneId))return;
   currentZoneEdit=zoneId;
   var cfg=getZoneConfig(zoneId);
   var items=gz(zoneId);
-  document.getElementById('mze-sub').textContent='Zona '+eh(zoneId)+' · '+items.length+' artículos';
+  document.getElementById('mze-sub').textContent='ID técnico: '+zoneId+' · '+items.length+' artículo'+(items.length!==1?'s':'');
   document.getElementById('mze-info').innerHTML=
-    '<strong>Zona '+eh(zoneId)+'</strong>'+
-    '<span style="display:block;font-size:.72rem;color:var(--text3);margin-top:4px">'+items.length+' artículo'+(items.length!==1?'s':'')+'</span>';
+    '<strong>'+eh(zlabel(zoneId))+'</strong>'+
+    '<span style="display:block;font-size:.72rem;color:var(--text3);margin-top:4px">El ID no cambia al renombrar; los artículos no se mueven.</span>';
   document.getElementById('mze-name').value=cfg.name||'';
   document.getElementById('mze-color').value=cfg.color||'';
   document.getElementById('mze').classList.add('act');
+  document.getElementById('mze-name').focus();
 }
-
 function closeZoneEdit(){
   document.getElementById('mze').classList.remove('act');
   currentZoneEdit=null;
 }
-
 function saveZoneConfig(){
   if(!currentZoneEdit)return;
-  var name=document.getElementById('mze-name').value.trim();
+  var name=limpiaNombre(document.getElementById('mze-name').value);
   var color=document.getElementById('mze-color').value.trim();
   if(color&&!/^#[0-9A-Fa-f]{6}$/.test(color)){
     toast('Color inválido. Usa formato hex: #xxxxxx','err');
     return;
   }
-  zones[currentZoneEdit]={...zones[currentZoneEdit],name:name,color:color};
-  saveZones();
-  if(color)setZoneColor(currentZoneEdit,color);
+  var id=currentZoneEdit;
+  zones[id]=Object.assign({},getZoneConfig(id),{name:name,color:color});
+  if(!saveZones())return;
   toast('Configuración guardada','ok');
   closeZoneEdit();
-  renderMap();
-}
-
-function resizeZone(zoneId,dw,dh){
-  var rect=document.getElementById('zone-'+zoneId);
-  if(!rect)return;
-  var cfg=getZoneConfig(zoneId);
-  var w=parseFloat(rect.getAttribute('width'))+dw;
-  var h=parseFloat(rect.getAttribute('height'))+dh;
-  w=Math.max(30,w);h=Math.max(20,h);
-  rect.setAttribute('width',w);
-  rect.setAttribute('height',h);
-  cfg.w=w;cfg.h=h;
-  saveZones();
-  
-  // Reposicionar textos
-  var x=parseFloat(rect.getAttribute('x'));
-  var y=parseFloat(rect.getAttribute('y'));
-  document.querySelectorAll('.zlbl[data-zone="'+zoneId+'"]').forEach(function(lbl){
-    lbl.setAttribute('x',x+w/2);
-    lbl.setAttribute('y',y+h/2-6);
-  });
-  document.querySelectorAll('.zcnt[data-zone="'+zoneId+'"]').forEach(function(cnt){
-    cnt.setAttribute('x',x+w/2);
-    cnt.setAttribute('y',y+h/2+8);
-  });
-  toast('Zona redimensionada','ok');
-}
-
-function resetZoneLayout(){
-  if(!confirm('¿Recargar el layout de zonas a las posiciones originales?'))return;
-  zones={};
-  saveZones();
-  location.reload();
-  toast('Layout reestablecido','ok');
-}
-
-function resetAllData(){
-  if(!confirm('⚠️ Esta acción eliminará TODOS los datos del almacén. ¿Estás seguro?'))return;
-  if(!confirm('Confirma: Se perderán todos los artículos, zonas y configuraciones.'))return;
-  db={};
-  zones={};
-  saveDB();
-  saveZones();
-  sel=null;
-  location.reload();
-  toast('Todos los datos eliminados','ok');
-}
-
-function confirmDelZone(){
-  if(!currentZoneEdit)return;
-  var items=gz(currentZoneEdit);
-  if(items.length>0){
-    var msg='Esta zona tiene '+items.length+' artículo'+(items.length!==1?'s':'')+'. ¿Quieres eliminar la zona y todos sus artículos?';
-    if(!confirm(msg))return;
-  }else{
-    if(!confirm('¿Eliminar la zona '+currentZoneEdit+'?'))return;
-  }
-  
-  // Eliminar artículos de la zona
-  delete db[currentZoneEdit];
-  // Eliminar configuración de la zona
-  delete zones[currentZoneEdit];
-  // Eliminar de la lista de zonas si es custom
-  saveDB();saveZones();
-  closeZoneEdit();
-  sel=null;
-  toast('Zona '+currentZoneEdit+' eliminada','ok');
   renderMap();renderZone();
 }
-
 document.getElementById('mze').addEventListener('click',function(e){if(e.target===this)closeZoneEdit()});
 
-/* Crear nueva zona */
+/* ── Eliminar zona: nunca borra articulos; con articulos obliga a trasladarlos antes ── */
+function openDelZone(){
+  var id=currentZoneEdit;
+  if(!id||!zoneExists(id))return;
+  delZoneId=id;
+  closeZoneEdit();
+  var items=gz(id);
+  document.getElementById('mdz-info').innerHTML=
+    '<strong>'+eh(zlabel(id))+'</strong>'+
+    '<span style="display:block;font-size:.76rem;color:var(--text2);margin-top:3px">ID: <b>'+eh(id)+'</b> · '+items.length+' artículo'+(items.length!==1?'s':'')+'</span>';
+  var vacia=items.length===0;
+  document.getElementById('mdz-empty').style.display=vacia?'block':'none';
+  document.getElementById('mdz-full').style.display=vacia?'none':'block';
+  document.getElementById('mdz-n').textContent=items.length;
+  var s=document.getElementById('mdz-dst');
+  s.innerHTML='<option value="">— Elige la zona de destino —</option>'+AZ.filter(function(z){return z!==id}).map(function(z){return'<option value="'+ea(z)+'">'+eh(zlabel(z))+' ('+gz(z).length+' art.)</option>'}).join('');
+  document.getElementById('mdz-msg').textContent='';
+  document.getElementById('mdz-msg').className='';
+  var go=document.getElementById('mdz-go');
+  go.textContent=vacia?'Eliminar zona':'Trasladar artículos y eliminar zona';
+  go.disabled=!vacia;
+  document.getElementById('mdz').classList.add('act');
+  (vacia?go:s).focus();
+}
+function closeDelZone(){document.getElementById('mdz').classList.remove('act');delZoneId=null}
+document.getElementById('mdz').addEventListener('click',function(e){if(e.target===this)closeDelZone()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('mdz').classList.contains('act'))closeDelZone()});
+
+/* Simula el traslado de TODOS los articulos de src a dst sobre una copia. Nada se toca aqui.
+   Un traslado no cambia en cuantas zonas esta cada nombre/CN, asi que el unico riesgo nuevo es chocar con
+   lo que YA hay en el destino (o entre los propios articulos trasladados). */
+function planTraslado(src,dst){
+  var errs=[];
+  if(!zoneExists(src)||!zoneExists(dst)||src===dst){return{ok:false,errs:['La zona de destino no es válida.']}}
+  var cdb=clonar(db),mover=cdb[src]||[],dest=cdb[dst]||[],antes=0;
+  for(var z in cdb)antes+=cdb[z].length;
+  mover.forEach(function(it){
+    var n=it.name.trim().toLowerCase(),c=(it.code||'').trim().toLowerCase();
+    dest.forEach(function(d){
+      if(d.name.trim().toLowerCase()===n)errs.push('«'+it.name+'» ya existe en la zona de destino');
+      else if(c&&d.code&&d.code.trim().toLowerCase()===c)errs.push('El CN '+it.code+' ya existe en destino («'+d.name+'»)');
+    });
+    dest.push(it);
+  });
+  cdb[dst]=dest;delete cdb[src];
+  var despues=0,ids={},dup=false;
+  for(var k in cdb)cdb[k].forEach(function(it){despues++;if(ho(ids,it._id))dup=true;ids[it._id]=1});
+  if(despues!==antes||dup)errs.push('No se puede garantizar la integridad de los artículos (recuento o identificadores).');
+  return{ok:!errs.length,errs:errs,cdb:cdb};
+}
+function textoErrores(errs){return errs.slice(0,4).join(' · ')+(errs.length>4?' · …y '+(errs.length-4)+' más':'')}
+function previewDelZone(){
+  var id=delZoneId,dst=document.getElementById('mdz-dst').value,msg=document.getElementById('mdz-msg'),go=document.getElementById('mdz-go');
+  go.disabled=true;
+  if(!dst){msg.textContent='';return}
+  var p=planTraslado(id,dst);
+  if(p.ok){msg.className='ok';var nn=gz(id).length;msg.textContent='Sin conflictos: se '+(nn===1?'trasladará 1 artículo':'trasladarán '+nn+' artículos')+' a '+zlabel(dst)+' conservando su identificador.';go.disabled=false}
+  else{msg.className='bad';msg.textContent='No se puede trasladar: '+textoErrores(p.errs)+'. Resuélvelo antes (renombra o mueve esos artículos) o elige otra zona.'}
+}
+function execDelZone(){
+  var id=delZoneId;
+  if(!id||!zoneExists(id))return;
+  var items=gz(id),dst=null,cdb;
+  if(items.length){
+    dst=document.getElementById('mdz-dst').value;
+    var p=planTraslado(id,dst);
+    if(!p.ok){previewDelZone();toast('Operación cancelada: '+textoErrores(p.errs),'err');return}
+    cdb=p.cdb;
+  }else{
+    cdb=clonar(db);delete cdb[id];
+  }
+  var cz=clonar(zones);
+  cz[id]={deleted:true};
+  if(!commitStrict(cdb,cz)){toast('No se pudo guardar. No se ha cambiado nada.','err');return}
+  db=cdb;zones=cz;
+  removeZoneDom(id);refreshAZ();undoStack.length=0;updateUndoUI();
+  var n=items.length;
+  sel=dst;
+  closeDelZone();
+  renderMap();renderZone();
+  toast('Zona '+id+' eliminada'+(n?' · '+n+' artículo'+(n!==1?'s':'')+' trasladado'+(n!==1?'s':'')+' a la zona '+dst:''),'ok');
+}
+
+/* ── Crear zona ── */
 function openNewZone(){
+  if(editMode)return;
   document.getElementById('nz-id').value='';
   document.getElementById('nz-name').value='';
   document.getElementById('nz-color').value='#dcfce7';
@@ -810,264 +1321,299 @@ function openNewZone(){
   document.getElementById('mnz').classList.add('act');
   document.getElementById('nz-id').focus();
 }
-
-function closeNewZone(){
-  document.getElementById('mnz').classList.remove('act');
+function closeNewZone(){document.getElementById('mnz').classList.remove('act')}
+function idEnUso(id){
+  var l=id.toLowerCase(),k;
+  for(k in zones)if(ho(zones,k)&&k.toLowerCase()===l)return true;     // incluye tumbas: un ID borrado no se reutiliza
+  for(k in db)if(ho(db,k)&&k.toLowerCase()===l)return true;
+  return BASE_IDS.some(function(b){return b.toLowerCase()===l});
 }
-
 function createNewZone(){
   var id=document.getElementById('nz-id').value.trim().toUpperCase();
-  var name=document.getElementById('nz-name').value.trim();
+  var name=limpiaNombre(document.getElementById('nz-name').value);
   var color=document.getElementById('nz-color').value;
   var size=document.getElementById('nz-size').value;
-  
   if(!id){toast('El ID de la zona es obligatorio','err');return}
-  if(AZ.indexOf(id)!==-1||zones[id]){toast('La zona '+id+' ya existe','err');return}
-  if(color&&!/^#[0-9A-Fa-f]{6}$/.test(color)){
-    toast('Color inválido. Usa formato hex: #xxxxxx','err');return;
-  }
-  
-  // Calcular tamaño basado en selección
+  if(!ID_RE.test(id)){toast('ID no válido: letras, números, punto, guion o guion bajo (máx. 12)','err');return}
+  if(idEnUso(id)){toast('El ID '+id+' ya existe o perteneció a una zona eliminada','err');return}
+  if(color&&!/^#[0-9A-Fa-f]{6}$/.test(color)){toast('Color inválido. Usa formato hex: #xxxxxx','err');return}
   var w=100,h=60;
   if(size==='small'){w=50;h=50}
   else if(size==='large'){w=150;h=100}
-  
-  // Posición (esquina inferior derecha libre)
-  var x=450,y=650;
-  
-  // Crear rectángulo en SVG
-  var svg=document.querySelector('.wsvg');
-  var rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
-  rect.setAttribute('class','zone-rect');
-  rect.setAttribute('id','zone-'+id);
-  rect.setAttribute('data-zone',id);
-  rect.setAttribute('x',x);
-  rect.setAttribute('y',y);
-  rect.setAttribute('width',w);
-  rect.setAttribute('height',h);
-  rect.setAttribute('rx','3');
-  rect.setAttribute('fill',color);
-  
-  // Crear label
-  var lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
-  lbl.setAttribute('class','zlbl');
-  lbl.setAttribute('data-zone',id);
-  lbl.setAttribute('x',x+w/2);
-  lbl.setAttribute('y',y+h/2-6);
-  lbl.setAttribute('data-zone',id);
-  lbl.textContent=id;
-  
-  // Crear contador
-  var cnt=document.createElementNS('http://www.w3.org/2000/svg','text');
-  cnt.setAttribute('class','zcnt');
-  cnt.setAttribute('id','c-'+id);
-  cnt.setAttribute('data-zone',id);
-  cnt.setAttribute('x',x+w/2);
-  cnt.setAttribute('y',y+h/2+8);
-  cnt.textContent='';
-  
-  svg.appendChild(rect);
-  svg.appendChild(lbl);
-  svg.appendChild(cnt);
-  
-  // Guardar configuración
-  zones[id]={name:name,color:color,x:x,y:y,w:w,h:h};
-  saveZones();
-  AZ.push(id);
-  AZ.sort(function(a,b){return a.localeCompare(b,undefined,{numeric:true})});
-  
+  var g=findFreeSpot(w,h);
+  if(!g){toast('No hay hueco libre en el plano para una zona de este tamaño','err');return}
+  var cz=clonar(zones);
+  cz[id]={name:name,color:color,x:g.x,y:g.y,w:g.w,h:g.h,custom:true,g0:{x:g.x,y:g.y,w:g.w,h:g.h}};
+  if(!commitStrict(db,cz)){toast('No se pudo guardar. No se ha cambiado nada.','err');return}
+  zones=cz;refreshAZ();buildZoneDom(id);undoStack.length=0;updateUndoUI();
   closeNewZone();
-  renderMap();
-  toast('Zona '+id+' creada correctamente','ok');
+  selectZone(id);
+  toast('Zona '+id+' creada. Usa «Editar plano» para colocarla donde quieras','ok');
 }
-
 document.getElementById('mnz').addEventListener('click',function(e){if(e.target===this)closeNewZone()});
 
-/* Drag and drop para SVG - Mejorado */
-function initDragDrop(){
-  var svg=document.querySelector('.wsvg');
-  var isDragging=false;
-  var dragOffset={x:0,y:0};
-  var snapGrid=10; // Snap a grilla de 10px
-  var minBounds={x:5,y:5,maxX:610,maxY:775};
-  
-  svg.addEventListener('mousedown',function(e){
-    var rect=e.target.closest('.zone-rect');
-    if(!rect)return;
-    isDragging=true;
-    dragZ=rect;
-    dragZ.classList.add('dragging');
-    var svgRect=svg.getBoundingClientRect();
-    dragX=e.clientX-svgRect.left;
-    dragY=e.clientY-svgRect.top;
+/* ═══════════════════════════════════════════
+   EDITAR PLANO (geometria)
+   Todo en coordenadas del viewBox (no en pixeles): getScreenCTM().inverse() absorbe escala, desplazamiento y preserveAspectRatio.
+   Sin modo edicion el plano no mueve nada: un arrastre accidental no desplaza zonas.
+   ═══════════════════════════════════════════ */
+var gesto=null,lastNudge=null;
+
+function ptSvg(e){
+  var svg=SVG(),m=svg.getScreenCTM();
+  if(!m)return null;
+  var p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;
+  return p.matrixTransform(m.inverse());
+}
+function snapGeo(){var s={};idsExistentes().forEach(function(id){var g=geomOf(id);if(g)s[id]=g});return s}
+function pushUndo(){undoStack.push(JSON.stringify(snapGeo()));if(undoStack.length>50)undoStack.shift();updateUndoUI()}
+function updateUndoUI(){
+  var b=document.getElementById('btn-undo');
+  if(b)b.disabled=!undoStack.length;
+}
+function setGeom(id,g){
+  var c=getZoneConfig(id);
+  c.x=g.x;c.y=g.y;c.w=g.w;c.h=g.h;
+  applyGeometry(id);
+}
+function undoGeo(){
+  if(!editMode||!undoStack.length)return;
+  var s=JSON.parse(undoStack.pop());
+  for(var id in s)if(zoneExists(id))setGeom(id,s[id]);
+  saveZones();updateUndoUI();renderMap();
+  toast('Cambio deshecho','ok');
+}
+function restoreGeo(){
+  if(!editMode)return;
+  var ids=idsExistentes();
+  if(!confirm('¿Restaurar la geometría inicial de las '+ids.length+' zonas actuales?\n\nNo se tocan artículos, nombres, colores ni categorías de riesgo, y las zonas eliminadas no se recrean.'))return;
+  pushUndo();
+  ids.forEach(function(id){var g=geomInicial(id);if(g)setGeom(id,g)});
+  saveZones();renderMap();
+  toast('Geometría inicial restaurada','ok');
+}
+function toggleEdit(){
+  editMode=!editMode;
+  if(editMode){
+    closeMM();closeMZ();closeNewZone();closeZoneEdit();
+    editSel=null;lastNudge=null;
+  }else{
+    gesto=null;editSel=null;
+  }
+  document.body.classList.toggle('plan-edit',editMode);
+  document.querySelector('.wc').classList.toggle('editing',editMode);
+  document.querySelector('.sidebar').inert=editMode;
+  document.querySelector('.hbtns').inert=editMode;
+  var bt=document.getElementById('btn-edit');
+  bt.textContent=editMode?'✔ Salir de «Editar plano»':'✎ Editar plano';
+  bt.setAttribute('aria-pressed',editMode?'true':'false');
+  document.getElementById('plan-tools').style.display=editMode?'flex':'none';
+  document.getElementById('plan-banner').style.display=editMode?'block':'none';
+  var h=document.getElementById('hdl');if(h)h.remove();
+  updateUndoUI();renderMap();
+  toast(editMode?'Modo edición del plano activado':'Modo edición desactivado. Cambios guardados','ok');
+}
+
+/* Tiradores: 8 (esquinas y lados), con tamano en unidades del viewBox calculado para que midan ~12 px en pantalla. */
+var HANDLES=[['nw',0,0],['n',.5,0],['ne',1,0],['e',1,.5],['se',1,1],['s',.5,1],['sw',0,1],['w',0,.5]];
+var CURS={nw:'nwse-resize',se:'nwse-resize',ne:'nesw-resize',sw:'nesw-resize',n:'ns-resize',s:'ns-resize',e:'ew-resize',w:'ew-resize'};
+function showHandles(){
+  var svg=SVG(),old=document.getElementById('hdl');
+  if(old)old.remove();
+  if(!editMode||!editSel||!zoneExists(editSel))return;
+  var g=geomOf(editSel);if(!g)return;
+  var scale=svg.getBoundingClientRect().width/VB.w||1;
+  var hs=Math.max(6,Math.min(12/scale,Math.max(6,Math.min(g.w,g.h)/3)));
+  var grp=mkSvg('g',{id:'hdl'});
+  grp.appendChild(mkSvg('rect',{'class':'hdl-box',x:g.x,y:g.y,width:g.w,height:g.h}));
+  HANDLES.forEach(function(h){
+    var r=mkSvg('rect',{'class':'hdl-h','data-h':h[0],x:g.x+g.w*h[1]-hs/2,y:g.y+g.h*h[2]-hs/2,width:hs,height:hs,rx:1.5});
+    r.style.cursor=CURS[h[0]];
+    grp.appendChild(r);
+  });
+  svg.appendChild(grp);
+}
+function geomDesde(s,H,pt,p0){
+  var dx=pt.x-p0.x,dy=pt.y-p0.y,L=s.x,R=s.x+s.w,T=s.y,B=s.y+s.h,clamp=function(v,a,b){return Math.min(b,Math.max(a,v))};
+  if(H==='move'){
+    var nx=clamp(Math.round(s.x+dx),VB.pad,VB.w-VB.pad-s.w),ny=clamp(Math.round(s.y+dy),VB.pad,VB.h-VB.pad-s.h);
+    return{x:nx,y:ny,w:s.w,h:s.h};
+  }
+  if(H.indexOf('w')>=0)L=clamp(Math.round(s.x+dx),VB.pad,R-VB.minW);
+  if(H.indexOf('e')>=0)R=clamp(Math.round(R+dx),L+VB.minW,VB.w-VB.pad);
+  if(H.indexOf('n')>=0)T=clamp(Math.round(s.y+dy),VB.pad,B-VB.minH);
+  if(H.indexOf('s')>=0)B=clamp(Math.round(B+dy),T+VB.minH,VB.h-VB.pad);
+  return{x:L,y:T,w:R-L,h:B-T};
+}
+function finGesto(e){
+  if(!gesto||(e&&e.pointerId!==undefined&&e.pointerId!==gesto.pid))return;
+  var g=gesto;gesto=null;
+  try{SVG().releasePointerCapture(g.pid)}catch(x){}
+  document.querySelectorAll('.zone-rect.dragging').forEach(function(r){r.classList.remove('dragging')});
+  if(g.moved){
+    undoStack.push(g.snap);if(undoStack.length>50)undoStack.shift();
+    saveZones();updateUndoUI();
+  }
+  renderMap();
+}
+function initPlanEditor(){
+  var svg=SVG();
+  svg.addEventListener('pointerdown',function(e){
+    if(!editMode||(e.pointerType==='mouse'&&e.button!==0))return;
+    var h=e.target.closest('.hdl-h'),r=e.target.closest('.zone-rect');
+    var id=h?editSel:(r?r.getAttribute('data-zone'):null);
+    if(!id){editSel=null;renderMap();return}
+    var p0=ptSvg(e);if(!p0)return;
+    if(!h&&id!==editSel){editSel=id;renderMap()}
+    var rz=document.getElementById('zone-'+id);if(rz&&document.activeElement!==rz)rz.focus({preventScroll:true});
+    gesto={id:id,H:h?h.getAttribute('data-h'):'move',p0:p0,start:geomOf(id),snap:JSON.stringify(snapGeo()),pid:e.pointerId,moved:false};
+    try{svg.setPointerCapture(e.pointerId)}catch(x){}
     e.preventDefault();
   });
-  
-  document.addEventListener('mousemove',function(e){
-    if(!isDragging||!dragZ)return;
-    var svgRect=svg.getBoundingClientRect();
-    var currentX=e.clientX-svgRect.left;
-    var currentY=e.clientY-svgRect.top;
-    var dx=currentX-dragX;
-    var dy=currentY-dragY;
-    
-    var x=parseFloat(dragZ.getAttribute('x'))+dx;
-    var y=parseFloat(dragZ.getAttribute('y'))+dy;
-    
-    // Aplicar snap-to-grid
-    x=Math.round(x/snapGrid)*snapGrid;
-    y=Math.round(y/snapGrid)*snapGrid;
-    
-    // Limites
-    x=Math.max(minBounds.x,Math.min(x,minBounds.maxX-parseFloat(dragZ.getAttribute('width'))));
-    y=Math.max(minBounds.y,Math.min(y,minBounds.maxY-parseFloat(dragZ.getAttribute('height'))));
-    
-    dragZ.setAttribute('x',x);
-    dragZ.setAttribute('y',y);
-    
-    // Mover textos asociados
-    var z=dragZ.getAttribute('data-zone');
-    var w=parseFloat(dragZ.getAttribute('width'))/2;
-    var h=parseFloat(dragZ.getAttribute('height'))/2;
-    
-    document.querySelectorAll('.zlbl[data-zone="'+z+'"]').forEach(function(lbl){
-      lbl.setAttribute('x',x+w);
-      lbl.setAttribute('y',y+h-6);
-    });
-    document.querySelectorAll('.zcnt[data-zone="'+z+'"]').forEach(function(cnt){
-      cnt.setAttribute('x',x+w);
-      cnt.setAttribute('y',y+h+8);
-    });
-    
-    dragX=currentX;dragY=currentY;
+  svg.addEventListener('pointermove',function(e){
+    if(!gesto||e.pointerId!==gesto.pid)return;
+    var pt=ptSvg(e);if(!pt)return;
+    var g=geomDesde(gesto.start,gesto.H,pt,gesto.p0),c=geomOf(gesto.id);
+    if(g.x===c.x&&g.y===c.y&&g.w===c.w&&g.h===c.h)return;
+    gesto.moved=true;
+    setGeom(gesto.id,g);
+    var r=document.getElementById('zone-'+gesto.id);if(r)r.classList.add('dragging');
+    showHandles();
   });
-  
-  document.addEventListener('mouseup',function(){
-    if(isDragging&&dragZ){
-      var z=dragZ.getAttribute('data-zone');
-      var cfg=getZoneConfig(z);
-      cfg.x=parseFloat(dragZ.getAttribute('x'));
-      cfg.y=parseFloat(dragZ.getAttribute('y'));
-      cfg.w=parseFloat(dragZ.getAttribute('width'));
-      cfg.h=parseFloat(dragZ.getAttribute('height'));
-      saveZones();
-      dragZ.classList.remove('dragging');
-      isDragging=false;
-      dragZ=null;
-      toast('Zona reposicionada','ok');
+  svg.addEventListener('pointerup',finGesto);
+  svg.addEventListener('pointercancel',finGesto);
+  svg.addEventListener('lostpointercapture',finGesto);
+  window.addEventListener('blur',function(){finGesto()});
+  window.addEventListener('resize',function(){if(editMode)showHandles()});
+
+  /* Seleccion normal (solo fuera del modo edicion) */
+  svg.addEventListener('click',function(e){
+    if(editMode)return;
+    var r=e.target.closest('.zone-rect');
+    if(r)selectZone(r.getAttribute('data-zone'));
+  });
+  svg.addEventListener('contextmenu',function(e){
+    if(editMode)return;
+    var r=e.target.closest('.zone-rect');
+    if(r){e.preventDefault();openZoneEdit(r.getAttribute('data-zone'))}
+  });
+  svg.addEventListener('focusin',function(e){
+    if(!editMode)return;
+    var r=e.target.closest&&e.target.closest('.zone-rect');
+    if(r&&r.getAttribute('data-zone')!==editSel){editSel=r.getAttribute('data-zone');renderMap()}
+  });
+  svg.addEventListener('keydown',function(e){
+    var r=e.target.closest&&e.target.closest('.zone-rect');
+    if(!r)return;
+    var id=r.getAttribute('data-zone');
+    if(!editMode){
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();selectZone(id)}
+      return;
     }
+    if(e.key==='Escape'){editSel=null;renderMap();return}
+    var d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+    if(!d)return;
+    e.preventDefault();
+    var s=geomOf(id),STEP=5;
+    var now=Date.now();
+    if(!lastNudge||lastNudge.id!==id||now-lastNudge.t>800)pushUndo();
+    lastNudge={id:id,t:now};
+    var ref=e.shiftKey?{x:0,y:0}:{x:0,y:0},pt={x:d[0]*STEP,y:d[1]*STEP};
+    var g=e.shiftKey?geomDesde(s,(d[0]?'e':'s'),pt,ref):geomDesde(s,'move',pt,ref);
+    setGeom(id,g);saveZones();renderMap();
   });
+  updateUndoUI();
 }
 
-/* Cargar posiciones guardadas */
-function applyZoneConfigs(){
-  for(var z in zones){
-    var cfg=zones[z];
-    var rect=document.getElementById('zone-'+z);
-    if(rect){
-      if(cfg.x!==undefined)rect.setAttribute('x',cfg.x);
-      if(cfg.y!==undefined)rect.setAttribute('y',cfg.y);
-      if(cfg.w!==undefined)rect.setAttribute('width',cfg.w);
-      if(cfg.h!==undefined)rect.setAttribute('height',cfg.h);
-      if(cfg.color)rect.style.fill=cfg.color;
-      // Reposicionar textos
-      var z_id=rect.getAttribute('data-zone');
-      var lbl=document.querySelector('.zlbl[data-zone="'+z_id+'"]');
-      var cnt=document.querySelector('.zcnt[data-zone="'+z_id+'"]');
-      var w=parseFloat(rect.getAttribute('width'))/2;
-      var h=parseFloat(rect.getAttribute('height'))/2;
-      if(lbl){lbl.setAttribute('x',parseFloat(rect.getAttribute('x'))+w);lbl.setAttribute('y',parseFloat(rect.getAttribute('y'))+h-6)}
-      if(cnt){cnt.setAttribute('x',parseFloat(rect.getAttribute('x'))+w);cnt.setAttribute('y',parseFloat(rect.getAttribute('y'))+h+8)}
-    }
-  }
+/* ── Filtro de riesgo y buscador ── */
+function matchRisk(it,f){
+  var r=it.riesgo;
+  if(f==='ne')return!r;
+  if(f==='sp')return!!r&&r.estado==='sin_peligro';
+  if(f==='any')return!!r&&r.estado==='clasificado';
+  return!!r&&r.estado==='clasificado'&&r.cat.indexOf(f)!==-1;
 }
-
-function renderMapWithConfig(){
-  document.querySelectorAll('.zone-rect').forEach(function(r){
-    var z=r.getAttribute('data-zone');
-    var cfg=getZoneConfig(z);
-    var n=gz(z).length;
-    var el=document.getElementById('c-'+z);
-    r.classList.toggle('has-items',n>0);
-    r.classList.toggle('selected',z===sel);
-    if(el)el.textContent=n>0?n+' art.':'';
-    if(cfg.color)r.style.fill=cfg.color;
-    else r.style.fill='';
-    
-    // Botón contextual para editar zona
-    r.style.cursor='grab';
-    r.addEventListener('contextmenu',function(e){
-      e.preventDefault();
-      openZoneEdit(z);
-    });
-    
-    // Tooltip al hover
-    r.setAttribute('title','Zona '+z+(cfg.name?' - '+cfg.name:'')+'\n'+n+' artículo'+(n!==1?'s':''));
-  });
-  updateStats();
+function riskSummary(it){
+  var r=it.riesgo;
+  if(!r)return'Riesgo: no evaluado';
+  if(r.estado==='sin_peligro')return'Sin peligro identificado';
+  return'Peligro documentado: clase'+(r.cat.length>1?'s':'')+' ADR '+r.cat.join(', ');
 }
-
-function updateStats(){
-  var total=0;
-  var zones=new Set();
-  for(var z in db){
-    var n=db[z].length;
-    total+=n;
-    if(n>0)zones.add(z);
-  }
-  document.getElementById('stat-total').textContent=total;
-  document.getElementById('stat-zones').textContent=zones.size;
+function initRiskUI(){
+  var s=document.getElementById('rf');
+  s.innerHTML='<option value="">Riesgo: todos</option><option value="any">Con algún peligro documentado</option>'+
+    RIESGOS.map(function(c){return'<option value="'+c.id+'">Clase '+c.id+' · '+eh(c.n.length>46?c.n.slice(0,45)+'…':c.n)+'</option>'}).join('')+
+    '<option value="sp">Sin peligro identificado</option><option value="ne">No evaluado</option>';
+  s.addEventListener('change',function(){riskFilter=s.value;doSearch();renderMap()});
+  document.getElementById('rleg-list').innerHTML=
+    RIESGOS.map(function(c){return'<li>'+chipHTML(c.id)+' <span><b>Clase '+c.id+'</b> · '+eh(c.n)+'</span></li>'}).join('');
 }
-
 function doSearch(){
   var q=document.getElementById('si').value.trim().toLowerCase();
-  var c=document.getElementById('sr');c.innerHTML='';if(!q)return;
+  var f=riskFilter;
+  var c=document.getElementById('sr');c.innerHTML='';
+  if(!q&&!f)return;
   var res=[];
-  for(var z in db){db[z].forEach(function(it){if(it.name.toLowerCase().indexOf(q)!==-1||(it.code&&it.code.toLowerCase().indexOf(q)!==-1))res.push({zone:z,name:it.name,code:it.code})})}
-  if(!res.length){c.innerHTML='<div class="snr">Sin resultados para "'+eh(q)+'"</div>';return}
-  res.forEach(function(r){
+  for(var z in db){db[z].forEach(function(it){
+    var txt=!q||it.name.toLowerCase().indexOf(q)!==-1||(it.code&&it.code.toLowerCase().indexOf(q)!==-1);
+    if(txt&&(!f||matchRisk(it,f)))res.push({zone:z,it:it});
+  })}
+  if(!res.length){c.innerHTML='<div class="snr">Sin resultados'+(q?' para "'+eh(q)+'"':'')+'</div>';return}
+  res.slice(0,200).forEach(function(r){
     var d=document.createElement('div');d.className='sri';
-    d.innerHTML='<div><div class="sri-n">'+eh(r.name)+'</div><div class="sri-c">'+(r.code?'CN: '+eh(r.code):'Sin codigo')+'</div></div><span class="sri-z">Zona '+eh(r.zone)+'</span>';
-    d.addEventListener('click',function(){sel=r.zone;renderMap();renderZone();document.querySelector('.wc').scrollIntoView({behavior:'smooth',block:'center'});toast('Zona '+r.zone+' seleccionada','ok')});
+    d.innerHTML='<div><div class="sri-n">'+eh(r.it.name)+'</div><div class="sri-c">'+(r.it.code?'CN: '+eh(r.it.code):'Sin codigo')+'</div><div class="sri-c">'+eh(riskSummary(r.it))+'</div></div><span class="sri-z" title="'+ea(zlabel(r.zone))+'">'+eh(zlabel(r.zone))+'</span>';
+    d.addEventListener('click',function(){
+      if(editMode||!zoneExists(r.zone))return;
+      sel=r.zone;renderMap();renderZone();document.querySelector('.wc').scrollIntoView({behavior:'smooth',block:'center'});toast(zlabel(r.zone)+' seleccionada','ok');
+    });
     c.appendChild(d);
   });
+  if(res.length>200){var m=document.createElement('div');m.className='snr';m.textContent='…y '+(res.length-200)+' más. Afina la búsqueda.';c.appendChild(m)}
 }
 document.getElementById('si').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch()});
 
 function exportData(){
-  var p={_farmastock:true,_v:'1.4',_d:new Date().toISOString(),zones:db,zoneConfigs:zones};
+  var p={_farmastock:true,_v:'1.5',_d:new Date().toISOString(),zones:db,zoneConfigs:zones};
   var b=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});
   var u=URL.createObjectURL(b);
   var a=document.createElement('a');a.href=u;a.download='farmastock-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(u);
-  toast('Exportado correctamente (incluye configuración de zonas)','ok');
+  toast('Exportado correctamente (incluye zonas, nombres, geometría y riesgos)','ok');
 }
 
 function exportZoneConfig(){
-  var cfg={_zoneConfig:true,_v:'1.4',_d:new Date().toISOString(),zones:zones};
+  var cfg={_zoneConfig:true,_v:'1.5',_d:new Date().toISOString(),zones:zones};
   var b=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});
   var u=URL.createObjectURL(b);
   var a=document.createElement('a');a.href=u;a.download='farmastock-zonas-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(u);
   toast('Configuración de zonas exportada','ok');
 }
 
-function importZoneConfig(ev){
-  var f=ev.target.files[0];if(!f)return;
-  var r=new FileReader();
-  r.onload=function(e){
-    try{
-      var p=JSON.parse(e.target.result);
-      var zc=p._zoneConfig?p.zones:p;
-      if(typeof zc!=='object'||Array.isArray(zc))throw new Error('Formato no reconocido');
-      if(!confirm('Reemplazar configuración de zonas actual?'))return;
-      zones=zc;
-      saveZones();
-      applyZoneConfigs();
-      renderMap();renderZone();
-      toast('Configuración de zonas importada','ok');
-    }catch(err){toast('Error: '+err.message,'err')}
-    ev.target.value='';
-  };
-  r.readAsText(f);
+/* Importar: todo o nada. Una copia sin metadatos de zona (v1.0–v1.3, o solo articulos) NO toca las zonas actuales;
+   despues reconcileZones garantiza que cada articulo importado cae en una zona que existe. */
+function importarCopia(p){
+  var inc=p._farmastock?p.zones:p;
+  if(!isObj(inc))throw new Error('Formato no reconocido');
+  var st={bad:0,risk:0},nuevo={};
+  for(var z in inc){
+    if(!ho(inc,z))continue;
+    if(!ID_RE.test(z))throw new Error('ID de zona no válido: "'+String(z).slice(0,20)+'"');
+    if(!Array.isArray(inc[z]))throw new Error('Estructura invalida');
+    nuevo[z]=inc[z].map(function(it){var n=normItem(it,st);if(!n)throw new Error('Artículo inválido en zona '+z);return n});
+  }
+  for(var z2 in nuevo)nuevo[z2].forEach(function(it){if(!it._id)it._id=uid()});
+  var ids={};
+  for(var z3 in nuevo)nuevo[z3].forEach(function(it){if(ho(ids,it._id))it._id=uid();ids[it._id]=1});
+  var sn=new Map(),sc=new Map();
+  for(var z4 in nuevo){
+    nuevo[z4].forEach(function(it){
+      var n=it.name.trim().toLowerCase();
+      var cnt=sn.get(n)||0;
+      if(cnt>=2)throw new Error('Nombre en mas de 2 zonas: "'+it.name+'"');
+      sn.set(n,cnt+1);
+      if(it.code&&it.code.trim()){var c=it.code.trim().toLowerCase();var cc=sc.get(c)||0;if(cc>=2)throw new Error('CN en mas de 2 zonas: '+it.code);sc.set(c,cc+1)}
+    });
+  }
+  return{db:nuevo,zc:(p._farmastock&&isObj(p.zoneConfigs))?sanitizeZones(p.zoneConfigs):null,risk:st.risk};
 }
 function importData(ev){
   var f=ev.target.files[0];if(!f)return;
@@ -1075,29 +1621,18 @@ function importData(ev){
   r.onload=function(e){
     try{
       var p=JSON.parse(e.target.result);
-      var inc=p._farmastock?p.zones:p;
-      if(typeof inc!=='object'||Array.isArray(inc))throw new Error('Formato no reconocido');
-      for(var z in inc)if(!Array.isArray(inc[z]))throw new Error('Estructura invalida');
-      for(var z in inc)inc[z].forEach(function(it){if(!it._id)it._id=uid()});
-      var sn=new Map(),sc=new Map();
-      for(var z in inc){
-        inc[z].forEach(function(it){
-          var n=it.name.trim().toLowerCase();
-          var cnt=sn.get(n)||0;
-          if(cnt>=2)throw new Error('Nombre en mas de 2 zonas: "'+it.name+'"');
-          sn.set(n,cnt+1);
-          if(it.code&&it.code.trim()){var c=it.code.trim().toLowerCase();var cc=sc.get(c)||0;if(cc>=2)throw new Error('CN en mas de 2 zonas: '+it.code);sc.set(c,cc+1)}
-        });
-      }
+      var R=importarCopia(p);
       var cur=Object.values(db).reduce(function(a,x){return a+x.length},0);
-      var imp=Object.values(inc).reduce(function(a,x){return a+x.length},0);
+      var imp=Object.values(R.db).reduce(function(a,x){return a+x.length},0);
       if(!confirm('Importar? Reemplaza el inventario actual ('+cur+' articulos) con '+imp+' articulos del archivo.'))return;
-      db=inc;
-      // Importar configuración de zonas si está disponible
-      if(p._farmastock&&p.zoneConfigs){
-        zones=p.zoneConfigs;
-      }
-      saveDB();saveZones();sel=null;applyZoneConfigs();renderMap();renderZone();toast(imp+' articulos importados','ok');
+      var pd=db,pz=clonar(zones);
+      db=R.db;
+      if(R.zc)zones=R.zc;
+      var msgs=reconcileZones();
+      if(!commitStrict(db,zones)){db=pd;zones=pz;toast('No se pudo guardar. No se ha cambiado nada.','err');return}
+      sel=null;undoStack.length=0;updateUndoUI();
+      refreshAZ();syncZonesDom();applyAllGeometry();renderMap();renderZone();
+      toast(imp+' articulos importados'+(R.risk?' · '+R.risk+' riesgo(s) mal formado(s) descartado(s)':'')+(msgs.length?' · '+msgs.join(' · '):''),'ok');
     }catch(err){toast('Error: '+err.message,'err')}
     ev.target.value='';
   };
@@ -1225,11 +1760,11 @@ window.xlsColsChange=function(){
 function renderScreenTable(scr,msg,btnNext){
   var arts=xlsState.articles;
   var filterQ=(document.getElementById('xtbl-filter')?document.getElementById('xtbl-filter').value:'').toLowerCase();
-  var bulkOpts='<option value="">Elige zona</option>'+AZ.map(function(z){return'<option value="'+z+'">Zona '+z+'</option>'}).join('');
+  var bulkOpts='<option value="">Elige zona</option>'+AZ.map(function(z){return'<option value="'+ea(z)+'">'+eh(zlabel(z))+'</option>'}).join('');
   var mkSel=function(i,which,val){
     var attr='data-i="'+i+'" data-w="'+which+'"';
     var opts='<option value=""'+(val===''?' selected':'')+'>— Sin ubicar —</option>'+
-      AZ.map(function(z){return'<option value="'+z+'"'+(z===val?' selected':'')+'>Zona '+z+'</option>'}).join('');
+      AZ.map(function(z){return'<option value="'+ea(z)+'"'+(z===val?' selected':'')+'>'+eh(zlabel(z))+'</option>'}).join('');
     return'<select class="'+(val?'ok':'pend')+'" '+attr+' onchange="xlsSetZona('+i+',\''+which+'\',this.value)" style="font-size:.74rem;padding:3px 4px;border:1.5px solid var(--border);border-radius:4px;background:#fff;color:var(--text);font-family:IBM Plex Sans,sans-serif;width:100%;box-sizing:border-box">'+opts+'</select>';
   };
 
@@ -1360,10 +1895,17 @@ function xlsCommit(){
 }
 
 ensureIds();
-applyZoneConfigs();
+captureDefaults();
+var avisos=reconcileZones();
+refreshAZ();
+syncZonesDom();
+applyAllGeometry();
+initRiskUI();
+initPlanEditor();
 renderMap();
 renderZone();
-initDragDrop();
+if(avisos.length){saveZones()}
+if(avisos.length||loadWarn.length){var aviso=avisos.concat(loadWarn).join(' · ');console.warn(aviso);toast(aviso,'err')}
 </script>
 </body>
 </html>
