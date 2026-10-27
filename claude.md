@@ -108,6 +108,7 @@ Funciones principales:
 - **Ámbito y límites**: el ADR regula el **transporte** por carretera (y no el almacenamiento). Se usa solo como vocabulario normalizado de clases. Esta etiqueta es un registro interno informativo: **no garantiza cumplimiento normativo ni sustituye** la clasificación, el etiquetado ni las obligaciones de almacenamiento y manipulación. Para medicamentos acabados, el CLP (Reglamento 1272/2008) los excluye como producto terminado destinado al usuario final (art. 1); el almacenamiento de productos químicos tiene su propia normativa.
 - **Pendiente de validar con quien corresponda (no verificado)**: qué normativa de almacenamiento es exigible en este almacén (p. ej. APQ/RD 656/2017, CLP/FDS para productos no medicamentosos) y si procede ampliar o sustituir el catálogo por una clasificación interna. Mientras tanto la estructura es configurable en `RIESGOS`.
 - El mismo producto en 2 zonas son dos entradas independientes: su riesgo **no se sincroniza** automáticamente (sincronizar por nombre/CN sería deducir).
+- **Peligrosidad por zona (v1.6)**: `zones[id].riesgo` = mismo formato que el de artículo pero solo `estado:'clasificado'` (con ≥1 clase y fuente). Es una **designación** de la zona, independiente de la de sus artículos; nunca se copia de uno a otro. En el plano se suman (`zoneCats`: `art:true` = chip relleno, `art:false` = chip con borde). `zonaMatch` la usa el filtro; «No evaluado»/«Sin peligro» solo miran artículos. La ficha avisa de clases de artículos no designadas en la zona (solo si la zona tiene alguna designación). Registro interno: no equivale a una autorización de almacenamiento.
 
 ---
 
@@ -232,4 +233,4 @@ Estas tareas **no** deben paralelizarse porque tienen dependencias entre sí:
 
 ## Versión actual
 
-`v1.5.1` (sobre la 1.5.0) — Nombres de zona, riesgo documentado, edición del plano y baja segura de zonas. Ver `CHANGELOG.md` (la v1.4 se documentó a posteriori).
+`v1.6.0` (sobre la 1.5.x) — Nombres de zona, riesgo documentado, edición del plano y baja segura de zonas. Ver `CHANGELOG.md` (la v1.4 se documentó a posteriori).

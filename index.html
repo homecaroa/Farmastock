@@ -221,6 +221,8 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
 .rleg ul{list-style:none;margin:6px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:3px 12px}
 .rleg li{display:flex;gap:6px;align-items:flex-start}
 .rnote{font-size:.66rem;color:var(--text3);line-height:1.45;margin-top:4px}
+.rchip.zd{background:#fff;border:1.5px solid;padding:0 3px}
+#mze .md{max-height:94vh;overflow-y:auto}
 .rchip{display:inline-block;min-width:24px;text-align:center;color:#fff;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:600;padding:1px 4px;line-height:1.3;flex-shrink:0}
 .rb{font-size:.66rem;margin-top:3px;line-height:1.5;color:var(--text2)}
 .rne{color:var(--text3);font-style:italic}
@@ -284,9 +286,9 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
     </div>
     <details class="rleg" id="rleg">
       <summary>Leyenda de riesgo documentado (⚠ en el plano)</summary>
-      <p class="rnote">⚠ junto a un código indica que la zona contiene artículos con peligro documentado; cada código es una clase ADR. Si no caben todos en la zona se muestra «+n»; el detalle completo está al pasar el ratón y en el panel lateral.</p>
+      <p class="rnote">⚠ junto a un código indica que la zona contiene artículos con peligro documentado; cada código es una clase ADR. <b>Chip relleno</b> = hay artículos con esa clase; <b>chip con borde</b> = la zona está designada para esa clase. Si no caben todos se muestra «+n»; el detalle completo está al pasar el ratón y en el panel lateral.</p>
       <ul id="rleg-list"></ul>
-      <p class="rnote"><b>Qué es y qué no es:</b> etiquetado informativo interno con las clases del ADR 2025 (transporte de mercancías peligrosas por carretera, BOE-A-2025-77, apartado 2.1.1.1). Solo refleja lo que una persona ha registrado con su fuente: no se deduce del nombre ni del CN. «No evaluado» no significa «sin peligro». <b>No garantiza el cumplimiento normativo ni sustituye</b> la clasificación, el etiquetado ni las obligaciones oficiales de almacenamiento, manipulación o transporte.</p>
+      <p class="rnote"><b>Qué es y qué no es:</b> etiquetado informativo interno con las clases del ADR 2025 (transporte de mercancías peligrosas por carretera, BOE-A-2025-77, apartado 2.1.1.1). Solo refleja lo que una persona ha registrado con su fuente (por artículo o por zona): no se deduce del nombre ni del CN. «No evaluado» no significa «sin peligro». <b>No garantiza el cumplimiento normativo ni sustituye</b> la clasificación, el etiquetado ni las obligaciones oficiales de almacenamiento, manipulación o transporte.</p>
     </details>
     <div class="wc">
       <svg class="wsvg" viewBox="0 0 620 800" xmlns="http://www.w3.org/2000/svg">
@@ -355,6 +357,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
           <div>
             <div class="zid" id="zid">-</div>
             <div class="zsub" id="zsub">0 articulos</div>
+            <div class="rb" id="zrisk"></div>
           </div>
           <button class="bc" id="btn-cfgzone" onclick="openZoneEdit(sel)" style="font-size:.7rem;padding:4px 9px;white-space:nowrap" title="Nombre, color y eliminar zona">&#9998; Zona</button>
           <button class="bc" id="btn-movezone" onclick="openMZ()" style="display:none;font-size:.7rem;padding:4px 9px;white-space:nowrap" title="Mover toda la zona">&#8660; Mover zona</button>
@@ -420,7 +423,13 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
         <label style="font-size:.76rem;color:var(--text2);display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="mze-nocolor"> Sin color propio (se colorea según el estado)</label>
       </div>
     </div>
-    <p class="rnote" style="margin:-4px 0 14px">La peligrosidad no se asigna a la zona: se registra en cada artículo (✏️ → «Riesgo documentado») y la zona muestra ⚠ sola si contiene artículos con peligro documentado.</p>
+    <div class="zrf" id="mze-rfed" style="margin-bottom:14px">
+      <div class="iet">Peligrosidad de la zona (opcional)</div>
+      <p class="rnote" style="margin:0 0 6px">Clases ADR para las que se designa esta zona (por ejemplo, un armario de inflamables). Es independiente de la de los artículos y en el plano se suman: chip relleno = hay artículos con esa clase; chip con borde = zona designada. Registro interno: no equivale a una autorización de almacenamiento.</p>
+      <div class="rcats" id="mze-rcats" style="display:grid"></div>
+      <div class="er"><input type="text" id="mze-rsrc" placeholder="Fuente (obligatoria si marcas alguna clase)" maxlength="200"></div>
+      <div class="er"><input type="text" id="mze-robs" placeholder="Observaciones (opcional)" maxlength="300"></div>
+    </div>
     <div class="mf">
       <button class="bmc" onclick="closeZoneEdit()">Cancelar</button>
       <button class="xbtn success" onclick="saveZoneConfig()">Guardar</button>
@@ -613,6 +622,8 @@ function sanitizeZones(raw){
     if(c.deleted===true){out[id]={deleted:true};continue}
     o.name=typeof c.name==='string'?limpiaNombre(c.name):'';
     o.color=(typeof c.color==='string'&&/^#[0-9A-Fa-f]{6}$/.test(c.color))?c.color:'';
+    /* Peligrosidad designada para la zona (independiente de la de sus articulos). Misma regla: sin fuente no vale. */
+    var rz=normRiesgo(c.riesgo);if(rz&&rz.estado==='clasificado')o.riesgo=rz;
     if(hasGeom(c)){var g=clampGeom(c);o.x=g.x;o.y=g.y;o.w=g.w;o.h=g.h}
     if(c.custom===true){
       o.custom=true;
@@ -733,6 +744,14 @@ function renderZone(){
   af.classList.add('vis');il.classList.add('vis');
   document.getElementById('zid').textContent=zlabel(sel);
   document.getElementById('zsub').textContent=items.length+(items.length===1?' articulo':' articulos');
+  var cz=zoneCatsZona(sel),ca=zoneCatsArt(sel),zh='';
+  if(cz.length){
+    var rzz=zones[sel].riesgo;
+    zh='<div>&#9888; Zona designada para: '+cz.map(function(c){return chipHTML(c,true)+' '+eh(rcat(c).n)}).join('; ')+'<div class="rsrc">Fuente: '+eh(rzz.fuente)+(rzz.obs?' · '+eh(rzz.obs):'')+'</div></div>';
+    var fuera=ca.filter(function(c){return cz.indexOf(c)===-1});
+    if(fuera.length)zh+='<div style="color:#92400e;margin-top:3px">Aviso: hay artículos con clase '+fuera.join(', ')+' que esta zona no tiene designada.</div>';
+  }
+  document.getElementById('zrisk').innerHTML=zh;
   document.getElementById('afz').textContent=sel;
   var btnMZ=document.getElementById('btn-movezone');
   if(btnMZ)btnMZ.style.display=items.length>0?'':'none';
@@ -772,7 +791,11 @@ function renderZone(){
 }
 
 /* ── Riesgo documentado (informativo; ver nota en claude.md) ── */
-function chipHTML(id){var c=rcat(id);return c?'<span class="rchip" style="background:'+c.c+'" title="Clase '+c.id+' · '+eh(c.n)+'">'+c.id+'</span>':''}
+function chipHTML(id,zona){
+  var c=rcat(id);if(!c)return'';
+  return zona?'<span class="rchip zd" style="color:'+c.c+';border-color:'+c.c+'" title="Clase '+c.id+' · '+eh(c.n)+' (designada para la zona)">'+c.id+'</span>'
+             :'<span class="rchip" style="background:'+c.c+'" title="Clase '+c.id+' · '+eh(c.n)+'">'+c.id+'</span>';
+}
 function riskHTML(it){
   var r=it.riesgo;
   if(!r)return'<div class="rb rne">Riesgo: no evaluado</div>';
@@ -1109,10 +1132,24 @@ function reconcileZones(){
 /* ── Texto de cada zona en el plano: id, chips de riesgo, nombre y contador ──
    Se apilan de arriba abajo mientras quepan; prioridad: id > chips > contador > nombre.
    Lo que no cabe sigue disponible en el <title> (al pasar el raton) y en el panel lateral. */
-function zoneCats(id){
+function zoneCatsArt(id){
   var set={};
   gz(id).forEach(function(it){if(it.riesgo&&it.riesgo.estado==='clasificado')it.riesgo.cat.forEach(function(c){set[c]=1})});
   return RIESGOS.filter(function(c){return set[c.id]}).map(function(c){return c.id});
+}
+function zoneCatsZona(id){
+  var r=ho(zones,id)?zones[id].riesgo:null;
+  return(r&&r.estado==='clasificado')?r.cat.slice():[];
+}
+/* Clases a mostrar en una zona: las de sus articulos (art:true, chip relleno) y las designadas para la zona (art:false, chip con borde). */
+function zoneCats(id){
+  var a=zoneCatsArt(id),z=zoneCatsZona(id);
+  return RIESGOS.filter(function(c){return a.indexOf(c.id)!==-1||z.indexOf(c.id)!==-1}).map(function(c){return{id:c.id,art:a.indexOf(c.id)!==-1}});
+}
+function zonaMatch(id,f){
+  var z=zoneCatsZona(id);
+  if(f==='any')return z.length>0;
+  return z.indexOf(f)!==-1;
 }
 function zoneEls(id){
   var svg=SVG(),rect=document.getElementById('zone-'+id);
@@ -1148,10 +1185,10 @@ function layoutZone(id){
     var total=TRI+(shown.length+(over?1:0))*CW,x0=cx-total/2;
     tri(x0,y);
     var cur=x0+TRI;
-    shown.forEach(function(cid){
-      var c=rcat(cid);
-      E.ch.appendChild(mkSvg('rect',{x:cur,y:y,width:17,height:11,rx:2,fill:c.c}));
-      var t=mkSvg('text',{x:cur+8.5,y:y+5.8,'font-size':7,'font-weight':700,fill:'#fff','text-anchor':'middle','dominant-baseline':'middle','font-family':'IBM Plex Mono,monospace'});t.textContent=cid;E.ch.appendChild(t);
+    shown.forEach(function(k){
+      var c=rcat(k.id);
+      E.ch.appendChild(mkSvg('rect',k.art?{x:cur,y:y,width:17,height:11,rx:2,fill:c.c}:{x:cur+.75,y:y+.75,width:15.5,height:9.5,rx:2,fill:'#fff',stroke:c.c,'stroke-width':1.5}));
+      var t=mkSvg('text',{x:cur+8.5,y:y+5.8,'font-size':7,'font-weight':700,fill:k.art?'#fff':c.c,'text-anchor':'middle','dominant-baseline':'middle','font-family':'IBM Plex Mono,monospace'});t.textContent=k.id;E.ch.appendChild(t);
       cur+=CW;
     });
     if(over){
@@ -1195,7 +1232,7 @@ function renderMapWithConfig(){
     r.classList.toggle('edsel',editMode&&z===editSel);
     if(el)el.textContent=n>0?n+' art.':'';
     r.style.fill=cfg.color||'';
-    var m=f?items.some(function(it){return matchRisk(it,f)}):false;
+    var m=f?(items.some(function(it){return matchRisk(it,f)})||zonaMatch(z,f)):false;
     if(m)hits++;
     r.classList.toggle('rf-match',m);
     layoutZone(z);
@@ -1204,8 +1241,10 @@ function renderMapWithConfig(){
     /* Con un color propio el texto se vuelve claro u oscuro para seguir leyéndose (antes: «5» oscuro sobre rojo). */
     var tc=cfg.color?textoSobre(cfg.color):'';
     [E.lbl,E.cnt,E.nm].forEach(function(e){if(e)e.style.fill=tc});
-    var cats=zoneCats(z);
-    var desc=zlabel(z)+', '+n+' artículo'+(n!==1?'s':'')+(cats.length?'. Peligro documentado, clase'+(cats.length>1?'s':'')+' ADR '+cats.join(', '):'');
+    var ca=zoneCatsArt(z),cz=zoneCatsZona(z);
+    var desc=zlabel(z)+', '+n+' artículo'+(n!==1?'s':'')+
+      (ca.length?'. Artículos con peligro documentado: clase'+(ca.length>1?'s':'')+' ADR '+ca.join(', '):'')+
+      (cz.length?'. Zona designada para la clase'+(cz.length>1?'s':'')+' ADR '+cz.join(', '):'');
     r.setAttribute('tabindex','0');r.setAttribute('role','button');r.setAttribute('aria-label',desc);
     var t=r.querySelector('title');if(!t){t=mkSvg('title',{});r.insertBefore(t,r.firstChild)}
     t.textContent=desc.replace(/\. /g,'\n');
@@ -1241,6 +1280,10 @@ function openZoneEdit(zoneId){
   document.getElementById('mze-name').value=cfg.name||'';
   document.getElementById('mze-color').value=cfg.color||'#dcfce7';
   document.getElementById('mze-nocolor').checked=!cfg.color;
+  var rz=cfg.riesgo&&cfg.riesgo.estado==='clasificado'?cfg.riesgo:null;
+  document.querySelectorAll('#mze-rcats input[data-rc]').forEach(function(c){c.checked=!!rz&&rz.cat.indexOf(c.getAttribute('data-rc'))!==-1});
+  document.getElementById('mze-rsrc').value=rz?rz.fuente:'';
+  document.getElementById('mze-robs').value=rz?rz.obs:'';
   document.getElementById('mze').classList.add('act');
   document.getElementById('mze-name').focus();
 }
@@ -1257,7 +1300,17 @@ function saveZoneConfig(){
     return;
   }
   var id=currentZoneEdit;
-  zones[id]=Object.assign({},getZoneConfig(id),{name:name,color:color});
+  /* Peligrosidad de la zona: si marcas alguna clase hace falta la fuente; sin clases se quita. */
+  var cat=[];
+  document.querySelectorAll('#mze-rcats input[data-rc]:checked').forEach(function(c){cat.push(c.getAttribute('data-rc'))});
+  var rz=null;
+  if(cat.length){
+    rz=normRiesgo({estado:'clasificado',cat:cat,fuente:document.getElementById('mze-rsrc').value,obs:document.getElementById('mze-robs').value,fecha:new Date().toISOString().slice(0,10)});
+    if(!rz){toast('Indica la fuente de la peligrosidad de la zona (criterio interno, proyecto de almacenamiento, etc.)','err');return}
+  }
+  var nueva=Object.assign({},getZoneConfig(id),{name:name,color:color});
+  if(rz)nueva.riesgo=rz;else delete nueva.riesgo;
+  zones[id]=nueva;
   if(!saveZones())return;
   toast('Configuración guardada','ok');
   closeZoneEdit();
@@ -1274,7 +1327,8 @@ function openDelZone(){
   var items=gz(id);
   document.getElementById('mdz-info').innerHTML=
     '<strong>'+eh(zlabel(id))+'</strong>'+
-    '<span style="display:block;font-size:.76rem;color:var(--text2);margin-top:3px">ID: <b>'+eh(id)+'</b> · '+items.length+' artículo'+(items.length!==1?'s':'')+'</span>';
+    '<span style="display:block;font-size:.76rem;color:var(--text2);margin-top:3px">ID: <b>'+eh(id)+'</b> · '+items.length+' artículo'+(items.length!==1?'s':'')+'</span>'+
+    (zoneCatsZona(id).length?'<span style="display:block;font-size:.72rem;color:var(--red);margin-top:3px">Esta zona tiene peligrosidad designada (clase '+zoneCatsZona(id).join(', ')+'): se perderá con la zona. Los artículos conservan la suya.</span>':'');
   var vacia=items.length===0;
   document.getElementById('mdz-empty').style.display=vacia?'block':'none';
   document.getElementById('mdz-full').style.display=vacia?'none':'block';
@@ -1583,6 +1637,9 @@ function initRiskUI(){
     RIESGOS.map(function(c){return'<option value="'+c.id+'">Clase '+c.id+' · '+eh(c.n.length>46?c.n.slice(0,45)+'…':c.n)+'</option>'}).join('')+
     '<option value="sp">Sin peligro identificado</option><option value="ne">No evaluado</option>';
   s.addEventListener('change',function(){riskFilter=s.value;doSearch();renderMap()});
+  document.getElementById('mze-rcats').innerHTML=RIESGOS.map(function(c){
+    return'<label><input type="checkbox" data-rc="'+c.id+'"> '+chipHTML(c.id)+' <span>'+eh(c.n)+'</span></label>';
+  }).join('');
   document.getElementById('rleg-list').innerHTML=
     RIESGOS.map(function(c){return'<li>'+chipHTML(c.id)+' <span><b>Clase '+c.id+'</b> · '+eh(c.n)+'</span></li>'}).join('');
 }
@@ -1596,7 +1653,18 @@ function doSearch(){
     var txt=!q||it.name.toLowerCase().indexOf(q)!==-1||(it.code&&it.code.toLowerCase().indexOf(q)!==-1);
     if(txt&&(!f||matchRisk(it,f)))res.push({zone:z,it:it});
   })}
-  if(!res.length){c.innerHTML='<div class="snr">Sin resultados'+(q?' para "'+eh(q)+'"':'')+'</div>';return}
+  /* Con un filtro de clase y sin texto, tambien se listan las zonas designadas para esa clase. */
+  var zres=(!q&&f&&f!=='ne'&&f!=='sp')?AZ.filter(function(z){return zonaMatch(z,f)}):[];
+  if(!res.length&&!zres.length){c.innerHTML='<div class="snr">Sin resultados'+(q?' para "'+eh(q)+'"':'')+'</div>';return}
+  zres.forEach(function(z){
+    var d=document.createElement('div');d.className='sri';
+    d.innerHTML='<div><div class="sri-n">'+eh(zlabel(z))+'</div><div class="sri-c">Zona designada para la clase ADR '+eh(zoneCatsZona(z).join(', '))+'</div></div><span class="sri-z">Zona</span>';
+    d.addEventListener('click',function(){
+      if(editMode||!zoneExists(z))return;
+      sel=z;renderMap();renderZone();document.querySelector('.wc').scrollIntoView({behavior:'smooth',block:'center'});toast(zlabel(z)+' seleccionada','ok');
+    });
+    c.appendChild(d);
+  });
   res.slice(0,200).forEach(function(r){
     var d=document.createElement('div');d.className='sri';
     d.innerHTML='<div><div class="sri-n">'+eh(r.it.name)+'</div><div class="sri-c">'+(r.it.code?'CN: '+eh(r.it.code):'Sin codigo')+'</div><div class="sri-c">'+eh(riskSummary(r.it))+'</div></div><span class="sri-z" title="'+ea(zlabel(r.zone))+'">'+eh(zlabel(r.zone))+'</span>';
@@ -1611,7 +1679,7 @@ function doSearch(){
 document.getElementById('si').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch()});
 
 function exportData(){
-  var p={_farmastock:true,_v:'1.5',_d:new Date().toISOString(),zones:db,zoneConfigs:zones};
+  var p={_farmastock:true,_v:'1.6',_d:new Date().toISOString(),zones:db,zoneConfigs:zones};
   var b=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});
   var u=URL.createObjectURL(b);
   var a=document.createElement('a');a.href=u;a.download='farmastock-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(u);
@@ -1619,7 +1687,7 @@ function exportData(){
 }
 
 function exportZoneConfig(){
-  var cfg={_zoneConfig:true,_v:'1.5',_d:new Date().toISOString(),zones:zones};
+  var cfg={_zoneConfig:true,_v:'1.6',_d:new Date().toISOString(),zones:zones};
   var b=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});
   var u=URL.createObjectURL(b);
   var a=document.createElement('a');a.href=u;a.download='farmastock-zonas-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(u);

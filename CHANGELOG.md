@@ -4,6 +4,19 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ---
 
+## [1.6.0] — 2026-10-27
+
+### Añadido
+- **Peligrosidad por zona**, además de la de cada artículo: en «Configurar zona» se pueden designar las clases ADR para las que está pensada una zona (por ejemplo, un armario de inflamables), con fuente obligatoria y observaciones. Es independiente de la de los artículos y se suman:
+  - En el plano, **chip relleno** = hay artículos con esa clase; **chip con borde** = la zona está designada para esa clase. Una zona vacía designada también se marca.
+  - El filtro por riesgo resalta las zonas designadas y las lista en los resultados; «No evaluado» y «Sin peligro» siguen mirando solo artículos.
+  - La ficha de zona muestra su designación y avisa si hay artículos con una clase que la zona no tiene designada.
+  - Al eliminar una zona se avisa de que pierde su designación (los artículos conservan la suya).
+  - Va en `farmastock_zones_v1` (`zones[id].riesgo`), con la misma validación que el riesgo de artículo (sin fuente o con clase inexistente se descarta al cargar o importar). Exportación `_v:"1.6"`; las copias anteriores se importan igual.
+- Es un registro interno informativo: **no equivale a una autorización de almacenamiento** (el diálogo y la leyenda lo dicen).
+
+---
+
 ## [1.5.1] — 2026-10-27
 
 ### Corregido
@@ -14,7 +27,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 - **Color de zona**: el diálogo «Configurar zona» pedía escribir un código hexadecimal (`#dcfce7`). Ahora hay un selector de color y la casilla «Sin color propio». Las zonas nuevas nacen sin color propio (antes quedaban fijas en verde y no reflejaban su estado). El texto de la zona pasa a claro u oscuro según el color para seguir leyéndose.
 
 ### Cambiado
-- El diálogo de zona explica que la peligrosidad se registra en cada artículo y que la zona muestra ⚠ sola.
+- (Esta nota se sustituyó en la 1.6.0: el diálogo ahora permite designar peligrosidad por zona.)
 
 ---
 
