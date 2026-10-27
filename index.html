@@ -288,7 +288,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
       <summary>Leyenda de riesgo documentado (⚠ en el plano)</summary>
       <p class="rnote">⚠ junto a un código indica que la zona contiene artículos con peligro documentado; cada código es una clase ADR. <b>Chip relleno</b> = hay artículos con esa clase; <b>chip con borde</b> = la zona está designada para esa clase. Si no caben todos se muestra «+n»; el detalle completo está al pasar el ratón y en el panel lateral.</p>
       <ul id="rleg-list"></ul>
-      <p class="rnote"><b>Qué es y qué no es:</b> etiquetado informativo interno con las clases del ADR 2025 (transporte de mercancías peligrosas por carretera, BOE-A-2025-77, apartado 2.1.1.1). Solo refleja lo que una persona ha registrado con su fuente (por artículo o por zona): no se deduce del nombre ni del CN. «No evaluado» no significa «sin peligro». <b>No garantiza el cumplimiento normativo ni sustituye</b> la clasificación, el etiquetado ni las obligaciones oficiales de almacenamiento, manipulación o transporte.</p>
+      <p class="rnote"><b>Qué es y qué no es:</b> etiquetado informativo interno con las clases del ADR 2025 (transporte de mercancías peligrosas por carretera, BOE-A-2025-77, apartado 2.1.1.1). Solo refleja lo que una persona ha registrado (por artículo o por zona): no se deduce del nombre ni del CN. «No evaluado» no significa «sin peligro». <b>No garantiza el cumplimiento normativo ni sustituye</b> la clasificación, el etiquetado ni las obligaciones oficiales de almacenamiento, manipulación o transporte.</p>
     </details>
     <div class="wc">
       <svg class="wsvg" viewBox="0 0 620 800" xmlns="http://www.w3.org/2000/svg">
@@ -427,7 +427,7 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
       <div class="iet">Peligrosidad de la zona (opcional)</div>
       <p class="rnote" style="margin:0 0 6px">Clases ADR para las que se designa esta zona (por ejemplo, un armario de inflamables). Es independiente de la de los artículos y en el plano se suman: chip relleno = hay artículos con esa clase; chip con borde = zona designada. Registro interno: no equivale a una autorización de almacenamiento.</p>
       <div class="rcats" id="mze-rcats" style="display:grid"></div>
-      <div class="er"><input type="text" id="mze-rsrc" placeholder="Fuente (obligatoria si marcas alguna clase)" maxlength="200"></div>
+      <div class="er"><input type="text" id="mze-rsrc" placeholder="Fuente (opcional)" maxlength="200"></div>
       <div class="er"><input type="text" id="mze-robs" placeholder="Observaciones (opcional)" maxlength="300"></div>
     </div>
     <div class="mf">
@@ -570,7 +570,8 @@ function clampGeom(g){
   return{x:Math.round(x),y:Math.round(y),w:Math.round(w),h:Math.round(h)};
 }
 
-/* Riesgo documentado de un articulo. Sin campo = "No evaluado". Solo se guarda si hay fuente: sin fuente no hay verificacion. */
+/* Riesgo documentado de un articulo. Sin campo = "No evaluado". La fuente es OPCIONAL (decision del dueño, 27-oct-2026): antes era obligatoria
+   para que «Sin peligro identificado» siempre dejara constancia de donde salia; ahora lo registrado es responsabilidad de quien lo marca. */
 function normRiesgo(r){
   if(!isObj(r))return null;
   var est=r.estado;
@@ -579,7 +580,6 @@ function normRiesgo(r){
   if(Array.isArray(r.cat))RIESGOS.forEach(function(c){if(r.cat.indexOf(c.id)!==-1)cat.push(c.id)});
   if(est==='clasificado'&&!cat.length)return null;
   var f=typeof r.fuente==='string'?r.fuente.trim().slice(0,200):'';
-  if(!f)return null;
   return{estado:est,cat:est==='clasificado'?cat:[],fuente:f,obs:typeof r.obs==='string'?r.obs.trim().slice(0,300):'',fecha:(typeof r.fecha==='string'&&/^\d{4}-\d{2}-\d{2}/.test(r.fecha))?r.fecha.slice(0,10):''};
 }
 /* Valida un articulo cargado o importado. Conserva los campos que no conoce. */
@@ -622,7 +622,7 @@ function sanitizeZones(raw){
     if(c.deleted===true){out[id]={deleted:true};continue}
     o.name=typeof c.name==='string'?limpiaNombre(c.name):'';
     o.color=(typeof c.color==='string'&&/^#[0-9A-Fa-f]{6}$/.test(c.color))?c.color:'';
-    /* Peligrosidad designada para la zona (independiente de la de sus articulos). Misma regla: sin fuente no vale. */
+    /* Peligrosidad designada para la zona (independiente de la de sus articulos). Misma validacion; la fuente es opcional. */
     var rz=normRiesgo(c.riesgo);if(rz&&rz.estado==='clasificado')o.riesgo=rz;
     if(hasGeom(c)){var g=clampGeom(c);o.x=g.x;o.y=g.y;o.w=g.w;o.h=g.h}
     if(c.custom===true){
@@ -747,7 +747,7 @@ function renderZone(){
   var cz=zoneCatsZona(sel),ca=zoneCatsArt(sel),zh='';
   if(cz.length){
     var rzz=zones[sel].riesgo;
-    zh='<div>&#9888; Zona designada para: '+cz.map(function(c){return chipHTML(c,true)+' '+eh(rcat(c).n)}).join('; ')+'<div class="rsrc">Fuente: '+eh(rzz.fuente)+(rzz.obs?' · '+eh(rzz.obs):'')+'</div></div>';
+    zh='<div>&#9888; Zona designada para: '+cz.map(function(c){return chipHTML(c,true)+' '+eh(rcat(c).n)}).join('; ')+fuenteHTML(rzz)+'</div>';
     var fuera=ca.filter(function(c){return cz.indexOf(c)===-1});
     if(fuera.length)zh+='<div style="color:#92400e;margin-top:3px">Aviso: hay artículos con clase '+fuera.join(', ')+' que esta zona no tiene designada.</div>';
   }
@@ -796,12 +796,17 @@ function chipHTML(id,zona){
   return zona?'<span class="rchip zd" style="color:'+c.c+';border-color:'+c.c+'" title="Clase '+c.id+' · '+eh(c.n)+' (designada para la zona)">'+c.id+'</span>'
              :'<span class="rchip" style="background:'+c.c+'" title="Clase '+c.id+' · '+eh(c.n)+'">'+c.id+'</span>';
 }
+/* Linea «Fuente · observaciones» solo si hay algo que mostrar (la fuente es opcional). */
+function fuenteHTML(r){
+  var t=(r.fuente?'Fuente: '+eh(r.fuente):'')+(r.fuente&&r.obs?' · ':'')+(r.obs?eh(r.obs):'');
+  return t?'<div class="rsrc">'+t+'</div>':'';
+}
 function riskHTML(it){
   var r=it.riesgo;
   if(!r)return'<div class="rb rne">Riesgo: no evaluado</div>';
-  if(r.estado==='sin_peligro')return'<div class="rb rsp">&#10004; Sin peligro identificado · Fuente: '+eh(r.fuente)+(r.obs?' · '+eh(r.obs):'')+'</div>';
+  if(r.estado==='sin_peligro')return'<div class="rb rsp">&#10004; Sin peligro identificado'+(r.fuente?' · Fuente: '+eh(r.fuente):'')+(r.obs?' · '+eh(r.obs):'')+'</div>';
   return'<div class="rb">&#9888; '+r.cat.map(function(id){var c=rcat(id);return chipHTML(id)+' '+eh(c?c.n:'')}).join('; ')+
-    '<div class="rsrc">Fuente: '+eh(r.fuente)+(r.obs?' · '+eh(r.obs):'')+'</div></div>';
+    fuenteHTML(r)+'</div>';
 }
 function riskFormHTML(it,id){
   var r=it.riesgo,est=r?(r.estado==='sin_peligro'?'sp':'cl'):'ne';
@@ -817,7 +822,7 @@ function riskFormHTML(it,id){
       '<option value="cl"'+(est==='cl'?' selected':'')+'>Con peligro documentado</option>'+
     '</select></div>'+
     '<div class="rcats" id="rc-'+id+'">'+cats+'</div>'+
-    '<div class="er rsrcin"><input type="text" id="rsrc-'+id+'" value="'+ea(r?r.fuente:'')+'" placeholder="Fuente de la clasificación (obligatoria)" maxlength="200"></div>'+
+    '<div class="er rsrcin"><input type="text" id="rsrc-'+id+'" value="'+ea(r?r.fuente:'')+'" placeholder="Fuente de la clasificación (opcional)" maxlength="200"></div>'+
     '<div class="er rsrcin"><input type="text" id="robs-'+id+'" value="'+ea(r?r.obs:'')+'" placeholder="Observaciones (opcional)" maxlength="300"></div>'+
   '</div>';
 }
@@ -828,7 +833,6 @@ function leerRiesgoForm(id){
   if(s.value==='ne')return{ok:true,riesgo:null};
   var fuente=document.getElementById('rsrc-'+id).value.trim();
   var obs=document.getElementById('robs-'+id).value.trim();
-  if(!fuente)return{ok:false,msg:'Indica la fuente de la clasificación (ficha de seguridad, ficha técnica, etc.)'};
   var cat=[];
   document.querySelectorAll('#rc-'+id+' input[data-rc]:checked').forEach(function(c){cat.push(c.getAttribute('data-rc'))});
   if(s.value==='cl'&&!cat.length)return{ok:false,msg:'Marca al menos una clase de peligro'};
@@ -1306,7 +1310,7 @@ function saveZoneConfig(){
   var rz=null;
   if(cat.length){
     rz=normRiesgo({estado:'clasificado',cat:cat,fuente:document.getElementById('mze-rsrc').value,obs:document.getElementById('mze-robs').value,fecha:new Date().toISOString().slice(0,10)});
-    if(!rz){toast('Indica la fuente de la peligrosidad de la zona (criterio interno, proyecto de almacenamiento, etc.)','err');return}
+    if(!rz){toast('Datos de peligrosidad no válidos','err');return}
   }
   var nueva=Object.assign({},getZoneConfig(id),{name:name,color:color});
   if(rz)nueva.riesgo=rz;else delete nueva.riesgo;
