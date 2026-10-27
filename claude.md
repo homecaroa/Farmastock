@@ -91,7 +91,7 @@ Funciones principales:
 }
 ```
 
-**Invariante crítica** (desde la v1.4): `_id` es único globalmente. Un mismo nombre o CN (case-insensitive) puede estar en **como máximo 2 zonas** y nunca dos veces en la misma. `dupName`/`dupCode` solo bloquean a partir de ahí; `enEstaZona` evita repetir en una misma zona. Un traslado no cambia en cuántas zonas está cada nombre/CN, por eso `planTraslado` solo comprueba choques con lo que ya hay en el destino.
+**Invariante crítica** (desde la v1.4): `_id` es único globalmente. Un mismo nombre o CN (case-insensitive) puede estar en **como máximo 2 zonas** y nunca dos veces en la misma. `dupName`/`dupCode` solo bloquean a partir de ahí; `enEstaZona`/`codeEnZona` evitan repetir nombre/CN dentro de una misma zona al añadir y editar (al editar solo si cambian), y `choqueCon(it,lista)` lo hace al mover (artículo suelto y zona completa). Un traslado no cambia en cuántas zonas está cada nombre/CN, por eso `planTraslado` solo comprueba choques con lo que ya hay en el destino.
 
 ### Modelo de zonas (v1.5)
 `farmastock_zones_v1` = `{ id: {name,color,x,y,w,h,custom?,g0?} | {deleted:true} }`.
@@ -103,11 +103,12 @@ Funciones principales:
 - `loadDB`/`sanitizeZones`/`normItem` validan lo que viene de `localStorage` o de un `.json`; lo descartado se respalda en `farmastock_v1_respaldo`.
 
 ### Clasificación de riesgo (informativa)
-- Campo opcional `item.riesgo = {estado:'sin_peligro'|'clasificado', cat:[ids ADR], fuente, obs, fecha}`. Sin campo = «No evaluado». **No se guarda sin fuente** (sin fuente no hay verificación) y **nunca se deduce del nombre ni del CN**.
+- Campo opcional `item.riesgo = {estado:'sin_peligro'|'clasificado', cat:[ids ADR], fuente, obs, fecha}`. Sin campo = «No evaluado». **La fuente es opcional** (decisión del dueño, 27-oct-2026; antes era obligatoria para que «Sin peligro identificado» dejara siempre constancia de su origen: ahora esa constancia depende de quien lo registra). «Con peligro documentado» exige ≥1 clase. **Nunca se deduce del nombre ni del CN.**
 - Catálogo `RIESGOS`: las 9 clases del **ADR 2025** tal como figuran en su apartado 2.1.1.1 (13 epígrafes: 1, 2, 3, 4.1, 4.2, 4.3, 5.1, 5.2, 6.1, 6.2, 7, 8, 9). Fuente verificada: texto oficial en [BOE-A-2025-77](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2025-77) (publicado 3-ene-2025, aplicable desde 1-ene-2025; el periodo transitorio del ADR 2023 acabó el 30-jun-2025). Los colores son solo para distinguir en pantalla, no son los de las placas.
 - **Ámbito y límites**: el ADR regula el **transporte** por carretera (y no el almacenamiento). Se usa solo como vocabulario normalizado de clases. Esta etiqueta es un registro interno informativo: **no garantiza cumplimiento normativo ni sustituye** la clasificación, el etiquetado ni las obligaciones de almacenamiento y manipulación. Para medicamentos acabados, el CLP (Reglamento 1272/2008) los excluye como producto terminado destinado al usuario final (art. 1); el almacenamiento de productos químicos tiene su propia normativa.
 - **Pendiente de validar con quien corresponda (no verificado)**: qué normativa de almacenamiento es exigible en este almacén (p. ej. APQ/RD 656/2017, CLP/FDS para productos no medicamentosos) y si procede ampliar o sustituir el catálogo por una clasificación interna. Mientras tanto la estructura es configurable en `RIESGOS`.
 - El mismo producto en 2 zonas son dos entradas independientes: su riesgo **no se sincroniza** automáticamente (sincronizar por nombre/CN sería deducir).
+- **Peligrosidad por zona (v1.6)**: `zones[id].riesgo` = mismo formato que el de artículo pero solo `estado:'clasificado'` (con ≥1 clase; fuente opcional). Es una **designación** de la zona, independiente de la de sus artículos; nunca se copia de uno a otro. En el plano se suman (`zoneCats`: `art:true` = chip relleno, `art:false` = chip con borde). `zonaMatch` la usa el filtro; «No evaluado»/«Sin peligro» solo miran artículos. La ficha avisa de clases de artículos no designadas en la zona (solo si la zona tiene alguna designación). Registro interno: no equivale a una autorización de almacenamiento.
 
 ---
 
@@ -232,4 +233,4 @@ Estas tareas **no** deben paralelizarse porque tienen dependencias entre sí:
 
 ## Versión actual
 
-`v1.5.0` — Nombres de zona, riesgo documentado, edición del plano y baja segura de zonas. Ver `CHANGELOG.md` (la v1.4 se documentó a posteriori).
+`v1.6.0` (sobre la 1.5.x) — Nombres de zona, riesgo documentado, edición del plano y baja segura de zonas. Ver `CHANGELOG.md` (la v1.4 se documentó a posteriori).
