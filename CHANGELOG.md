@@ -7,13 +7,16 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 ## [1.6.0] — 2026-10-27
 
 ### Añadido
-- **Peligrosidad por zona**, además de la de cada artículo: en «Configurar zona» se pueden designar las clases ADR para las que está pensada una zona (por ejemplo, un armario de inflamables), con fuente obligatoria y observaciones. Es independiente de la de los artículos y se suman:
+- **Peligrosidad por zona**, además de la de cada artículo: en «Configurar zona» se pueden designar las clases ADR para las que está pensada una zona (por ejemplo, un armario de inflamables), con fuente y observaciones (ambas opcionales). Es independiente de la de los artículos y se suman:
   - En el plano, **chip relleno** = hay artículos con esa clase; **chip con borde** = la zona está designada para esa clase. Una zona vacía designada también se marca.
   - El filtro por riesgo resalta las zonas designadas y las lista en los resultados; «No evaluado» y «Sin peligro» siguen mirando solo artículos.
   - La ficha de zona muestra su designación y avisa si hay artículos con una clase que la zona no tiene designada.
   - Al eliminar una zona se avisa de que pierde su designación (los artículos conservan la suya).
   - Va en `farmastock_zones_v1` (`zones[id].riesgo`), con la misma validación que el riesgo de artículo (sin fuente o con clase inexistente se descarta al cargar o importar). Exportación `_v:"1.6"`; las copias anteriores se importan igual.
 - Es un registro interno informativo: **no equivale a una autorización de almacenamiento** (el diálogo y la leyenda lo dicen).
+
+### Cambiado
+- **La fuente de la peligrosidad pasa a ser opcional**, tanto en artículos como en zonas (decisión del dueño, 27-oct-2026). Antes era obligatoria para que «Sin peligro identificado» y «Con peligro documentado» dejaran siempre constancia de su origen; ahora esa constancia depende de quien lo registra. Sigue exigiéndose marcar al menos una clase para «Con peligro documentado». Si no hay fuente ni observaciones no se muestra una línea vacía, y la opción ya no se llama «(verificado)».
 
 ---
 
@@ -35,7 +38,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ### Añadido
 - **Nombres de zona**: cada zona conserva su ID técnico y puede tener un nombre visible («Zona 5 — Analgésicos»). Se edita con el botón «✎ Zona» del panel lateral (o clic derecho en el plano) y se muestra en el plano, la ficha de zona, los resultados de búsqueda, los selectores de destino y el `<title>` accesible de cada zona. Sin nombre se muestra «Zona [ID]».
-- **Riesgo documentado de cada artículo** (informativo): estado «No evaluado» (por defecto), «Sin peligro identificado (verificado)» o «Con peligro documentado», con clase(s) ADR, fuente (obligatoria si se verifica) y observaciones. Filtro por riesgo en el buscador, resaltado de zonas en el plano, señal ⚠ + códigos de clase en cada zona afectada (con «+n» si no caben) y leyenda con texto, iconos y colores. Ver «Clasificación de riesgo» en `claude.md` para ámbito y límites.
+- **Riesgo documentado de cada artículo** (informativo): estado «No evaluado» (por defecto), «Sin peligro identificado» o «Con peligro documentado», con clase(s) ADR, fuente y observaciones (la fuente pasó a ser opcional en la 1.6.0). Filtro por riesgo en el buscador, resaltado de zonas en el plano, señal ⚠ + códigos de clase en cada zona afectada (con «+n» si no caben) y leyenda con texto, iconos y colores. Ver «Clasificación de riesgo» en `claude.md` para ámbito y límites.
 - **Modo «Editar plano»**: mover y redimensionar zonas con ratón, táctil o teclado (flechas / Mayús+flechas), en coordenadas del `viewBox` (correcto con el plano escalado), con tamaño mínimo 30×24 y límites del plano, «Deshacer último cambio» y «Restaurar geometría inicial» (con confirmación). El resto de acciones quedan desactivadas mientras se edita.
 - **Eliminar zona con seguridad**: el diálogo muestra nombre, ID y nº de artículos. Una zona con artículos no se puede eliminar sin trasladarlos antes a una zona elegida explícitamente; si hay conflicto de nombre/CN en el destino, no se hace nada y se explica por qué. Operación atómica (artículos y zonas se guardan juntos o no se guarda nada).
 - Zonas navegables con teclado (Tab, Enter/Espacio) con indicador de foco visible.
