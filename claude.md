@@ -11,7 +11,8 @@
 
 - **Stack**: HTML5 + CSS3 + JavaScript ES6 vanilla. Sin frameworks, sin servidor, sin dependencias externas de runtime.
 - **Despliegue**: GitHub Pages — archivo único `index.html` como punto de entrada.
-- **Persistencia**: `localStorage` del navegador bajo la clave `farmastock_v1`.
+- **Persistencia**: `localStorage` del navegador. `farmastock_v1` = artículos por zona; `farmastock_zones_v1` = metadatos de zona (nombre, color, geometría, altas y bajas); `farmastock_v1_respaldo` = copia cruda si al cargar hubo que descartar datos malformados.
+- **Única dependencia externa de runtime**: `xlsx` (CDN jsdelivr) para «Desde Excel». Si no carga, el resto de la app funciona.
 - **Audiencia**: Personal de farmacia sin formación técnica.
 
 ---
@@ -21,6 +22,7 @@
 ```
 farmastock/
 ├── index.html       # Aplicación completa (único archivo de la app)
+├── farmacia-almacen.html  # v1.0 original (1-abr-2026). No es la app desplegada; no tocar
 ├── CLAUDE.md        # Este archivo — guía para agentes
 ├── README.md        # Documentación para usuarios/GitHub
 ├── CHANGELOG.md     # Historial de versiones
@@ -50,7 +52,7 @@ Variables clave:
 ### 2. `<body>` — HTML
 - `<header>` → logo + botones Exportar/Importar
 - `.layout` → grid 2 columnas: `.mapp` (plano SVG) + `.sidebar` (panel)
-- `.mapp` → SVG con 23 `<rect class="zone-rect" data-zone="N">` + textos
+- `.mapp` → botón «Editar plano», leyenda de riesgo y SVG (`viewBox="0 0 620 800"`) con 26 zonas base `<rect class="zone-rect" data-zone="N">` + textos (las zonas creadas se añaden por JS)
 - `.sidebar` → búsqueda + detalle de zona + formulario de alta + lista de artículos
 - `#mm` → modal de movimiento entre zonas
 - `#toast` → notificaciones flotantes
@@ -89,22 +91,39 @@ Funciones principales:
 }
 ```
 
-**Invariante crítica**: `_id` es único globalmente. Nunca puede existir el mismo `_id`, nombre (case-insensitive) ni CN (case-insensitive) en más de una zona.
+**Invariante crítica** (desde la v1.4): `_id` es único globalmente. Un mismo nombre o CN (case-insensitive) puede estar en **como máximo 2 zonas** y nunca dos veces en la misma. `dupName`/`dupCode` solo bloquean a partir de ahí; `enEstaZona` evita repetir en una misma zona. Un traslado no cambia en cuántas zonas está cada nombre/CN, por eso `planTraslado` solo comprueba choques con lo que ya hay en el destino.
+
+### Modelo de zonas (v1.5)
+`farmastock_zones_v1` = `{ id: {name,color,x,y,w,h,custom?,g0?} | {deleted:true} }`.
+- **Existe** una zona si es base (`BASE_IDS`) y no tiene tumba, o es `custom:true`. **Geometría por defecto** ≠ existencia: base = `DEFAULT_GEOM` (leída del SVG del propio código al arrancar), custom = `g0` (la de creación). «Restaurar geometría» solo toca zonas que existen.
+- Eliminar deja una **tumba** `{deleted:true}`: el ID no se reutiliza (comparación sin distinguir mayúsculas) ni la zona reaparece al recargar. Solo una copia de seguridad la recupera.
+- La geometría es el dato; el DOM es su reflejo (`applyGeometry`/`layoutZone`). Todo en unidades del `viewBox` (`ptSvg` usa `getScreenCTM().inverse()`), nunca en píxeles.
+- `reconcileZones()` (al cargar e importar) garantiza que **ningún artículo queda en una zona que no existe**: restaura la zona base eliminada o crea una custom.
+- Eliminar zona / importar escriben con `commitStrict` (artículos y zonas juntos o ninguno).
+- `loadDB`/`sanitizeZones`/`normItem` validan lo que viene de `localStorage` o de un `.json`; lo descartado se respalda en `farmastock_v1_respaldo`.
+
+### Clasificación de riesgo (informativa)
+- Campo opcional `item.riesgo = {estado:'sin_peligro'|'clasificado', cat:[ids ADR], fuente, obs, fecha}`. Sin campo = «No evaluado». **No se guarda sin fuente** (sin fuente no hay verificación) y **nunca se deduce del nombre ni del CN**.
+- Catálogo `RIESGOS`: las 9 clases del **ADR 2025** tal como figuran en su apartado 2.1.1.1 (13 epígrafes: 1, 2, 3, 4.1, 4.2, 4.3, 5.1, 5.2, 6.1, 6.2, 7, 8, 9). Fuente verificada: texto oficial en [BOE-A-2025-77](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2025-77) (publicado 3-ene-2025, aplicable desde 1-ene-2025; el periodo transitorio del ADR 2023 acabó el 30-jun-2025). Los colores son solo para distinguir en pantalla, no son los de las placas.
+- **Ámbito y límites**: el ADR regula el **transporte** por carretera (y no el almacenamiento). Se usa solo como vocabulario normalizado de clases. Esta etiqueta es un registro interno informativo: **no garantiza cumplimiento normativo ni sustituye** la clasificación, el etiquetado ni las obligaciones de almacenamiento y manipulación. Para medicamentos acabados, el CLP (Reglamento 1272/2008) los excluye como producto terminado destinado al usuario final (art. 1); el almacenamiento de productos químicos tiene su propia normativa.
+- **Pendiente de validar con quien corresponda (no verificado)**: qué normativa de almacenamiento es exigible en este almacén (p. ej. APQ/RD 656/2017, CLP/FDS para productos no medicamentosos) y si procede ampliar o sustituir el catálogo por una clasificación interna. Mientras tanto la estructura es configurable en `RIESGOS`.
+- El mismo producto en 2 zonas son dos entradas independientes: su riesgo **no se sincroniza** automáticamente (sincronizar por nombre/CN sería deducir).
 
 ---
 
 ## Zonas del almacén
 
+Zonas base (la lista real es `BASE_IDS`; las del plano pueden renombrarse, moverse, eliminarse y crearse):
+
 | Columna | Zonas |
 |---|---|
-| Columna derecha | 1, 2, 3, 4, 5, 5b, 6, 7, 8, 9 |
+| Columna derecha | 1, 2, 3, 4, 5, 5b, 6, 6.2, 7, 7b, 8, 9 |
 | Parte superior | 10, 11 |
 | Columna izquierda | 12, 13, 14, 15, 16, 17 |
 | Parte inferior izquierda | 18, 19 |
 | Centro inferior | 20, 21, 22, 23 |
-| Especial | CASONERA (franja vertical decorativa, sin artículos) |
 
-Todas las zonas son `<rect class="zone-rect" data-zone="ID">` en el SVG con `viewBox="0 0 620 780"`.
+Todas las zonas son `<rect class="zone-rect" data-zone="ID">` en el SVG con `viewBox="0 0 620 800"`. IDs válidos: `/^[A-Za-z0-9][A-Za-z0-9._-]{0,11}$/` (se interpolan en selectores y atributos).
 
 ---
 
@@ -213,4 +232,4 @@ Estas tareas **no** deben paralelizarse porque tienen dependencias entre sí:
 
 ## Versión actual
 
-`v1.3.0` — Anti-duplicados por `_id` estable. Ver `CHANGELOG.md` para historial completo.
+`v1.5.0` — Nombres de zona, riesgo documentado, edición del plano y baja segura de zonas. Ver `CHANGELOG.md` (la v1.4 se documentó a posteriori).
