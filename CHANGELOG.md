@@ -4,6 +4,20 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ---
 
+## [1.5.1] — 2026-10-27
+
+### Corregido
+- **Mover un artículo a una zona que ya tenía ese nombre o CN lo duplicaba dentro de la zona.** Ahora se rechaza con el motivo y el diálogo sigue abierto para elegir otra zona.
+- **Editar un artículo permitía repetir un nombre o CN que ya existía en la misma zona** (solo se miraba si estaba en otras 2 zonas). Solo se comprueba lo que cambia, así que un artículo que ya tuviera un «gemelo» por este fallo se puede seguir editando.
+- **«Mover zona completa» tampoco miraba el destino** (la comprobación era sobre otras zonas). Ahora simula artículo a artículo contra lo que habrá en el destino: los que chocan se quedan en el origen y el resto se mueve. Si chocan todos, no mueve nada.
+- El alta de un artículo no rechazaba un CN repetido dentro de la misma zona.
+- **Color de zona**: el diálogo «Configurar zona» pedía escribir un código hexadecimal (`#dcfce7`). Ahora hay un selector de color y la casilla «Sin color propio». Las zonas nuevas nacen sin color propio (antes quedaban fijas en verde y no reflejaban su estado). El texto de la zona pasa a claro u oscuro según el color para seguir leyéndose.
+
+### Cambiado
+- El diálogo de zona explica que la peligrosidad se registra en cada artículo y que la zona muestra ⚠ sola.
+
+---
+
 ## [1.5.0] — 2026-10-26
 
 ### Añadido

@@ -414,9 +414,13 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
       <input type="text" id="mze-name" placeholder="Ej: Analgésicos" maxlength="40" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:IBM Plex Sans,sans-serif;font-size:.78rem;box-sizing:border-box">
     </div>
     <div style="margin-bottom:14px">
-      <label style="font-size:.75rem;color:var(--text3);display:block;margin-bottom:6px">Color (hex)</label>
-      <input type="text" id="mze-color" placeholder="#dcfce7" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:IBM Plex Mono,monospace;font-size:.75rem;box-sizing:border-box">
+      <label for="mze-color" style="font-size:.75rem;color:var(--text3);display:block;margin-bottom:6px">Color de la zona en el plano</label>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input type="color" id="mze-color" value="#dcfce7" oninput="document.getElementById('mze-nocolor').checked=false" style="width:64px;height:38px;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;padding:2px;background:#fff">
+        <label style="font-size:.76rem;color:var(--text2);display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="mze-nocolor"> Sin color propio (se colorea según el estado)</label>
+      </div>
     </div>
+    <p class="rnote" style="margin:-4px 0 14px">La peligrosidad no se asigna a la zona: se registra en cada artículo (✏️ → «Riesgo documentado») y la zona muestra ⚠ sola si contiene artículos con peligro documentado.</p>
     <div class="mf">
       <button class="bmc" onclick="closeZoneEdit()">Cancelar</button>
       <button class="xbtn success" onclick="saveZoneConfig()">Guardar</button>
@@ -462,7 +466,8 @@ header{background:var(--accent);color:#fff;padding:0 20px;height:54px;display:fl
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div>
         <label style="font-size:.75rem;color:var(--text3);display:block;margin-bottom:4px">Color</label>
-        <input type="color" id="nz-color" value="#dcfce7" style="width:100%;height:40px;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer">
+        <input type="color" id="nz-color" value="#dcfce7" oninput="document.getElementById('nz-nocolor').checked=false" style="width:100%;height:40px;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer">
+        <label style="font-size:.68rem;color:var(--text2);display:flex;gap:5px;align-items:center;margin-top:4px;cursor:pointer"><input type="checkbox" id="nz-nocolor" checked> Sin color propio</label>
       </div>
       <div>
         <label style="font-size:.75rem;color:var(--text3);display:block;margin-bottom:4px">Tamaño</label>
@@ -664,6 +669,23 @@ function contarZonasCodigo(code,xid){
   for(var z in db){for(var i=0;i<db[z].length;i++){var it=db[z][i];if(it._id===xid)continue;if(it.code&&it.code.trim().toLowerCase()===c)zonas.add(z);}}
   return zonas.size;
 }
+/* ¿Está este CN ya en esta zona concreta? */
+function codeEnZona(code,zone,xid){
+  if(!code||!code.trim())return false;
+  var c=code.trim().toLowerCase(),items=ho(db,zone)?db[zone]:[];
+  for(var i=0;i<items.length;i++){if(items[i]._id!==xid&&items[i].code&&items[i].code.trim().toLowerCase()===c)return true}
+  return false;
+}
+/* Motivo por el que `it` chocaria con lo que ya hay en `list` (mismo nombre o mismo CN), o ''. Un articulo no puede repetirse dentro de una zona. */
+function choqueCon(it,list){
+  var n=it.name.trim().toLowerCase(),c=(it.code||'').trim().toLowerCase();
+  for(var i=0;i<list.length;i++){
+    var d=list[i];if(d._id===it._id)continue;
+    if(d.name.trim().toLowerCase()===n)return'«'+it.name+'» ya existe en el destino';
+    if(c&&d.code&&d.code.trim().toLowerCase()===c)return'El CN '+it.code+' ya existe en el destino';
+  }
+  return'';
+}
 /* ¿Está este nombre ya en esta zona concreta? */
 function enEstaZona(name,zone,xid){
   var n=name.trim().toLowerCase();
@@ -826,6 +848,7 @@ function addItem(){
   var code=document.getElementById('icode').value.trim();
   if(!name){toast('Introduce el nombre del articulo','err');return}
   if(enEstaZona(name,sel,null)){toast('"'+name+'" ya existe en esta zona','err');return}
+  if(codeEnZona(code,sel,null)){toast('El CN '+code+' ya existe en esta zona','err');return}
   if(contarZonasNombre(name,null)>=2){toast('"'+name+'" ya esta en 2 zonas (maximo permitido)','err');return}
   if(code&&contarZonasCodigo(code,null)>=2){toast('CN '+code+' ya esta en 2 zonas (maximo permitido)','err');return}
   if(!db[sel])db[sel]=[];
@@ -865,6 +888,13 @@ function saveEdit(id){
   if(dn){toast('"'+dn.item.name+'" ya existe en Zona '+dn.zone,'err');return}
   var dc=dupCode(code,id);
   if(dc){toast('CN '+code+' ya esta en Zona '+dc.zone+': '+dc.item.name,'err');return}
+  /* Dentro de la misma zona no se puede repetir nombre ni CN. Solo se comprueba lo que CAMBIA: asi un artículo
+     que ya tuviera un gemelo (por el fallo anterior) sigue pudiéndose editar sin tocar nombre ni CN. */
+  var f0=byId(id);
+  if(f0){
+    if(name.toLowerCase()!==f0.item.name.trim().toLowerCase()&&enEstaZona(name,f0.zone,id)){toast('"'+name+'" ya existe en esta zona','err');return}
+    if(code.toLowerCase()!==(f0.item.code||'').trim().toLowerCase()&&codeEnZona(code,f0.zone,id)){toast('El CN '+code+' ya existe en esta zona','err');return}
+  }
   var rk=leerRiesgoForm(id);
   if(!rk.ok){toast(rk.msg,'err');return}
   var f=byId(id);
@@ -899,6 +929,8 @@ function execMove(tz){
   if(!mid)return;
   var f=byId(mid);if(!f){closeMM();return}
   var it=f.item;
+  var motivo=choqueCon(it,gz(tz));
+  if(motivo){toast('No se mueve: '+motivo,'err');return}
   if(!db[tz])db[tz]=[];
   db[tz].push(Object.assign({},it));
   db[f.zone].splice(f.idx,1);
@@ -935,22 +967,18 @@ function execMoveZone(tz){
   if(!sel)return;
   var items=gz(sel);
   if(!items.length){closeMZ();return}
-  // detectar conflictos de nombre/código en destino
-  var conflicts=[];
+  if(tz===sel)return;
+  /* Antes se miraba si el nombre/CN estaba en otras 2 zonas (no el destino), así que se podía duplicar dentro del destino.
+     Ahora se simula artículo a artículo contra lo que habrá en el destino. Los que chocan se quedan en el origen. */
+  var dest=gz(tz).slice(),mover=[],quedan=[];
   items.forEach(function(it){
-    if(dupName(it.name,it._id)||dupCode(it.code,it._id))conflicts.push(it.name);
+    if(choqueCon(it,dest))quedan.push(it);
+    else{mover.push(it);dest.push(it)}
   });
-  if(conflicts.length){
-    if(!confirm('Hay '+conflicts.length+' artículo(s) con nombre o CN ya existente en el destino. Se omitirán al mover. ¿Continuar?'))return;
-  }
-  var moved=0,skipped=0,quedan=[];
-  if(!db[tz])db[tz]=[];
-  items.slice().forEach(function(it){
-    if(dupName(it.name,it._id)||dupCode(it.code,it._id)){skipped++;quedan.push(it);return}
-    db[tz].push(Object.assign({},it));
-    moved++;
-  });
-  /* Los omitidos se quedan donde estaban: antes se borraba la zona entera y con ella los artículos omitidos. */
+  if(quedan.length&&!confirm('Hay '+quedan.length+' artículo(s) con nombre o CN ya existente en el destino. No se moverán: se quedan en la zona de origen. ¿Continuar con el resto?'))return;
+  if(!mover.length){closeMZ();toast('No se ha movido nada: todos los artículos chocan con el destino','err');return}
+  var moved=mover.length,skipped=quedan.length;
+  db[tz]=dest;
   if(quedan.length)db[sel]=quedan;else delete db[sel];
   saveDB();closeMZ();
   var prev=sel;
@@ -1148,6 +1176,11 @@ function layoutZone(id){
   }
 }
 
+function textoSobre(hex){
+  var n=parseInt(hex.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;
+  return(0.299*r+0.587*g+0.114*b)>150?'#1a2433':'#ffffff';
+}
+
 /* ── Plano: pintar estado, accesibilidad y filtro de riesgo ── */
 function renderMapWithConfig(){
   var f=riskFilter,hits=0;
@@ -1168,6 +1201,9 @@ function renderMapWithConfig(){
     layoutZone(z);
     var E=zoneEls(z);
     [E.rect,E.lbl,E.cnt,E.nm,E.ch].forEach(function(e){if(e)e.classList.toggle('rf-dim',!!f&&!m)});
+    /* Con un color propio el texto se vuelve claro u oscuro para seguir leyéndose (antes: «5» oscuro sobre rojo). */
+    var tc=cfg.color?textoSobre(cfg.color):'';
+    [E.lbl,E.cnt,E.nm].forEach(function(e){if(e)e.style.fill=tc});
     var cats=zoneCats(z);
     var desc=zlabel(z)+', '+n+' artículo'+(n!==1?'s':'')+(cats.length?'. Peligro documentado, clase'+(cats.length>1?'s':'')+' ADR '+cats.join(', '):'');
     r.setAttribute('tabindex','0');r.setAttribute('role','button');r.setAttribute('aria-label',desc);
@@ -1203,7 +1239,8 @@ function openZoneEdit(zoneId){
     '<strong>'+eh(zlabel(zoneId))+'</strong>'+
     '<span style="display:block;font-size:.72rem;color:var(--text3);margin-top:4px">El ID no cambia al renombrar; los artículos no se mueven.</span>';
   document.getElementById('mze-name').value=cfg.name||'';
-  document.getElementById('mze-color').value=cfg.color||'';
+  document.getElementById('mze-color').value=cfg.color||'#dcfce7';
+  document.getElementById('mze-nocolor').checked=!cfg.color;
   document.getElementById('mze').classList.add('act');
   document.getElementById('mze-name').focus();
 }
@@ -1214,7 +1251,7 @@ function closeZoneEdit(){
 function saveZoneConfig(){
   if(!currentZoneEdit)return;
   var name=limpiaNombre(document.getElementById('mze-name').value);
-  var color=document.getElementById('mze-color').value.trim();
+  var color=document.getElementById('mze-nocolor').checked?'':document.getElementById('mze-color').value.trim();
   if(color&&!/^#[0-9A-Fa-f]{6}$/.test(color)){
     toast('Color inválido. Usa formato hex: #xxxxxx','err');
     return;
@@ -1317,6 +1354,7 @@ function openNewZone(){
   document.getElementById('nz-id').value='';
   document.getElementById('nz-name').value='';
   document.getElementById('nz-color').value='#dcfce7';
+  document.getElementById('nz-nocolor').checked=true;
   document.getElementById('nz-size').value='medium';
   document.getElementById('mnz').classList.add('act');
   document.getElementById('nz-id').focus();
@@ -1331,7 +1369,7 @@ function idEnUso(id){
 function createNewZone(){
   var id=document.getElementById('nz-id').value.trim().toUpperCase();
   var name=limpiaNombre(document.getElementById('nz-name').value);
-  var color=document.getElementById('nz-color').value;
+  var color=document.getElementById('nz-nocolor').checked?'':document.getElementById('nz-color').value;
   var size=document.getElementById('nz-size').value;
   if(!id){toast('El ID de la zona es obligatorio','err');return}
   if(!ID_RE.test(id)){toast('ID no válido: letras, números, punto, guion o guion bajo (máx. 12)','err');return}

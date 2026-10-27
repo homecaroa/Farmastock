@@ -91,7 +91,7 @@ Funciones principales:
 }
 ```
 
-**Invariante crítica** (desde la v1.4): `_id` es único globalmente. Un mismo nombre o CN (case-insensitive) puede estar en **como máximo 2 zonas** y nunca dos veces en la misma. `dupName`/`dupCode` solo bloquean a partir de ahí; `enEstaZona` evita repetir en una misma zona. Un traslado no cambia en cuántas zonas está cada nombre/CN, por eso `planTraslado` solo comprueba choques con lo que ya hay en el destino.
+**Invariante crítica** (desde la v1.4): `_id` es único globalmente. Un mismo nombre o CN (case-insensitive) puede estar en **como máximo 2 zonas** y nunca dos veces en la misma. `dupName`/`dupCode` solo bloquean a partir de ahí; `enEstaZona`/`codeEnZona` evitan repetir nombre/CN dentro de una misma zona al añadir y editar (al editar solo si cambian), y `choqueCon(it,lista)` lo hace al mover (artículo suelto y zona completa). Un traslado no cambia en cuántas zonas está cada nombre/CN, por eso `planTraslado` solo comprueba choques con lo que ya hay en el destino.
 
 ### Modelo de zonas (v1.5)
 `farmastock_zones_v1` = `{ id: {name,color,x,y,w,h,custom?,g0?} | {deleted:true} }`.
@@ -232,4 +232,4 @@ Estas tareas **no** deben paralelizarse porque tienen dependencias entre sí:
 
 ## Versión actual
 
-`v1.5.0` — Nombres de zona, riesgo documentado, edición del plano y baja segura de zonas. Ver `CHANGELOG.md` (la v1.4 se documentó a posteriori).
+`v1.5.1` (sobre la 1.5.0) — Nombres de zona, riesgo documentado, edición del plano y baja segura de zonas. Ver `CHANGELOG.md` (la v1.4 se documentó a posteriori).
